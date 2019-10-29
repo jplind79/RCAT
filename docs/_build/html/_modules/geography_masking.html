@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>geography_masking &#8212; Rossby Centre Analysis Tool  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rossby Centre Analysis Tool  documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for geography_masking</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#  Routine for Masking Data with Polygons ##</span>
+<span class="c1">#</span>
+<span class="c1">#  By: Petter Lind</span>
+<span class="c1">#      2014-03-02  v1.0 </span>
+<span class="c1">#      2016-11-04  v2.0</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># Import necessary modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib.path</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">scipy.spatial.distance</span> <span class="k">as</span> <span class="nn">sd</span>
+
+<div class="viewcode-block" id="regions"><a class="viewcode-back" href="../geography_masking.html#geography_masking.regions">[docs]</a><span class="k">def</span> <span class="nf">regions</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">reg_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See available and retrieve regions from a region dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    area: string</span>
+<span class="sd">        name of region to be extracted</span>
+<span class="sd">    reg_print: boolean</span>
+<span class="sd">        if available regions should be printed</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    area_file: string</span>
+<span class="sd">        path to the text file with polygon data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    
+    <span class="c1"># -------- Dictionary of predfined regions -------- #</span>
+    <span class="n">reg_dir</span> <span class="o">=</span> <span class="s2">&quot;/home/a001514/code/development/python/scripts/regions/&quot;</span>
+    
+    <span class="n">reg_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Sweden&quot;</span>        <span class="p">:</span>  <span class="s2">&quot;sweden_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Switzerland&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;switzerland_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Norway&quot;</span>        <span class="p">:</span>  <span class="s2">&quot;norway_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Germany&quot;</span>       <span class="p">:</span>  <span class="s2">&quot;germany_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Iberian pen.&quot;</span>  <span class="p">:</span>  <span class="s2">&quot;iberian_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Spain&quot;</span>         <span class="p">:</span>  <span class="s2">&quot;spain_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;France&quot;</span>        <span class="p">:</span>  <span class="s2">&quot;france_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Utd Kingdom&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;UK_poly_6-12km.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;The Alps&quot;</span>      <span class="p">:</span>  <span class="s2">&quot;alp_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Scandinavia&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;Scand_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Centr. Europe&quot;</span> <span class="p">:</span>  <span class="s2">&quot;MidEur_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;East Europe&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;EastEur_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;S-E Europe&quot;</span>    <span class="p">:</span>  <span class="s2">&quot;SEastEur_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;West Europe&quot;</span>   <span class="p">:</span>  <span class="s2">&quot;WestEur_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;British Isles&quot;</span> <span class="p">:</span>  <span class="s2">&quot;BIsles_poly_LS.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Mediterranean&quot;</span> <span class="p">:</span>  <span class="s2">&quot;MedSea_poly.txt&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;USIS Sthlm&quot;</span>    <span class="p">:</span>  <span class="s2">&quot;usis_sthlm.txt&quot;</span>
+            <span class="p">}</span>
+    
+    <span class="k">if</span> <span class="n">reg_print</span><span class="p">:</span>
+        <span class="nb">print</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available regions:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span>
+        <span class="nb">print</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">reg_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">area_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reg_dir</span><span class="p">,</span> <span class="n">reg_dict</span><span class="p">[</span><span class="n">area</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">area_file</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error! </span><span class="se">\n</span><span class="s2"> </span><span class="si">{0}</span><span class="s2"> is not a pre-defined area.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">area_file</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="reg_mask"><a class="viewcode-back" href="../geography_masking.html#geography_masking.reg_mask">[docs]</a><span class="k">def</span> <span class="nf">reg_mask</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rotuine to mask grid points outside a specified polygon.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: 2D numpy array </span>
+<span class="sd">        data matrix </span>
+<span class="sd">    area: string or list with tuples </span>
+<span class="sd">        Either name of predefined region to extract (see reg_dict function for more</span>
+<span class="sd">        info.), or a list with tuples defining a polygon; e.g. [(lon1, lat1), </span>
+<span class="sd">        (lon2, lat2),...,(lonN, latN), (lon1, lat1)]. NB! First and last tuple</span>
+<span class="sd">        must be the same, closing the polygon.</span>
+<span class="sd">    xp,yp: numpy arrays </span>
+<span class="sd">        eastward and northward grid points respectively</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    masked_data: 2D numpy array</span>
+<span class="sd">        the masked data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+     
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="s2">&quot;Error! data array must be two-dimensional.&quot;</span>
+
+    <span class="c1"># Dimensions of grid</span>
+    <span class="k">if</span> <span class="n">xp</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">yp</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="c1"># Rearrange grid points into a list of tuples</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="n">xp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">yp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="k">if</span> <span class="n">xp</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">(</span><span class="n">xp</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">yp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+            <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">area</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">coord_return</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+            
+        <span class="n">reg_file</span> <span class="o">=</span> <span class="n">regions</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">reg_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>       <span class="c1"># Skip first line</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="p">[</span><span class="n">coord_return</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">area</span>
+
+    <span class="n">reg_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poly</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">reg_path</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+    
+    <span class="n">masked_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+
+    <span class="c1"># Determine maximum distance in polygon #</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dist</span><span class="p">):</span>
+        <span class="c1"># Indices for unmasked grid points (to )</span>
+        <span class="n">idx_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">idx_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idx_points</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">distance</span> <span class="o">=</span> <span class="n">sd</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">idx_points</span><span class="p">)</span>
+        <span class="n">dmax</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">masked_data</span><span class="p">,</span> <span class="n">dmax</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">masked_data</span></div>
+
+<div class="viewcode-block" id="get_poly"><a class="viewcode-back" href="../geography_masking.html#geography_masking.get_poly">[docs]</a><span class="k">def</span> <span class="nf">get_poly</span><span class="p">(</span><span class="n">map_zoom</span><span class="o">=</span><span class="s2">&quot;World&quot;</span><span class="p">,</span> <span class="n">write</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">print_areas</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve polygon arbitrarily drawn interactively on a map by mouse clicking.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    map_zoom: String</span>
+<span class="sd">        Name of region to zoom into on map. </span>
+<span class="sd">    write: Boolean</span>
+<span class="sd">        If polygon should be written to file, saved in working dir</span>
+<span class="sd">    print_areas: Boolean</span>
+<span class="sd">        Available regions are shown if set True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    poly: list</span>
+<span class="sd">        List with tuples of lat/lon coordinates for drawn polygon</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mzoom_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Europe&quot;</span> <span class="p">:</span> <span class="p">{</span> 
+                        <span class="s2">&quot;proj&quot;</span> <span class="p">:</span> <span class="s2">&quot;lcc&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;wdth&quot;</span> <span class="p">:</span> <span class="mi">5</span><span class="n">e6</span><span class="p">,</span>
+                        <span class="s2">&quot;hght&quot;</span> <span class="p">:</span> <span class="mi">3</span><span class="n">e6</span><span class="p">,</span>
+                        <span class="s2">&quot;lon0&quot;</span> <span class="p">:</span> <span class="mi">17</span><span class="p">,</span>
+                        <span class="s2">&quot;lat0&quot;</span> <span class="p">:</span> <span class="mi">51</span><span class="p">,</span>
+                        <span class="s2">&quot;lat1&quot;</span> <span class="p">:</span> <span class="mi">51</span><span class="p">,</span>
+                        <span class="p">}</span>
+            <span class="p">}</span>
+                        
+    <span class="k">if</span> <span class="n">print_areas</span><span class="p">:</span>
+        <span class="nb">print</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available map areas:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">mzoom_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">import</span> <span class="nn">draw_polygon</span>
+        <span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">Basemap</span>
+    
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">,(</span><span class="mi">16</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+        <span class="c1"># Create Canvas object and mouse click settings</span>
+        <span class="n">cnv</span> <span class="o">=</span> <span class="n">draw_polygon</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;motion_notify_event&#39;</span><span class="p">,</span><span class="n">cnv</span><span class="o">.</span><span class="n">set_location</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span><span class="n">cnv</span><span class="o">.</span><span class="n">update_path</span><span class="p">)</span>
+    
+        <span class="c1"># Create map object</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">mzoom_dict</span><span class="p">[</span><span class="n">map_zoom</span><span class="p">][</span><span class="s1">&#39;wdth&#39;</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="n">mzoom_dict</span><span class="p">[</span><span class="n">map_zoom</span><span class="p">][</span><span class="s1">&#39;wdth&#39;</span><span class="p">],</span>
+                <span class="n">projection</span><span class="o">=</span><span class="n">mzoom_dict</span><span class="p">[</span><span class="n">map_zoom</span><span class="p">][</span><span class="s1">&#39;proj&#39;</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span>
+                <span class="n">lat_1</span><span class="o">=</span><span class="n">mzoom_dict</span><span class="p">[</span><span class="n">map_zoom</span><span class="p">][</span><span class="s1">&#39;lat1&#39;</span><span class="p">],</span> <span class="n">lat_0</span><span class="o">=</span><span class="n">mzoom_dict</span><span class="p">[</span><span class="n">map_zoom</span><span class="p">][</span><span class="s1">&#39;lat0&#39;</span><span class="p">],</span>
+                <span class="n">lon_0</span><span class="o">=</span><span class="n">mzoom_dict</span><span class="p">[</span><span class="n">map_zoom</span><span class="p">][</span><span class="s1">&#39;lon0&#39;</span><span class="p">])</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">drawcoastlines</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">drawcountries</span><span class="p">()</span>
+    
+        <span class="nb">print</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Map is now shown ...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Click points for polygon; right click to close polygon.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;When finished, close map window&quot;</span><span class="p">)</span>
+    
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    
+        <span class="n">verts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cnv</span><span class="o">.</span><span class="n">vert</span><span class="p">)</span>
+        <span class="n">lonpt</span><span class="p">,</span> <span class="n">latpt</span> <span class="o">=</span>  <span class="n">m</span><span class="p">(</span><span class="n">verts</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">verts</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="n">poly</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lonpt</span><span class="p">,</span> <span class="n">latpt</span><span class="p">)]</span>
+        
+        <span class="k">if</span> <span class="n">write</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;poly.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">poly</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">poly</span></div>
+
+<div class="viewcode-block" id="topo_mask"><a class="viewcode-back" href="../geography_masking.html#geography_masking.topo_mask">[docs]</a><span class="k">def</span> <span class="nf">topo_mask</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">orog</span><span class="p">,</span> <span class="n">orog_int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rotuine to mask grid points outside a specified height interval.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data:  2D numpy array</span>
+<span class="sd">        the data matrix </span>
+<span class="sd">    orog:  2D numpy array</span>
+<span class="sd">        array containing topographical heights (same resolution as data)</span>
+<span class="sd">    orog_int: 1D array,list,tuple </span>
+<span class="sd">        the height interval outside which data should be masked.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    masked_data: 2D numpy array</span>
+<span class="sd">        the masked data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+            <span class="s2">&quot;Error! data array must be two-dimensional.&quot;</span>
+
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">()</span> <span class="o">==</span> <span class="n">orog</span><span class="o">.</span><span class="n">shape</span><span class="p">(),</span> \
+            <span class="s2">&quot;Error! data and orography arrays must have identical grids&quot;</span>
+    
+    <span class="c1"># Create topographical mask</span>
+    <span class="n">orog_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_outside</span><span class="p">(</span><span class="n">orog</span><span class="p">,</span> <span class="n">orog_int</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">orog_int</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">orog_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">getmask</span><span class="p">(</span><span class="n">orog_mask</span><span class="p">)</span>
+
+    <span class="n">masked_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">orog_mask</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">masked_data</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, SMHI - Rossby Centre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>

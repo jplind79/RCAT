@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>read_write_netcdf module &#8212; Rossby Centre Analysis Tool  documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Rossby Centre Analysis Tool  documentation" href="index.html" />
+    <link rel="next" title="rossbyplots module" href="rossbyplots.html" />
+    <link rel="prev" title="py_colors module" href="py_colors.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="rossbyplots.html" title="rossbyplots module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py_colors.html" title="py_colors module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-read_write_netcdf">
+<span id="read-write-netcdf-module"></span><h1>read_write_netcdf module<a class="headerlink" href="#module-read_write_netcdf" title="Permalink to this headline">¶</a></h1>
+<p>This module provides functions representing tools to read and write
+NetCDF files.</p>
+<p>&#64;author Petter Lind
+&#64;date   2014-10-20</p>
+<dl class="function">
+<dt id="read_write_netcdf.getDimensions">
+<code class="descclassname">read_write_netcdf.</code><code class="descname">getDimensions</code><span class="sig-paren">(</span><em>nc</em>, <em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/read_write_netcdf.html#getDimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#read_write_netcdf.getDimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to retrieve the dimensions of a netcdf file
+nc: Netcdf object opened with function &#8220;openFile&#8221;
+close: set True if you want the file to be closed after retrieval.
+Returns lons and lats, time as well as gridsize Nx,Ny</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="read_write_netcdf.getParams">
+<code class="descclassname">read_write_netcdf.</code><code class="descname">getParams</code><span class="sig-paren">(</span><em>nc</em>, <em>params</em>, <em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/read_write_netcdf.html#getParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#read_write_netcdf.getParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to retrieve variables from a netcdf file
+nc: Netcdf object opened with function &#8220;openFile&#8221;
+params: A list of strings with the parameters to be retrieved
+close: set True if you want the file to be closed after retrieval.
+Returns a list with the given parameters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="read_write_netcdf.ncdump">
+<code class="descclassname">read_write_netcdf.</code><code class="descname">ncdump</code><span class="sig-paren">(</span><em>nc_fid</em>, <em>verb=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/read_write_netcdf.html#ncdump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#read_write_netcdf.ncdump" title="Permalink to this definition">¶</a></dt>
+<dd><p>ncdump outputs dimensions, variables and their attribute information.
+The information is similar to that of NCAR&#8217;s ncdump utility.
+ncdump requires a valid instance of Dataset.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>nc_fid: netCDF4.Dataset </dt>
+<dd>A netCDF4 dateset object</dd>
+<dt>verb: Boolean </dt>
+<dd>whether or not nc_attrs, nc_dims, and nc_vars are printed</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="docutils">
+<dt>nc_attrs: list </dt>
+<dd>A Python list of the NetCDF file global attributes</dd>
+<dt>nc_dims: list  </dt>
+<dd>A Python list of the NetCDF file dimensions</dd>
+<dt>nc_vars: list</dt>
+<dd>A Python list of the NetCDF file variables</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="read_write_netcdf.openDirFile">
+<code class="descclassname">read_write_netcdf.</code><code class="descname">openDirFile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/read_write_netcdf.html#openDirFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#read_write_netcdf.openDirFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to open netcdf file.
+filename:  string giving the name of the netcdf file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="read_write_netcdf.openFile">
+<code class="descclassname">read_write_netcdf.</code><code class="descname">openFile</code><span class="sig-paren">(</span><em>directory</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/read_write_netcdf.html#openFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#read_write_netcdf.openFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to open netcdf file.
+directory: string giving the location of the file
+filename:  string giving the name of the netcdf file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="read_write_netcdf.write2netcdf">
+<code class="descclassname">read_write_netcdf.</code><code class="descname">write2netcdf</code><span class="sig-paren">(</span><em>filename</em>, <em>filedir</em>, <em>dims</em>, <em>vars</em>, <em>gattr</em>, <em>format='NETCDF4'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/read_write_netcdf.html#write2netcdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#read_write_netcdf.write2netcdf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Open a new NetCDF file to write the data to. For format, you can choose</dt>
+<dd>from &#8216;NETCDF3_CLASSIC&#8217;, &#8216;NETCDF3_64BIT&#8217;, &#8216;NETCDF4_CLASSIC&#8217;, and &#8216;NETCDF4&#8217;
+(default)</dd>
+<dt>Args:</dt>
+<dd><blockquote class="first">
+<div>filename: name of netcdf file to write to
+filedir: directory path to put the file
+dim: a dictionary containing dimensions to be used
+var: a dictionary containing variables and corresponding values and
+attributes.
+gattr: dictionary containing global attributes</div></blockquote>
+<dl class="last docutils">
+<dt>Kwargs:</dt>
+<dd><p class="first">format: Specify netCDF format</p>
+<p>The dictionaries should be structured as described by the examples
+below:</p>
+<p>dims_dict = {}
+dims_dict[&#8216;x&#8217;] = 154
+dims_dict[&#8216;y&#8217;] = 192
+dims_dict[&#8216;nv&#8217;] = 4
+dims_dict[&#8216;time&#8217;] = None</p>
+<p>vars_dict = {}
+vars_dict = {&#8216;lon&#8217;: {&#8216;values&#8217;: lons, &#8216;dims&#8217;: (&#8216;y&#8217;, &#8216;x&#8217;),</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="docutils">
+<dt>&#8216;attributes&#8217;: {&#8216;long_name&#8217;: &#8216;longitude&#8217;,</dt>
+<dd>&#8216;standard_name&#8217;: &#8216;longitude&#8217;,
+&#8216;units&#8217;: &#8216;degrees_east&#8217;,
+&#8216;_CoordinateAxisType&#8217;: &#8216;Lon&#8217;}},</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>&#8216;lat&#8217;: {&#8216;values&#8217;: lats, &#8216;dims&#8217;: (&#8216;y&#8217;, &#8216;x&#8217;),</dt>
+<dd><dl class="first last docutils">
+<dt>&#8216;attributes&#8217;: {&#8216;long_name&#8217;: &#8216;latitude&#8217;,</dt>
+<dd>&#8216;standard_name&#8217;: &#8216;latitude&#8217;,
+&#8216;units&#8217;: &#8216;degrees_north&#8217;,
+&#8216;_CoordinateAxisType&#8217;: &#8216;Lat&#8217;}},</dd>
+</dl>
+</dd>
+<dt>&#8216;pr&#8217;: {&#8216;values&#8217;: pr, &#8216;dims&#8217;: (&#8216;time&#8217;, &#8216;y&#8217;, &#8216;x&#8217;),</dt>
+<dd><dl class="first last docutils">
+<dt>&#8216;attributes&#8217;: {&#8216;long_name&#8217;: &#8216;precipitation&#8217;,</dt>
+<dd><dl class="first last docutils">
+<dt>&#8216;standard_name&#8217;: &#8216;precipitation flux&#8217;,</dt>
+<dd>&#8216;units&#8217;: &#8216;kg m-2 s-1&#8217;,
+&#8216;coordinates&#8217;: &#8216;lon lat&#8217;,
+&#8216;_FillValue&#8217;: -9999.}}}</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>glob_attr = {&#8216;description&#8217;: &#8216;some description of file&#8217;,</dt>
+<dd>&#8216;history&#8217;: &#8216;Created &#8216; + time.ctime(time.time()),
+&#8216;experiment&#8217;: &#8216;Fractions Skill Score analysis&#8217;,
+&#8216;contact&#8217;: <a class="reference external" href="mailto:'petter&#46;lind&#37;&#52;&#48;smhi&#46;se">'petter<span>&#46;</span>lind<span>&#64;</span>smhi<span>&#46;</span>se</a>&#8216;,
+&#8216;references&#8217;: &#8216;<a class="reference external" href="http://journals.ametsoc.org/doi/abs/">http://journals.ametsoc.org/doi/abs/</a>                                    10.1175/2007MWR2123.1&#8217;}</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="py_colors.html"
+                        title="previous chapter">py_colors module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="rossbyplots.html"
+                        title="next chapter">rossbyplots module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/read_write_netcdf.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="rossbyplots.html" title="rossbyplots module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py_colors.html" title="py_colors module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, SMHI - Rossby Centre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>

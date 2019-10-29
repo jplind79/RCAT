@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>py_colors module &#8212; Rossby Centre Analysis Tool  documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Rossby Centre Analysis Tool  documentation" href="index.html" />
+    <link rel="next" title="read_write_netcdf module" href="read_write_netcdf.html" />
+    <link rel="prev" title="geography_masking module" href="geography_masking.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="read_write_netcdf.html" title="read_write_netcdf module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="geography_masking.html" title="geography_masking module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-py_colors">
+<span id="py-colors-module"></span><h1>py_colors module<a class="headerlink" href="#module-py_colors" title="Permalink to this headline">¶</a></h1>
+<p>This module provides access to predefined (Matplotlib) or self-produced
+colors and color maps.</p>
+<p>&#64;author Petter Lind
+&#64;date   2015-05-18</p>
+<dl class="function">
+<dt id="py_colors.getcolormap">
+<code class="descclassname">py_colors.</code><code class="descname">getcolormap</code><span class="sig-paren">(</span><em>cmap_name</em>, <em>custom=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_colors.html#getcolormap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_colors.getcolormap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to retrieve colormap, either customized (custom=True) or available
+through Matplotlib predefined colormaps.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>cmap_name: string</dt>
+<dd>String, giving name of colormap to be retrieved.</dd>
+<dt>custom: Boolean</dt>
+<dd>Logical indicating self-produced (custom=True) or Matplotlib
+colormap.</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div>cmap: Matplotlib colormap object</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="py_colors.getsinglecolor">
+<code class="descclassname">py_colors.</code><code class="descname">getsinglecolor</code><span class="sig-paren">(</span><em>color_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_colors.html#getsinglecolor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_colors.getsinglecolor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to retrieve single custom color.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>color_name: string</dt>
+<dd>String, giving name of color to be retrieved.</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div>color: Matplotlib color object</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="py_colors.norm_colors">
+<code class="descclassname">py_colors.</code><code class="descname">norm_colors</code><span class="sig-paren">(</span><em>bounds</em>, <em>ncolors</em>, <em>clip=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/py_colors.html#norm_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#py_colors.norm_colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>In addition to min and max of levels, this function takes as arguments
+boundaries between which data is to be mapped. The colors are then
+linearly distributed between these &#8216;bounds&#8217;.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="geography_masking.html"
+                        title="previous chapter">geography_masking module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="read_write_netcdf.html"
+                        title="next chapter">read_write_netcdf module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/py_colors.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="read_write_netcdf.html" title="read_write_netcdf module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="geography_masking.html" title="geography_masking module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, SMHI - Rossby Centre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>

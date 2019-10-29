@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rossbyplots &#8212; Rossby Centre Analysis Tool  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Rossby Centre Analysis Tool  documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rossbyplots</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Graphics module </span>
+<span class="sd">---------------</span>
+<span class="sd">Functions for different plots such as scatterplots and mapplots,</span>
+<span class="sd">initiation and configuration of figure objects etc</span>
+
+<span class="sd">Created: Autumn 2016</span>
+<span class="sd">Authors: Petter Lind &amp; David Lindstedt</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="c1"># Global modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># Functions</span>
+<div class="viewcode-block" id="figure_setup"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.figure_setup">[docs]</a><span class="k">def</span> <span class="nf">figure_setup</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span> <span class="n">plottype</span><span class="o">=</span><span class="s1">&#39;lineplot&#39;</span><span class="p">,</span> <span class="n">printtypes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Setting up a figure object</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    figsize: tuple</span>
+<span class="sd">        Size of figure in inches; (width, height)</span>
+<span class="sd">    plottype: string</span>
+<span class="sd">        Type of plot to make</span>
+<span class="sd">    printtypes: boolean</span>
+<span class="sd">        If available plottypes should be printed on screen</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">pltypes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;map&#39;</span>     <span class="p">:</span> <span class="s1">&#39;classic&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;line&#39;</span>    <span class="p">:</span> <span class="s1">&#39;ggplot&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;scatter&#39;</span> <span class="p">:</span> <span class="s1">&#39;fivethirtyeight&#39;</span>
+            <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">printtypes</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available plot types: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pltypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">pltypes</span><span class="p">[</span><span class="n">plottype</span><span class="p">])</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="grid_setup"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.grid_setup">[docs]</a><span class="k">def</span> <span class="nf">grid_setup</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">fshape</span><span class="p">,</span> <span class="o">**</span><span class="n">grid_kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Set up the plot axes using mpl_toolkits.ImageGrid</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        fig: Figure object</span>
+<span class="sd">        fshape: tuple</span>
+<span class="sd">            setting the shape of figure (nrow, ncol)</span>
+<span class="sd">        **grid_kwargs: Additional keyword arguments</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        grid: AxesGrid object</span>
+
+<span class="sd">    Examples of **kwargs with default values:</span>
+<span class="sd">        direction=&quot;row&quot;,</span>
+<span class="sd">        axes_pad=0.02,</span>
+<span class="sd">        add_all=True,</span>
+<span class="sd">        share_all=False,</span>
+<span class="sd">        label_mode = &quot;L&quot;,</span>
+<span class="sd">        aspect=True,</span>
+<span class="sd">        cbar_mode=None,</span>
+<span class="sd">        cbar_location=&#39;right&#39;,</span>
+<span class="sd">        cbar_size=&quot;5%&quot;,</span>
+<span class="sd">        cbar_pad=None,</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="k">import</span> <span class="n">ImageGrid</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">ImageGrid</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span>
+                     <span class="mi">111</span><span class="p">,</span>
+                     <span class="n">nrows_ncols</span><span class="o">=</span><span class="n">fshape</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">grid_kwargs</span>
+                     <span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid</span></div>
+
+<div class="viewcode-block" id="axes_settings"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.axes_settings">[docs]</a><span class="k">def</span> <span class="nf">axes_settings</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">figtitle</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">xtlabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ytlabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">xticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Configuration of axes; titles and labels</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        ax: axes object</span>
+<span class="sd">            Axes object assoicated with figure</span>
+<span class="sd">        figtitle: string</span>
+<span class="sd">            The headtitle</span>
+<span class="sd">        xlabel, ylabel: strings</span>
+<span class="sd">            Labels of the axes</span>
+<span class="sd">        xticks, yticks: lists or arrays</span>
+<span class="sd">            If set, location of ticks</span>
+<span class="sd">        xtlabels, ytlabels: lists or arrays</span>
+<span class="sd">            Contains tick labels (corresponding to ticks location)</span>
+<span class="sd">        xlim, ylim: lists or arrays</span>
+<span class="sd">            Limits of the axes</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">import</span> <span class="nn">py_colors</span>
+
+    <span class="n">black</span>     <span class="o">=</span> <span class="n">py_colors</span><span class="o">.</span><span class="n">getsinglecolor</span><span class="p">(</span><span class="s1">&#39;almost_black&#39;</span><span class="p">)</span>
+    
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">figtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">black</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">black</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">black</span><span class="p">)</span>
+    
+    <span class="p">((</span><span class="n">xticks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">xtlabels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtlabels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">black</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">yticks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">yticks</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">ytlabels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytlabels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">black</span><span class="p">))</span>
+
+    <span class="p">((</span><span class="n">xlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">ylim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">))</span>
+
+    <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()]</span>
+    <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="map_axes_settings"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.map_axes_settings">[docs]</a><span class="k">def</span> <span class="nf">map_axes_settings</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span><span class="p">,</span> <span class="n">figtitle</span><span class="p">,</span> <span class="n">headtitle</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Settings for map plot axes</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        fig: Object handle</span>
+<span class="sd">            Figure handle</span>
+<span class="sd">        axs: List</span>
+<span class="sd">            List with axes from map plot</span>
+<span class="sd">        figtitle: List </span>
+<span class="sd">            List of titles for each plot in figure</span>
+<span class="sd">        headtitle: String</span>
+<span class="sd">            Head title of figure</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">figtitle</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axs</span><span class="p">)]</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">headtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_legend"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.make_legend">[docs]</a><span class="k">def</span> <span class="nf">make_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sc_points</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">num_points</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Adds legend to plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        ax          -   Axes object of figure</span>
+<span class="sd">        labels      -   String or list of strings; labels of legend items</span>
+<span class="sd">        loc         -   Location of legend; default 0 (&#39;best&#39;)</span>
+<span class="sd">        fontsize    -   Fontsize of labels</span>
+<span class="sd">        ncol        -   Number of columns for multiple legend items</span>
+<span class="sd">        sc_points   -   Number of points in legend for scatterplot</span>
+<span class="sd">        num_points  -   Number of points in legend for line plot</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        legend: legend object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+                        <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+                        <span class="n">loc</span><span class="o">=</span><span class="n">loc</span><span class="p">,</span>
+                        <span class="n">ncol</span><span class="o">=</span><span class="n">ncol</span><span class="p">,</span>
+                        <span class="n">scatterpoints</span><span class="o">=</span><span class="n">sc_points</span><span class="p">,</span>
+                        <span class="n">numpoints</span><span class="o">=</span><span class="n">num_points</span><span class="p">,</span>
+                        <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span>
+              <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">legend</span></div>
+
+
+<div class="viewcode-block" id="make_scatter_plot"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.make_scatter_plot">[docs]</a><span class="k">def</span> <span class="nf">make_scatter_plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a scatter plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        grid: AxesGrid object </span>
+<span class="sd">            returned from the &#39;grid_setup&#39; function</span>
+<span class="sd">        xdata/ydata: List of array </span>
+<span class="sd">            with data for x/y axis</span>
+<span class="sd">        labels: List</span>
+<span class="sd">            List with strings of legend labels</span>
+<span class="sd">        **sc_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.scatter</span>
+<span class="sd">            See matplotlib.org for more information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: Axes objects</span>
+<span class="sd">            The axes objects created for each plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>    
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+        <span class="n">xd</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+        <span class="n">yd</span> <span class="o">=</span> <span class="n">ydata</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+        <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axs</span></div>
+
+<div class="viewcode-block" id="make_line_plot"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.make_line_plot">[docs]</a><span class="k">def</span> <span class="nf">make_line_plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a line plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        grid: AxesGrid object </span>
+<span class="sd">            returned from the &#39;grid_setup&#39; function</span>
+<span class="sd">        xdata/ydata: List of array </span>
+<span class="sd">            with data for x/y axis</span>
+<span class="sd">        labels: List</span>
+<span class="sd">            List with strings of legend labels</span>
+<span class="sd">        **lp_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.line </span>
+<span class="sd">            See matplotlib.org for more information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: Axes objects</span>
+<span class="sd">            The axes objects created for each plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>    
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xdata</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">xd</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xd</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+        <span class="n">yd</span> <span class="o">=</span> <span class="n">ydata</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)</span>
+        <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">axs</span></div>
+
+<div class="viewcode-block" id="mapprod"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.mapprod">[docs]</a><span class="k">def</span> <span class="nf">mapprod</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">proj</span><span class="o">=</span><span class="s1">&#39;stere&#39;</span><span class="p">,</span> <span class="n">lon_0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_ts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lat_1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="s1">&#39;crnrs&#39;</span><span class="p">,</span> <span class="n">zoom_geom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">area_thrs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a basemap object to be used in the overlaying of 2d plots.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lat: array</span>
+<span class="sd">        array of the latitudes</span>
+<span class="sd">    lon: array</span>
+<span class="sd">        array of the longitudes</span>
+<span class="sd">    proj: string</span>
+<span class="sd">        the projection to be used (so far only two proj&#39;s: </span>
+<span class="sd">        sterographic and lambert conformal)</span>
+<span class="sd">    lat_0/lon_0: float</span>
+<span class="sd">        centre latitude and longitude location of map</span>
+<span class="sd">    lat_1: float</span>
+<span class="sd">        first standard parallell. if proj=&#39;lcc&#39;, lat_1 must be given.</span>
+<span class="sd">    lat_2: float</span>
+<span class="sd">        second standard parallell (defaults to lat_1). if proj=&#39;lcc&#39;, lat_1 must be given.</span>
+<span class="sd">    res: string</span>
+<span class="sd">        resolution (low &#39;l&#39;, intermediate &#39;i&#39; or high &#39;h&#39;)</span>
+<span class="sd">    zoom: string</span>
+<span class="sd">        &quot;cornrs&quot; or &quot;geom&quot;, how to set the extent of map</span>
+<span class="sd">    area_thrs: float</span>
+<span class="sd">        threshold area (default 1000 km2), under which objects are not</span>
+<span class="sd">        shown on map.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    m: Basemap object</span>
+<span class="sd">        map object</span>
+<span class="sd">    coords: list</span>
+<span class="sd">        list containing x,y arrays of the transformed longitudes to map coordinates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">Basemap</span>
+
+    <span class="c1"># Set default for lat_2 for lambert conformal proj</span>
+    <span class="k">if</span> <span class="n">proj</span><span class="o">==</span><span class="s1">&#39;lcc&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lat_2</span><span class="p">:</span>
+        <span class="n">lat_2</span> <span class="o">=</span> <span class="n">lat_1</span>
+
+    <span class="k">if</span> <span class="n">lon</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+        <span class="n">lon</span><span class="p">[</span><span class="n">lon</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">360.</span>
+        <span class="n">lon</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># The central point of the domain</span>
+        <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">lat_0</span><span class="p">:</span>
+            <span class="n">lat_0</span> <span class="o">=</span> <span class="n">lat_0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lat_0</span> <span class="o">=</span> <span class="n">lat</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">ny</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">nx</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">lon_0</span><span class="p">:</span>
+            <span class="n">lon_0</span> <span class="o">=</span> <span class="n">lon_0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lon_0</span> <span class="o">=</span> <span class="n">lon</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">ny</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">nx</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>  
+
+        <span class="n">corners</span> <span class="o">=</span> <span class="p">[</span><span class="n">lat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">lon</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lon</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># The central point of the domain</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">lat</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">lon</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">if</span> <span class="n">lat_0</span><span class="p">:</span>
+            <span class="n">lat_0</span> <span class="o">=</span> <span class="n">lat_0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lat_0</span> <span class="o">=</span> <span class="n">lat</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">ny</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">lon_0</span><span class="p">:</span>
+            <span class="n">lon_0</span> <span class="o">=</span> <span class="n">lon_0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lon_0</span> <span class="o">=</span> <span class="n">lon</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">nx</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span>  
+        
+        <span class="n">corners</span> <span class="o">=</span> <span class="p">[</span><span class="n">lat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lon</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">lon</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="c1"># Create lon/lat 2D meshgrid</span>
+        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span> 
+    
+    <span class="n">m_arr</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">zoom</span> <span class="o">==</span> <span class="s1">&#39;crnrs&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">grid</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">proj</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                    <span class="n">lat_0</span><span class="o">=</span><span class="n">lat_0</span><span class="p">,</span> <span class="n">lon_0</span><span class="o">=</span><span class="n">lon_0</span><span class="p">,</span> <span class="n">lat_ts</span><span class="o">=</span><span class="n">lat_ts</span><span class="p">,</span> <span class="n">lat_1</span><span class="o">=</span><span class="n">lat_1</span><span class="p">,</span> <span class="n">lat_2</span><span class="o">=</span><span class="n">lat_2</span><span class="p">,</span>\
+                    <span class="n">llcrnrlat</span><span class="o">=</span><span class="p">(</span><span class="n">corners</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">urcrnrlat</span><span class="o">=</span><span class="p">(</span><span class="n">corners</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>\
+                    <span class="n">llcrnrlon</span><span class="o">=</span><span class="p">(</span><span class="n">corners</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="n">urcrnrlon</span><span class="o">=</span><span class="p">(</span><span class="n">corners</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>\
+                    <span class="n">rsphere</span><span class="o">=</span><span class="p">(</span><span class="mf">6378137.00</span><span class="p">,</span><span class="mf">6356752.3142</span><span class="p">),</span><span class="n">area_thresh</span><span class="o">=</span><span class="n">area_thrs</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">m_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">zoom_geom</span><span class="p">,</span> <span class="s1">&#39;&#39;&#39;Error! </span><span class="se">\n</span><span class="s1"> zoom_geom argument is empty; set </span>
+<span class="s1">        correctly, [width/height] in meters, and try again.&#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">grid</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">proj</span><span class="p">,</span> 
+                    <span class="n">lat_0</span><span class="o">=</span><span class="n">lat_0</span><span class="p">,</span> <span class="n">lon_0</span><span class="o">=</span><span class="n">lon_0</span><span class="p">,</span> <span class="n">lat_ts</span><span class="o">=</span><span class="n">lat_0</span><span class="p">,</span> <span class="n">lat_1</span><span class="o">=</span><span class="n">lat_1</span><span class="p">,</span> <span class="n">lat_2</span><span class="o">=</span><span class="n">lat_2</span><span class="p">,</span>\
+                    <span class="n">width</span><span class="o">=</span><span class="n">zoom_geom</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="n">zoom_geom</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>\
+                    <span class="n">rsphere</span><span class="o">=</span><span class="p">(</span><span class="mf">6378137.00</span><span class="p">,</span><span class="mf">6356752.3142</span><span class="p">),</span><span class="n">area_thresh</span><span class="o">=</span><span class="n">area_thrs</span><span class="p">,</span><span class="n">resolution</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">m_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">m_arr</span><span class="p">]</span>                <span class="c1"># compute map proj coordinates.</span>
+    
+    <span class="k">return</span> <span class="n">m_arr</span><span class="p">,</span> <span class="n">coords</span></div>
+
+
+<div class="viewcode-block" id="make_map_plot"><a class="viewcode-back" href="../rossbyplots.html#rossbyplots.make_map_plot">[docs]</a><span class="k">def</span> <span class="nf">make_map_plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">map_obj</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">clevs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    make_map_plot: Producing a map plot</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    grid: AxesGrid object</span>
+<span class="sd">        Provides the axes for plots</span>
+<span class="sd">    map_obj: Basemap object</span>
+<span class="sd">        Handle for the map object returned from &#39;mapprod&#39; function</span>
+<span class="sd">    data: List with 2D array(s)</span>
+<span class="sd">        data to plot</span>
+<span class="sd">    coords: List</span>
+<span class="sd">        List with arrays of map coordinates; returned from &#39;mapprod&#39; function</span>
+<span class="sd">    clevs: 1D list/array </span>
+<span class="sd">        contour levels</span>
+<span class="sd">    cmap: string</span>
+<span class="sd">        color map name</span>
+<span class="sd">    cb_title: string</span>
+<span class="sd">        color bar title</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: Axes object</span>
+<span class="sd">            The axes objects created for each map plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> \
+            <span class="sd">&quot;&quot;&quot; Error! 2D data array(s) must be stored in </span>
+<span class="sd">            list data container. &quot;&quot;&quot;</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">))]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">))]</span>
+    
+    <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+        <span class="n">mdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>       
+        <span class="k">assert</span> <span class="n">mdata</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+                <span class="s2">&quot;Error! Data array(s) must be two-dimensional.&quot;</span>
+      
+        <span class="k">if</span> <span class="n">clevs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">mdata</span><span class="p">))</span>
+            <span class="n">dmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">mdata</span><span class="p">))</span>
+            <span class="n">dstep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">dmax</span> <span class="o">-</span> <span class="n">dmin</span><span class="p">)</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">clevels</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="p">,</span> <span class="n">dstep</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clevels</span> <span class="o">=</span> <span class="n">clevs</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">map_obj</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> 
+        <span class="n">xc</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">yc</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># The contour plot</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+                        <span class="n">xc</span><span class="p">,</span> <span class="n">yc</span><span class="p">,</span> 
+                        <span class="n">mdata</span><span class="p">,</span> 
+                        <span class="n">levels</span><span class="o">=</span><span class="n">clevels</span><span class="p">,</span> 
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                        <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+                        <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+<span class="c1">#                        extend=&#39;both&#39;,</span>
+                        <span class="p">)</span>
+
+        <span class="n">m</span><span class="o">.</span><span class="n">drawcountries</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;#424242&quot;</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">drawcoastlines</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#383838&#39;</span><span class="p">)</span>    <span class="c1"># draw coastlines, state and country boundaries, edge of map.</span>
+        
+        <span class="n">cb</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cbar_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="n">clevels</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">boundaries</span><span class="o">=</span><span class="n">clevels</span><span class="p">)</span>
+        <span class="n">cb</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span>
+    
+        <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">axs</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Rossby Centre Analysis Tool  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, SMHI - Rossby Centre.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+    </div>
+  </body>
+</html>
