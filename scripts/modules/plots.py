@@ -42,8 +42,10 @@ def figure_init(plottype='line', printtypes=False):
 
 def image_grid_setup(figsize=(12, 12), fshape=(1, 1), **grid_kwargs):
     """
-    Set up the plot axes using mpl_toolkits.ImageGrid
+    Set up the plot axes using mpl_toolkits.axes_grid1.ImageGrid
     Used primarily when plotting maps or for image analysis
+    For more information on available settings:
+        https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html
 
     Parameters
     ----------

@@ -7,37 +7,45 @@ to get an efficient and structured way of collaboration within our model
 developers but also for non pythonists that want to use the tool for standard
 climate data analysis.  
 
-### Documentation ###
+## Documentation ##
 
-Most recent documentation is available in docs.
+The documentation is somewhat thin at the moment. To get started, the most
+relevant reads (under *docs*) are:
 
-*Open docs/_build/html/index.html in you browser*
+* [README_configuration](docs/README_configuration.md)
+* [README_statistics](docs/README_statistics.md)
 
-### How do I get set up? ###
+## How do I get set up? ##
 
-#### Dependencies ####
+### Dependencies ###
 
-Most modules are included in the repo but some standard python modules are a prerequisite:
+Many modules are included in the repo but some standard python modules are a prerequisite:
 
 * python3 (python2 is not supported)
 * numpy
+* xarray
 * matplotlib
 * basemap
 * scipy
 * netcdf4
 * mpl_toolkits
+* dask (for parallelization purposes)
+* dask_jobqueue
+* esmpy
+* xesmf
+* palettable (for color options in visualization)
 * *pygrib (only if working with grib files)*
 
-### Contribution guidelines ###
+## Contribution guidelines ##
 
 * Writing tests
 * Code review
 * Other guidelines
 
-### Issues and bug reports ###
+## Issues and bug reports ##
 
 Bug reports, ideas, wishes are very welcome. Please report any issues using the links for Wiki and Issues.
 
-### Who do I talk to? ###
+## Who do I talk to? ##
 
-* Repo owner or admin
+See [AUTHORS](AUTHORS.md)

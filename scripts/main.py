@@ -437,7 +437,7 @@ def get_variable_config(var_conf, var):
         'obs_scale_factor': var_conf['obs scale factor'],
         'prep_func': get_prep_func(var_conf['accumulated']),
         'regrid': var_conf['regrid to'],
-        'rgr_method': remap.get_remap_method(var)
+        'rgr_method': var_conf['regrid method'],
     }
     return vdict
 

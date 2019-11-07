@@ -20,7 +20,7 @@ def default_stats_config(stats):
     """
     stats_dict = {
         'moments': {
-            'moment stat': 'mean',
+            'moment stat': ['D', 'mean'],
             'vars': [],
             'resample resolution': None,
             'pool data': False,
