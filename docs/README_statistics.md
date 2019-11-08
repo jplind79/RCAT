@@ -152,7 +152,7 @@ The code in RCAT is heavily based on
 with dask applications so much of the things that can be done in xarray, like
 many (basic) statistical calculations, are already dask compliant and therefore
 relatively easy to implement in RCAT. If you would like to include any new such feature,
-have a look in the [*rcat_statistics.py*](src/rcat_statistics.py) script, for example
+have a look in the [*rcat_statistics.py*](../src/rcat_statistics.py) script, for example
 how the implementation of 'seasonal cycle' has been done.
 
 For more elaborate statistics, using for example functions created by the user
