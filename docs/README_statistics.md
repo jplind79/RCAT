@@ -2,7 +2,7 @@
 
 ### How do you specify which statistics to do? ###
 In the **STATISTICS** section in
-[config_main.ini](../scripts/config/config_main.ini) you specify the statistics
+[config_main.ini](../src/config/config_main.ini) you specify the statistics
 to be done, in a Python dictionary structure.
 
 ```
@@ -19,7 +19,7 @@ stats = {
 The keys in *stats* are the statistical measures and values provides the
 settings/configurations to be applied to the specific statistical calculation.
 The statistics that are currently available in RCAT and their default settings
-are given in the [statistics.py](../scripts/statistics.py) module. In
+are given in the [statistics.py](../src/statistics.py) module. In
 particular, the *default_stats_config* function in that module specifies the
 statistics possible to calculate along with their properties. Many of the
 properties (or settings) are common for each of the measures, for example
@@ -85,7 +85,7 @@ Boolean switch (True/False). Set to `True` if statistics should be done on
 pooled data, i.e. assembling all the grid points and time steps and then perform
 calculations. If you want to the pooling to be done over certain sub-regions,
 then you need to specify these in the `regions` property in
-[config_main.ini](../scripts/config/config_main.ini).
+[config_main.ini](../src/config/config_main.ini).
 
 * *thr*
 
@@ -129,7 +129,7 @@ from each bin interval in the pdf (or frequency intensity distribution) is compu
 
 * *normalized* (in Rxx)
 
-In the *Rxx* function (see [statfuncs.py](../scripts/modules/statfuncs.py) module)
+In the *Rxx* function (see [statfuncs.py](../src/modules/statfuncs.py) module)
 the counts above the threshold is normalized by the total number of values if
 this property is set to True.
 
@@ -152,7 +152,7 @@ The code in RCAT is heavily based on
 with dask applications so much of the things that can be done in xarray, like
 many (basic) statistical calculations, are already dask compliant and therefore
 relatively easy to implement in RCAT. If you would like to include any new such feature,
-have a look in the [*statistics.py*](scripts/statistics.py) script, for example
+have a look in the [*statistics.py*](src/statistics.py) script, for example
 how the implementation of 'seasonal cycle' has been done.
 
 For more elaborate statistics, using for example functions created by the user

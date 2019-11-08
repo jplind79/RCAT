@@ -1,7 +1,7 @@
 ## RCAT Configuration ##
 ### How do you perform an analysis with RCAT? ###
 The main set up is done in the configuration file
-[config_main.ini](../scripts/config/config_main.ini). In this file you will set
+[config_main.ini](../src/config/config_main.ini). In this file you will set
 up paths to model data, which variables to analyze and how (define statistics),
 which observations to compare with etc. In other words, this is your starting
 point when applying RCAT.
@@ -130,7 +130,7 @@ String or list of strings with acronyms of observations to be included in the
 analysis (for the variable of choice, and therefore different observations can
 be chosen for different variables). Available observations, and their acronyms,
 are specified in
-[observations_metadata.py](../scripts/modules/observations_metadata.py). In this
+[observations_metadata.py](../src/modules/observations_metadata.py). In this
 file you can also add new observational data sets. The data should be in
 standrad CF convention format and file names must include (in a certain format)
 the years and months covered by the data. 
@@ -176,7 +176,7 @@ evaluation/validation of the model. This means that (for the moment) a set of
 standards plots (maps and line plots) can be done by RCAT for a set of standard
 statistical output: annual, seasonal and diurnal cycles, pdf's, percentiles and
 ASoP analysis. If plotting procedures for other statistics is wished for, they
-need to be implemented in the RCAT [plotting module](../scripts/validation_plots.py).
+need to be implemented in the RCAT [plotting module](../src/validation_plots.py).
 
 If *validation plot* is set to True, standard plots will be produced for the
 defined statistics. Otherwise, plotting can be done elsewhere using the statistical
@@ -200,7 +200,7 @@ latter case you need to set 'zoom_geom' [width, height]. Note that these
 settings refers to the reference model in the analysis which is the *_first_* model
 data set specified in the **MODELS** section.
 
-For more settings, see the *map_setup* function in [plots.py](../scripts/modules/plots.py).
+For more settings, see the *map_setup* function in [plots.py](../src/modules/plots.py).
 
 * *map grid setup*
 
@@ -212,7 +212,7 @@ map grid setup = {'axes_pad': 0.5, 'cbar_mode': 'each', 'cbar_location': 'right'
 Settings for the map plot configuration, for example whether to use a colorbar
 or not (*cbar_mode*) and where to put it and the padding between panels. For
 more info, see the *image_grid_setup* function in
-[plots.py](../scripts/modules/plots.py).
+[plots.py](../src/modules/plots.py).
 
 * *map kwargs*
 
@@ -221,7 +221,7 @@ map kwargs = {'filled': True, 'mesh': True}
 ```
 
 Additional keyword arguments to be added in the matplotlib contour plot call,
-see the *make_map_plot* function in [plots.py](../scripts/modules/plots.py).   
+see the *make_map_plot* function in [plots.py](../src/modules/plots.py).   
 
 * line plot settings
 
@@ -232,7 +232,7 @@ line kwargs = {'lw': 2.5}
 
 Likewise, settings for line plots can be made, e.g. line widths and styles as
 well as axes configurations. There are a number of functions in
-[plots.py](../scripts/modules/plots.py) that handles line/scatter/box plots,
+[plots.py](../src/modules/plots.py) that handles line/scatter/box plots,
 see for example the *fig_grid_setup* and *make_line_plot* functions.
 
 6. **SLURM**
