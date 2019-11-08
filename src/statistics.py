@@ -30,14 +30,14 @@ def default_stats_config(stats):
             'vars': [],
             'resample resolution': None,
             'pool data': False,
-            'time stat': 'mean',
+            'stat method': 'mean',
             'thr': None,
             'chunk dimension': 'time'},
         'annual cycle': {
             'vars': [],
             'resample resolution': None,
             'pool data': False,
-            'time stat': 'mean',
+            'stat method': 'mean',
             'thr': None,
             'chunk dimension': 'time'},
         'diurnal cycle': {
@@ -46,7 +46,7 @@ def default_stats_config(stats):
             'hours': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
                       17, 18, 19, 20, 21, 22, 23],
             'dcycle stat': 'amount',
-            'time stat': 'mean',
+            'stat method': 'mean',
             'thr': None,
             'pool data': False,
             'chunk dimension': 'space'},
@@ -206,7 +206,7 @@ def seasonal_cycle(data, var, stat, stat_config):
     """
     Calculate seasonal cycle
     """
-    tstat = stat_config[stat]['time stat']
+    tstat = stat_config[stat]['stat method']
     in_thr = stat_config[stat]['thr']
     if in_thr is not None:
         if var in in_thr:
@@ -235,7 +235,7 @@ def annual_cycle(data, var, stat, stat_config):
     """
     Calculate annual cycle
     """
-    tstat = stat_config[stat]['time stat']
+    tstat = stat_config[stat]['stat method']
     in_thr = stat_config[stat]['thr']
     if in_thr is not None:
         if var in in_thr:
@@ -278,7 +278,7 @@ def diurnal_cycle(data, var, stat, stat_config):
         thr = in_thr
 
     if dcycle_stat == 'amount':
-        tstat = stat_config[stat]['time stat']
+        tstat = stat_config[stat]['stat method']
         data = _check_hours(data)
         if 'percentile' in tstat:
             q = float(tstat.split(' ')[1])

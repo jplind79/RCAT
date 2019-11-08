@@ -324,7 +324,7 @@ def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
     #             var: {'dtype': 'float32', '_FillValue': 1.e20}
     #             }
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
-        tstat = '_' + stat_dict['time stat'].replace(' ', '_')
+        tstat = '_' + stat_dict['stat method'].replace(' ', '_')
     else:
         tstat = ''
     stat_name = stat.replace(' ', '_')
@@ -542,7 +542,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
     grdnme = grid_coords['target grid'][var]['gridname']
     st = stat.replace(' ', '_')
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
-        tstat = '_' + cdict['stats_conf'][stat]['time stat'].replace(' ', '_')
+        tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(' ', '_')
     else:
         tstat = ''
     thrlg = (('thr' in cdict['stats_conf'][stat]) and
@@ -589,7 +589,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
         'observation': obs,
         'variable': var,
         'time res': tres,
-        'time stat': tstat,
+        'stat method': tstat,
         'units': var_conf['units'],
         'grid coords': grid_coords,
         'map configure': cdict['map configure'],
@@ -744,7 +744,8 @@ print("\n\t ---- Statistics ----\n")
 stats_dict = {}
 for stat in cdict['stats_conf']:
     vrs = cdict['stats_conf'][stat]['vars']
-    vlist = list(cdict['variables'].keys()) if not vrs else vrs
+    vlist = list(cdict['variables'].keys()) if not vrs \
+        else [vrs] if not isinstance(vrs, list) else vrs
     vrfrq = {v: cdict['variables'][v]['freq'] for v in vlist}
     pool = cdict['stats_conf'][stat]['pool data']
     chunk_dim = cdict['stats_conf'][stat]['chunk dimension']
