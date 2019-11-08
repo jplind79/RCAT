@@ -16,7 +16,7 @@ import dask.array as da
 import numpy as np
 from dask.distributed import Client
 from dask_jobqueue import SLURMCluster
-import statistics as st
+import rcat_statistics as st
 
 import warnings
 warnings.filterwarnings("ignore")
