@@ -19,7 +19,7 @@ stats = {
 The keys in *stats* are the statistical measures and values provides the
 settings/configurations to be applied to the specific statistical calculation.
 The statistics that are currently available in RCAT and their default settings
-are given in the [statistics.py](../src/statistics.py) module. In
+are given in the [rcat_statistics.py](../src/rcat_statistics.py) module. In
 particular, the *default_stats_config* function in that module specifies the
 statistics possible to calculate along with their properties. Many of the
 properties (or settings) are common for each of the measures, for example
@@ -152,7 +152,7 @@ The code in RCAT is heavily based on
 with dask applications so much of the things that can be done in xarray, like
 many (basic) statistical calculations, are already dask compliant and therefore
 relatively easy to implement in RCAT. If you would like to include any new such feature,
-have a look in the [*statistics.py*](src/statistics.py) script, for example
+have a look in the [*rcat_statistics.py*](src/rcat_statistics.py) script, for example
 how the implementation of 'seasonal cycle' has been done.
 
 For more elaborate statistics, using for example functions created by the user
