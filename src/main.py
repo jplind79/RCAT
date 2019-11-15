@@ -125,15 +125,19 @@ def get_grids(nc, target_grid, method='bilinear'):
     """
     Get and/or modify the source and target grids for interpolation
     """
-    if method == 'conservative' and 'lon_bnds' not in nc.data_vars:
-        print("--- Lon/lat bounds not in file! ---")
-        print("Calculating them internally ...")
+    # EDIT 15/11 2019 by Petter
+    # There's no consistent way to handle data where lon_bnds/lat_bnds are
+    # already available, They may have different formats not all handled by
+    # xesmf regridding tool. Thus, for now, calculation of grid corners is
+    # always performed when method='conservative'
+    if method == 'conservative':
+        print("Calculating lat/lon bounds ...")
         print()
         slon_b, slat_b = remap.fnCellCorners(nc.lon.values, nc.lat.values)
-        tlon_b, tlat_b = remap.fnCellCorners(target_grid['lon'],
-                                             target_grid['lat'])
         s_grid = {'lon': nc.lon.values, 'lat': nc.lat.values,
                   'lon_b': slon_b, 'lat_b': slat_b}
+        tlon_b, tlat_b = remap.fnCellCorners(target_grid['lon'],
+                                             target_grid['lat'])
         t_grid = {'lon': target_grid['lon'], 'lat': target_grid['lat'],
                   'lon_b': tlon_b, 'lat_b': tlat_b}
     else:
