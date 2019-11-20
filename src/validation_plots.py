@@ -30,7 +30,7 @@ def plot_main(pltdict, statistic):
     obs = pdict['observation']
     var = pdict['variable']
     tres = pdict['time res']
-    tstat = pdict['time stat']
+    tstat = pdict['stat method']
     units = pdict['units']
     years = pdict['years']
     regions = pdict['regions']

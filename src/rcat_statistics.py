@@ -298,6 +298,11 @@ def diurnal_cycle(data, var, stat, stat_config):
         totdays = np.array([(data_sub['time.hour'].values == h).sum()
                             for h in np.arange(24)])
         statnm = "Frequency | thr: {}".format(thr)
+    else:
+        print("Unknown configured diurnal cycle stat: {}".format(dcycle_stat))
+        sys.exit()
+
+    dcycle = dcycle.chunk({'hour': -1})
     hrs = stat_config[stat]['hours']
     st_data = dcycle.sel(hour=hrs)
     if dcycle_stat == 'frequency':

@@ -546,7 +546,8 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
     grdnme = grid_coords['target grid'][var]['gridname']
     st = stat.replace(' ', '_')
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
-        tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(' ', '_')
+        tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(
+            ' ', '_')
     else:
         tstat = ''
     thrlg = (('thr' in cdict['stats_conf'][stat]) and

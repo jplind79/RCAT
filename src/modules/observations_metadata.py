@@ -112,8 +112,8 @@ def obs_data():
             'grid': None
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'file pattern': 'pr_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'ERAI': {
@@ -127,8 +127,13 @@ def obs_data():
             'grid': None
         },
         'HIPRAD': {
-            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h',
+            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h/masked',
             'file pattern': 'pr_HIPRAD2_1H_YYYYMM01-YYYYMM31.nc', # noqa
+            'grid': None
+        },
+        'HIPRADv3': {
+            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/Nordic_v3/1h',
+            'file pattern': 'pr_HIPRAD3_Nordic_1H_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': None
         },
         'SENORGE': {
