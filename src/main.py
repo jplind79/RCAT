@@ -214,10 +214,10 @@ def regridding(data, data_name, var, target_grid, method):
     data_dist = client.persist(indata[var].data)
     sgrid, tgrid, dim_val, dim_shape = get_grids(indata, target_grid, method)
     regridder = remap.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method))
-    A = regridder.A
+    wgts = client.scatter(regridder.weights, broadcast=True)
     rgr_data = da.map_blocks(_rgr_calc, data_dist, dtype=float,
                              chunks=(indata.chunks['time'],) + dim_val,
-                             A=A, out_dims=dim_val)
+                             wgts=wgts, out_dims=dim_val)
     rgr_data = client.persist(rgr_data)  # IS THIS NEEDED?
 
     # Contain dask in xarray dataset
@@ -234,7 +234,7 @@ def regridding(data, data_name, var, target_grid, method):
     return dset
 
 
-def _rgr_calc(data, A, out_dims):
+def _rgr_calc(data, wgts, out_dims):
     """
     Regrid data with sparse matrix multiplication
     For more info, see xESMF python module docs and code
@@ -242,7 +242,7 @@ def _rgr_calc(data, A, out_dims):
     s = data.shape
     Ny_in, Nx_in = (s[-2], s[-1])
     indata_flat = data.reshape(-1, Ny_in*Nx_in)
-    outdata_flat = A.dot(indata_flat.T).T
+    outdata_flat = wgts.dot(indata_flat.T).T
     N_extra_list = s[0:-2]
     Ny_out, Nx_out = out_dims
     outdata = outdata_flat.reshape([*N_extra_list, Ny_out, Nx_out])
@@ -459,9 +459,9 @@ def get_mod_data(mconf, tres, var, cfactor, prep_func):
 
     print("\n** Opening {} files **".format(mod_name.upper()))
     if tres == 'mon':
-        mod_data = xa.open_mfdataset(flist, parallel=True)
+        mod_data = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
     else:
-        mod_data = xa.open_mfdataset(flist, parallel=True,
+        mod_data = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
                                      preprocess=prep_func)
     if cfactor is not None:
         mod_data[var] *= cfactor
@@ -487,7 +487,7 @@ def get_obs_data(obs, var, cfactor, sy, ey, mns):
 
     # Open obs files
     obs_flist = obsmeta.get_file_list(var, obs, sdate, edate)
-    f_obs = xa.open_mfdataset(obs_flist, parallel=True)
+    f_obs = xa.open_mfdataset(obs_flist, combine='by_coords', parallel=True)
 
     # Extract years
     obs_data = f_obs.where(((f_obs.time.dt.year >= sy) &

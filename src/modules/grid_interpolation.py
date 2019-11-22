@@ -429,11 +429,11 @@ def add_matrix_NaNs(regridder):
         has been replaced with NaN's.
     """
     from scipy import sparse
-    X = regridder.A
+    X = regridder.weights
     M = sparse.csr_matrix(X)
     num_nonzeros = np.diff(M.indptr)
     M[num_nonzeros == 0, 0] = np.NaN
-    regridder.A = sparse.coo_matrix(M)
+    regridder.weights = sparse.coo_matrix(M)
 
     return regridder
 
