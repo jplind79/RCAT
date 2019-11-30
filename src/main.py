@@ -309,10 +309,14 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
 def get_month_string(mlist):
     d = {1: 'J', 2: 'F', 3: 'M', 4: 'A', 5: 'M', 6: 'J', 7: 'J', 8: 'A',
          9: 'S', 10: 'O', 11: 'N', 12: 'D'}
+    dl = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul',
+          8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
     if len(mlist) == 12:
         mstring = 'ANN'
+    elif len(mlist) == 1:
+        mstring = dl[mlist[0]]
     else:
-        if mlist == (1, 2, 12):
+        if mlist == [1, 2, 12]:
             mlist = (12, 1, 2)
         mstring = ''.join(d[m] for m in mlist)
     return mstring
