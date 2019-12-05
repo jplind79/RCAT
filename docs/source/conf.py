@@ -49,6 +49,10 @@ exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------
 
+# Read the docs has contents.rst as default main document. Need to set this for
+# the build to succeed.
+master_doc = 'index'
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
