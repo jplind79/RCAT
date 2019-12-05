@@ -8,7 +8,6 @@ Regional Climate Analysis Tool
 
 .. toctree::
    :maxdepth: 4
-   :caption: Contents:
 
    tutorials
    howto
