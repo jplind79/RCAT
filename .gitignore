@@ -16,3 +16,6 @@ __pycache__
 *~		      # temp files
 *.swap
 *.nc
+
+# Other
+docs/build
