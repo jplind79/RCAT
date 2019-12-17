@@ -216,7 +216,7 @@ def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
     from itertools import cycle
 
     def map_label(axs, labels):
-        [ax.text(0.04, 0.94, label, horizontalalignment='left',
+        [ax.text(0.05, 0.92, label, horizontalalignment='left',
                  verticalalignment='center', fontsize='large',
                  bbox=dict(facecolor='white', edgecolor='black',
                            boxstyle='round'), size='large',

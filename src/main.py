@@ -275,7 +275,8 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
                     diff = indata.time.values[1] - indata.time.values[0]
                     nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
                     tresample = stats_config[stat]['resample resolution']
-                    sec_resample = to_timedelta(tresample[0]).total_seconds()
+                    tr, fr = _get_freq(tresample[0])
+                    sec_resample = to_timedelta(tr, fr).total_seconds()
                     if nsec != sec_resample:
                         indata = eval("indata.resample(time='{}').{}('time').\
                                       dropna('time', 'all')".format(
@@ -316,10 +317,24 @@ def get_month_string(mlist):
     elif len(mlist) == 1:
         mstring = dl[mlist[0]]
     else:
-        if mlist == [1, 2, 12]:
+        if mlist in ([1, 2, 12], (1, 2, 12)):
             mlist = (12, 1, 2)
         mstring = ''.join(d[m] for m in mlist)
     return mstring
+
+
+def _get_freq(tf):
+    from functools import reduce
+
+    d = [j.isdigit() for j in tf]
+    freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
+    unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
+
+    if unit in ('M', 'Y'):
+        freq = freq*30 if unit == 'M' else freq*365
+        unit = 'D'
+
+    return freq, unit
 
 
 def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
@@ -405,14 +420,13 @@ def manage_chunks(data, chunk_dim):
         ysize = data[yd].size
 
         # Max number of chunks
-        cmax = 500
-        n = np.sqrt((xsize*ysize)/cmax)
-        c_size = np.round(np.maximum(xsize, ysize)/n).astype(int)
+        cmax = 1000
+        c_size = np.round(np.maximum(xsize, ysize)/np.sqrt(cmax)).astype(int)
         data = data.chunk({'time': data.time.size, xd: c_size, yd: c_size})
     else:
         nchunks = len(data.chunks['time'])
-        if nchunks > 500:
-            rchunk_size = np.round(data.time.size/500).astype(int)
+        if nchunks > 1000:
+            rchunk_size = np.round(data.time.size/1000).astype(int)
             data = data.chunk({'time': rchunk_size})
 
     return data
@@ -693,10 +707,12 @@ grid_coords = {}
 grid_coords['meta data'] = {}
 grid_coords['target grid'] = {}
 data_dict = {}
-
+month_dd = {}
+year_dd = {}
 for var in cdict['variables']:
     tres = cdict['variables'][var]['freq']
     print("\n\tVariable: {} -- Input resolution: {}".format(var, tres))
+
     grid_coords['meta data'][var] = {}
     grid_coords['target grid'][var] = {}
     if tres not in data_dict:
@@ -728,13 +744,13 @@ for var in cdict['variables']:
             get_grid_coords(mod_data['data'],
                             grid_coords['meta data'][var][mod_name])
 
-    month_dd = {m: cdict['models'][m]['months'] for m in mod_names}
-    year_dd = {m: (cdict['models'][m]['start year'],
-                   cdict['models'][m]['end year']) for m in mod_names}
+    month_dd[var] = {m: cdict['models'][m]['months'] for m in mod_names}
+    year_dd[var] = {m: (cdict['models'][m]['start year'],
+                        cdict['models'][m]['end year']) for m in mod_names}
     if obs_list is not None:
-        month_dd.update({o: cdict['obs months'] for o in obs_list})
-        year_dd.update({o: (cdict['obs start year'], cdict['obs end year'])
-                        for o in obs_list})
+        month_dd[var].update({o: cdict['obs months'] for o in obs_list})
+        year_dd[var].update({o: (cdict['obs start year'],
+                                 cdict['obs end year']) for o in obs_list})
 
     ##################################
     #  1B REMAP DATA TO COMMON GRID  #
@@ -783,10 +799,10 @@ for stat in cdict['stats_conf']:
         tres = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
         for m in stats_dict[stat][v]:
-            time_suffix = get_month_string(month_dd[m])
+            time_suffix = get_month_string(month_dd[v][m])
             st_data = stats_dict[stat][v][m]
             save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
-                         year_dd[m][0], year_dd[m][1], time_suffix,
+                         year_dd[v][m][0], year_dd[v][m][1], time_suffix,
                          cdict['stats_conf'][stat], tres, thrstr,
                          cdict['regions'])
 
@@ -804,7 +820,7 @@ if cdict['validation_plot']:
     for sn in statnames:
         for v in stats_dict[sn]:
             plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
-                                      cdict['variables'][v]['obs'], year_dd,
-                                      month_dd, img_outdir, stat_outdir, sn)
+                                      cdict['variables'][v]['obs'], year_dd[v],
+                                      month_dd[v], img_outdir, stat_outdir, sn)
             print("\t** Plotting: {} for {} **\n".format(sn, v))
             vplot.plot_main(plot_dict, sn)

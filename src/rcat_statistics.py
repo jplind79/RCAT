@@ -154,6 +154,20 @@ def _check_hours(ds):
     return ds
 
 
+def _get_freq(tf):
+    from functools import reduce
+
+    d = [j.isdigit() for j in tf]
+    freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
+    unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
+
+    if unit in ('M', 'Y'):
+        freq = freq*30 if unit == 'M' else freq*365
+        unit = 'D'
+
+    return freq, unit
+
+
 ############################################################
 #                                                          #
 #                   STATISTICS FUNCTIONS                   #
@@ -180,8 +194,8 @@ def moments(data, var, stat, stat_config):
 
     diff = data.time.values[1] - data.time.values[0]
     nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
-    sec_resample = to_timedelta(mstat[0]).total_seconds()
-
+    tr, fr = _get_freq(mstat[0])
+    sec_resample = to_timedelta(tr, fr).total_seconds()
     expr = "data[var].resample(time='{}').{}('time').dropna('time', 'all')"\
         .format(mstat[0], mstat[1])
 
