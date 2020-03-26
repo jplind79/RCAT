@@ -534,9 +534,9 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
                     ax.axhline(color='k', lw=2, ls='--', alpha=.7)
             else:
                 if xdata is not None:
-                    lines = ax.plot(xd, yd)
+                    lines = ax.plot(xdata[i], yd, **lp_kwargs)
                 else:
-                    lines = ax.plot(yd)
+                    lines = ax.plot(yd, **lp_kwargs)
 
                 if labels is not None:
                     [line.set_label(labels[i]) for line in lines]
@@ -623,7 +623,7 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
             if leg_labels is not None:
                 cols = [bx.get_facecolor() for bx in bp['boxes']]
                 h = custom_legend(cols, lg_lbls)
-                ax.legend(handles=h, fontsize='x-large')
+                ax.legend(handles=h, fontsize='large')
 
         ax.spines["left"].set_visible(True)
         ax.spines["bottom"].set_visible(True)
@@ -701,7 +701,7 @@ def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
     if leg_labels is not None:
         cols = [bx.get_facecolor() for bx in bp['boxes']]
         h = custom_legend(cols, leg_labels)
-        ax.legend(handles=h, fontsize='x-large')
+        ax.legend(handles=h, fontsize='large')
 
     return bps
 
@@ -717,7 +717,7 @@ def _decorate_box(ax, bp):
     """
     from itertools import cycle
 
-    idx = [1, 7, 3, 5, 10, 6, 2, 8, 0, 11, 9, 4]
+    idx = [1, 5, 3, 7, 10, 6, 2, 8, 0, 11, 9, 4]
     colors = np.vstack((
         mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
         mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
@@ -744,11 +744,11 @@ def _decorate_box(ax, bp):
         w2.set(color=c, linestyle='-', lw=2)
 
     # draw a black line for the median
-    [m.set(color='grey', linewidth=2) for m in bp['medians']]
+    [m.set(color='grey', linewidth=2.5) for m in bp['medians']]
 
     # Set fliers
     for flier in bp['fliers']:
-        flier.set(marker='.', markersize=6,
+        flier.set(marker='.', markersize=8,
                   mfc='k', mew=0.0, alpha=0.3)
 
 

@@ -213,7 +213,8 @@ def regridding(data, data_name, var, target_grid, method):
     # This works. Replace with xarray apply_ufunc?
     data_dist = client.persist(indata[var].data)
     sgrid, tgrid, dim_val, dim_shape = get_grids(indata, target_grid, method)
-    regridder = remap.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method))
+    regridder = remap.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method,
+                                                   reuse_weights=True))
     wgts = client.scatter(regridder.weights, broadcast=True)
     rgr_data = da.map_blocks(_rgr_calc, data_dist, dtype=float,
                              chunks=(indata.chunks['time'],) + dim_val,
@@ -250,6 +251,25 @@ def _rgr_calc(data, wgts, out_dims):
     return outdata
 
 
+def resampling(data, tresample):
+    """
+    Resample data to chosen time frequency and resample method.
+    """
+    from pandas import to_timedelta
+    diff = data.time.values[1] - data.time.values[0]
+    nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
+    tr, fr = _get_freq(tresample[0])
+    sec_resample = to_timedelta(tr, fr).total_seconds()
+    if nsec != sec_resample:
+        data = eval("data.resample(time='{}', label='right').{}('time').\
+                      dropna('time', 'all')".format(
+                          tresample[0], tresample[1]))
+    else:
+        print("Data is already at target resolution, skipping "
+              "resampling ...\n\n")
+    return data
+
+
 def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
     """
     Calculate statistics for variables and models/obs
@@ -267,20 +287,12 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
                 indata = ddict[f][v][m]['data']
                 st_data[v][m] = {}
                 if len(indata.data_vars) > 2:
-                    indata_tmp = indata[v]
-                    indata = indata_tmp.to_dataset()
+                    indata = indata[v].to_dataset()
 
+                # Resampling of data
                 if stats_config[stat]['resample resolution'] is not None:
-                    from pandas import to_timedelta
-                    diff = indata.time.values[1] - indata.time.values[0]
-                    nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
-                    tresample = stats_config[stat]['resample resolution']
-                    tr, fr = _get_freq(tresample[0])
-                    sec_resample = to_timedelta(tr, fr).total_seconds()
-                    if nsec != sec_resample:
-                        indata = eval("indata.resample(time='{}').{}('time').\
-                                      dropna('time', 'all')".format(
-                                          tresample[0], tresample[1]))
+                    indata = resampling(
+                        indata, stats_config[stat]['resample resolution'])
 
                 # Check chunking of data
                 data = manage_chunks(indata, chunk_dim)
@@ -326,6 +338,7 @@ def get_month_string(mlist):
 def _get_freq(tf):
     from functools import reduce
 
+    tf = str(1) + tf if not tf[0].isdigit() else tf
     d = [j.isdigit() for j in tf]
     freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
     unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
@@ -420,13 +433,14 @@ def manage_chunks(data, chunk_dim):
         ysize = data[yd].size
 
         # Max number of chunks
-        cmax = 1000
-        c_size = np.round(np.maximum(xsize, ysize)/np.sqrt(cmax)).astype(int)
+        cmax = 500
+        n = np.sqrt((xsize*ysize)/cmax)
+        c_size = np.round(np.maximum(xsize, ysize)/n).astype(int)
         data = data.chunk({'time': data.time.size, xd: c_size, yd: c_size})
     else:
         nchunks = len(data.chunks['time'])
-        if nchunks > 1000:
-            rchunk_size = np.round(data.time.size/1000).astype(int)
+        if nchunks > 500:
+            rchunk_size = np.round(data.time.size/500).astype(int)
             data = data.chunk({'time': rchunk_size})
 
     return data
@@ -464,7 +478,7 @@ def get_variable_config(var_conf, var):
     return vdict
 
 
-def get_mod_data(mconf, tres, var, cfactor, prep_func):
+def get_mod_data(model, mconf, tres, var, cfactor, prep_func):
     """
     Open model data files where file path is dependent on time resolution tres.
     """
@@ -474,8 +488,11 @@ def get_mod_data(mconf, tres, var, cfactor, prep_func):
         mconf['fpath'], '{}/{}_*{}_{}.nc'.format(tres, var, tres, dd)))
         for dd in date_list]
     flist = [y for x in _flist for y in x]
+    if np.unique([len(f) for f in flist]).size > 1:
+        flngth = np.unique([len(f) for f in flist])
+        flist = [f for f in flist if len(f) == flngth[0]]
 
-    print("\n** Opening {} files **".format(mod_name.upper()))
+    print("\n** Opening {} files **".format(model.upper()))
     if tres == 'mon':
         mod_data = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
     else:
@@ -485,7 +502,7 @@ def get_mod_data(mconf, tres, var, cfactor, prep_func):
         mod_data[var] *= cfactor
 
     grid = {'lon': mod_data.lon.values, 'lat': mod_data.lat.values}
-    gridname = 'grid_{}_{}'.format(mod_name.upper(), mod_data.attrs['domain'])
+    gridname = 'grid_{}_{}'.format(model.upper(), mod_data.attrs['domain'])
 
     outdata = {'data': mod_data, 'grid': grid, 'gridname': gridname}
     return outdata
@@ -631,7 +648,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
         _fm_listr = {stat: {r:  [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                m, st, var, thrstr, tres, tstat, r, grdnme,
+                m, st, var, thrstr, tres, tstat, r.replace(' ', '_'), grdnme,
                 yrs_d[m][0], yrs_d[m][1], get_month_string(mon_d[m]))))
             for m in models] for r in cdict['regions']}}
         fm_listr = {s: {r: [y for x in _fm_listr[s][r] for y in x]
@@ -640,9 +657,10 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
             _fo_listr = {stat: {r: [glob.glob(os.path.join(
                 stat_outdir, '{}'.format(st),
                 '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                    o, st, var, thrstr, tres, tstat, r, grdnme,
-                    yrs_d[o][0], yrs_d[o][1], get_month_string(mon_d[o]))))
-                for o in obs_list] for r in cdict['regions']}}
+                    o, st, var, thrstr, tres, tstat, r.replace(' ', '_'),
+                    grdnme, yrs_d[o][0], yrs_d[o][1],
+                    get_month_string(mon_d[o])))) for o in obs_list]
+                for r in cdict['regions']}}
             fo_listr = {s: {r: [y for x in _fo_listr[s][r] for y in x]
                             for r in _fo_listr[s]} for s in _fo_listr}
         else:
@@ -736,8 +754,9 @@ for var in cdict['variables']:
     mod_names = []
     for mod_name, settings in cdict['models'].items():
         mod_names.append(mod_name)
-        mod_data = get_mod_data(settings, tres, var, var_conf['scale_factor'],
-                                var_conf['prep_func'])
+        mod_data = get_mod_data(
+            mod_name, settings, tres, var, var_conf['scale_factor'],
+            var_conf['prep_func'])
         data_dict[tres][var][mod_name] = mod_data
         if mod_name not in grid_coords['meta data'][var]:
             grid_coords['meta data'][var][mod_name] = {}

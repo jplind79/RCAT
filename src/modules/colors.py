@@ -39,9 +39,9 @@ prec_diff_wzero = ["#8B2500", "#983900", "#A64D00", "#B46100", "#C27500",
                    "#CF8B0D", "#DAA543", "#E4BE78", "#EFD8AE", "#F9F2E4",
                    "#FFFFFF", "#FFFFFF", "#E4EEE4", "#AECEAE",
                    "#78AD78", "#438C43", "#0D6C0D", "#285428", "#5D3F5D",
-                   "#932A93", "#C915C9", "#FF00FF", "#FE8181"]
+                   "#5B7AD7", "#2D50B9", "#233E90", "#142352"]
 prec_diff_wzero = colors.ListedColormap(prec_diff_wzero)
-prec_diff_wzero.set_over("#fe8181")
+prec_diff_wzero.set_over("#142352")
 prec_diff_wzero.set_under("#e0301e")
 
 myGrBuPu_long = ["White", "#edfac2", "#cdffcd", "#99f0b2", "#53bd9f",

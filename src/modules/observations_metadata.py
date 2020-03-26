@@ -147,7 +147,8 @@ def obs_data():
             'grid': None
         },
         'HIPRADv2.0': {
-            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code/masked',
+            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code/masked', # noqa
+            # 'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code', # noqa
             'file pattern': 'pr_HIPRAD2_1H_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': None
         },
@@ -164,6 +165,11 @@ def obs_data():
         'SENORGE': {
             'path': '/nobackup/rossby20/sm_petli/data/seNorge_pr/orig',
             'file pattern': 'pr_seNorge2_PREC1h_grid_YYYYMM.nc', # noqa
+            'grid': None
+        },
+        'Klimagrid': {
+            'path': '/nobackup/rossby20/sm_petli/data/klimagrid/1h',
+            'file pattern': 'pr_Klimagrid_Denmark_1h_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': None
         },
         'EC-EARTH': {
@@ -245,6 +251,26 @@ def obs_data():
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/SW/CLARA-A2/day',  # noqa
             'file pattern': 'rsds_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': None
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Long-wave surface net radiation
+    'rlns': {
+        'ERA5': {
+            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'file pattern': 'rlns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Short-wave surface net radiation
+    'rsns': {
+        'ERA5': {
+            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'file pattern': 'rsns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 

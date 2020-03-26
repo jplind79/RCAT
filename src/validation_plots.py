@@ -705,7 +705,7 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, obs, var,
 
 
 def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod, obs,
-                      var, tres, tstat, units, years, regions, img_dir,
+                      var, tres, tstat, units, ytitle, regions, img_dir,
                       grid_coords, map_conf, map_grid, map_sets, line_grid,
                       line_sets):
     """
@@ -813,15 +813,15 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod, obs,
     for p in range(ndata + 1):
         data_name = ftitles[p].replace(' ', '')
         if thr != 'None':
-            headtitle = '{} | {} [{}] | Threshold: {}\n{}-{} | {}'.format(
-                ftitles[p], var, units, thr, years[0], years[1], seas)
-            fn = '{}_thr{}_{}{}_map_diurnal_cycle_{}_{}-{}_{}.png'.format(
-                var, thrnm, tres, tstat, data_name, years[0], years[1], seas)
+            headtitle = '{} | {} [{}] | Threshold: {}\n{} | {}'.format(
+                ftitles[p], var, units, thr, ytitle, seas)
+            fn = '{}_thr{}_{}{}_map_diurnal_cycle_{}_{}_{}.png'.format(
+                var, thrnm, tres, tstat, data_name, ytitle, seas)
         else:
-            headtitle = '{} | {} [{}] | {}-{} | {}'.format(
-                ftitles[p], var, units, years[0], years[1], seas)
-            fn = '{}_{}{}_map_diurnal_cycle_{}_{}-{}_{}.png'.format(
-                var, tres, tstat, data_name, years[0], years[1], seas)
+            headtitle = '{} | {} [{}] | {} | {}'.format(
+                ftitles[p], var, units, ytitle, seas)
+            fn = '{}_{}{}_map_diurnal_cycle_{}_{}_{}.png'.format(
+                var, tres, tstat, data_name, ytitle, seas)
 
         rpl.figure_init(plottype='map')
 
@@ -848,12 +848,12 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod, obs,
     # Line plot diurnal cycle
     if fm_listr is not None:
         line_diurnal_cycle(fm_listr, fo_listr, models, nmod, obs, var,
-                           tres, tstat, units, years, regions, img_dir,
+                           tres, tstat, units, ytitle, regions, img_dir,
                            line_grid, line_sets)
 
 
 def line_diurnal_cycle(fm_list, fo_list, models, nmod, obs, var, tres, tstat,
-                       units, years, regions, img_dir, line_grid, line_sets):
+                       units, ytitle, regions, img_dir, line_grid, line_sets):
     """
     Plotting annual cycle line plot
     """
@@ -907,26 +907,24 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, obs, var, tres, tstat,
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
-            headtitle = '{} |  Threshold: {}\n{} | {}-{} | {}'.format(
-                var, thr, reg, years[0], years[1], seas)
+            headtitle = '{} |  Threshold: {}\n{} | {} | {}'.format(
+                var, thr, reg, ytitle, seas)
             if obs is not None:
                 fn = """{}_thr{}_{}{}_lnplot_diurnal_cycle_{}_model_"""
-                """{}_{}-{}_{}.png""".format(var, thrnm, tres, tstat, regnm,
-                                             obslbl, years[0], years[1], seas)
+                """{}_{}_{}.png""".format(var, thrnm, tres, tstat, regnm,
+                                          obslbl, ytitle, seas)
             else:
                 fn = """{}_thr{}_{}{}_lnplot_diurnal_cycle_{}_model_"""
-                """{}-{}_{}.png""".format(var, thrnm, tres, tstat, regnm,
-                                          years[0], years[1], seas)
+                """{}_{}.png""".format(var, thrnm, tres, tstat, regnm,
+                                       ytitle, seas)
         else:
-            headtitle = '{} |  {} | {}-{} | {}'.format(var, reg, years[0],
-                                                       years[1], seas)
+            headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle, seas)
             if obs is not None:
-                fn = '{}_{}{}_lnplot_diurnal_cycle_{}_model_{}_{}-{}_{}.png'.\
-                    format(var, tres, tstat, regnm, obslbl,
-                           years[0], years[1], seas)
+                fn = '{}_{}{}_lnplot_diurnal_cycle_{}_model_{}_{}_{}.png'.\
+                    format(var, tres, tstat, regnm, obslbl, ytitle, seas)
             else:
-                fn = '{}_{}{}_lnplot_diurnal_cycle_{}_model_{}-{}_{}.png'.\
-                    format(var, tres, tstat, regnm, years[0], years[1], seas)
+                fn = '{}_{}{}_lnplot_diurnal_cycle_{}_model_{}_{}.png'.\
+                    format(var, tres, tstat, regnm, ytitle, seas)
 
         # figure settings
         figsize = (14, 12)
@@ -973,7 +971,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, obs, var, tres, tstat,
 
 
 def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, obs,
-             var, tres, tstat, units, years, regions, img_dir,
+             var, tres, tstat, units, ytitle, regions, img_dir,
              grid_coords, map_conf, map_grid, map_sets, line_grid,
              line_sets):
     """
@@ -1028,23 +1026,22 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, obs,
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
-            headtitle = '{} |  Threshold: {}\n{} | {}-{} | {}'.format(
-                var, thr, reg, years[0], years[1], seas)
+            headtitle = '{} |  Threshold: {}\n{} | {} | {}'.format(
+                var, thr, reg, ytitle, seas)
             if obs is not None:
-                fn = '{}_thr{}_{}_pdf_{}_model_{}_{}-{}_{}.png'.format(
-                    var, thrnm, tres, regnm, obslbl, years[0], years[1], seas)
+                fn = '{}_thr{}_{}_pdf_{}_model_{}_{}_{}.png'.format(
+                    var, thrnm, tres, regnm, obslbl, ytitle, seas)
             else:
-                fn = '{}_thr{}_{}_pdf_{}_model_{}-{}_{}.png'.format(
-                    var, thrnm, tres, regnm, years[0], years[1], seas)
+                fn = '{}_thr{}_{}_pdf_{}_model_{}_{}.png'.format(
+                    var, thrnm, tres, regnm, ytitle, seas)
         else:
-            headtitle = '{} |  {} | {}-{} | {}'.format(var, reg, years[0],
-                                                       years[1], seas)
+            headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle, seas)
             if obs is not None:
-                fn = '{}_{}_pdf_{}_model_{}_{}-{}_{}.png'.format(
-                    var, tres, regnm, obslbl, years[0], years[1], seas)
+                fn = '{}_{}_pdf_{}_model_{}_{}_{}.png'.format(
+                    var, tres, regnm, obslbl, ytitle, seas)
             else:
-                fn = '{}_{}_pdf_{}_model_{}-{}_{}.png'.format(
-                    var, tres, regnm, years[0], years[1], seas)
+                fn = '{}_{}_pdf_{}_model_{}_{}.png'.format(
+                    var, tres, regnm, ytitle, seas)
 
         # figure settings
         figsize = (19, 7)
@@ -1316,7 +1313,7 @@ def line_asop(fm_listr, fo_listr, models, nmod, obs, var, tres, tstat,
             ylabel = [ylabels[ff]]*2
             ylim = [None]*2
             xlabel = [None, 'Intensity ({})'.format(units)]
-            xlim = [[1e-4, 1e2]]*2
+            xlim = [[1e-2, 1e2]]*2
 
             rpl.figure_init(plottype='line')
             ln_grid = deepcopy(line_grid)

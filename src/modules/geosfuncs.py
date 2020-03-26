@@ -34,6 +34,7 @@ def regions(area="", reg_print=False):
 
     reg_dict = {
             "Sweden": "sweden_poly_6-12km.txt",
+            "Skane": "skane_poly.txt",
             "Sweden flat": "sweden_no_mountains.txt",
             "Sweden east coast": "sweden_east_coast.txt",
             "Sweden north east coast": "sweden_northeast_coast.txt",
@@ -47,8 +48,10 @@ def regions(area="", reg_print=False):
             "South Norway": "south_norway_v2.txt",
             "Mid Norway": "mid_norway.txt",
             "Norwegian Sea": "norwegian_sea.txt",
+            "Norwegian Sea Large": "norwegian_sea_large.txt",
             "Finland": "finland_poly.txt",
             "Denmark": "denmark_poly.txt",
+            "Jutland interior": "jutland_interior_poly.txt",
             "Netherlands": "netherlands.txt",
             "Germany": "germany_poly_6-12km.txt",
             "South Germany": "south_germany_poly.txt",
