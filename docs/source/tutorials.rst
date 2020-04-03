@@ -45,7 +45,9 @@ RCAT environment
 
 **Install dependencies**
 
-* conda activate rcat
+It's important that you follow the order of the installation list below due to
+a bug in the esmpy module.
+
 * conda install esmpy
 * conda install xesmf dask
 * conda install netcdf4 dask-jobqueue matplotlib basemap
