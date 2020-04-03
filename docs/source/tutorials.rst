@@ -3,25 +3,27 @@ Tutorials
 
 .. :doc:`Installing </install>`
 
-**Installation**
+Installation
+------------
 
-Required dependencies
----------------------
+**Miniconda**
+Install `Miniconda <https://conda.io/projects/conda/en/latest/user-guide/install/linux.html>`_
 
-* python3 (python2 is not supported)
-* numpy
-* xarray
-* matplotlib
-* basemap
-* scipy
-* netcdf4
-* mpl_toolkits
-* dask 
-* dask_jobqueue
-* esmpy
-* xesmf
+**Update conda**
 
-Optional packages
------------------
-* palettable (for color options in visualization)
-* pygrib (only if working with grib files)
+* conda update conda
+
+**Create environment**
+
+* conda create -n rcat
+
+**Activate environment**
+
+* conda activate rcat
+
+**Install dependencies**
+
+* conda activate rcat
+* conda install esmpy
+* conda install xesmf dask
+* conda install netcdf4 dask-jobqueue matplotlib basemap
