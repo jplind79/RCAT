@@ -32,8 +32,9 @@ Hands on guides with code examples.
 Reference material (APIs)
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :hidden:
+   :includehidden:
 
    tutorials
    howto

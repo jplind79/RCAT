@@ -1,4 +1,7 @@
+.. _howto:
+
 How-To Guides
 =============
 
-asdf asdfdsaf
+Coming soon!
+

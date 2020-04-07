@@ -62,7 +62,8 @@ html_theme = 'sphinx_rtd_theme'
 # options for sphinx_rtd_theme
 html_theme_options = {
     # Toc options
-    'collapse_navigation': False
+    'collapse_navigation': False,
+    'titles_only': True
 }
 #html_theme_options = {
 #    'canonical_url': '',
