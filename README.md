@@ -9,32 +9,27 @@ climate data analysis.
 
 ## Documentation ##
 
-The documentation is somewhat thin at the moment. To get started, the most
-relevant reads (under *docs*) are:
+To get started, the most relevant reads (under *docs*) are:
 
 * [README_configuration](docs/README_configuration.md)
 * [README_statistics](docs/README_statistics.md)
 
-## How do I get set up? ##
+For more information and tutorials see the documentation at [Read the
+Docs](https://regional-climate-analysis-tool.readthedocs.io "readthedocs.io")
 
 ### Dependencies ###
 
 Many modules are included in the repo but some standard python modules are a prerequisite:
 
 * python3 (python2 is not supported)
-* numpy
-* xarray
-* matplotlib
-* basemap
-* scipy
-* netcdf4
-* mpl_toolkits
-* dask (for parallelization purposes)
-* dask_jobqueue
 * esmpy
 * xesmf
+* dask (for parallelization purposes)
+* dask_jobqueue
+* matplotlib
+* basemap
+* netcdf4
 * palettable (for color options in visualization)
-* *pygrib (only if working with grib files)*
 
 ## Contribution guidelines ##
 
