@@ -3,11 +3,10 @@
 RCAT Statistics
 ===============
 
-In the **STATISTICS** section in
-[config_main.ini](../src/config/config_main.ini) you specify the statistics to
-be done, in a Python dictionary structure.
+In the **STATISTICS** section in the file config_main.ini you specify the
+statistics to be done, in a Python dictionary structure.
 
-.. code-block:: bash
+::
 
    stats = {
      'annual cycle': 'default',
@@ -21,8 +20,9 @@ be done, in a Python dictionary structure.
 The keys in stats are the statistical measures and values provides the
 settings/configurations to be applied to the specific statistical calculation.
 The statistics that are currently available in RCAT and their default settings
-are given in the [rcat_statistics.py](../src/rcat_statistics.py) See
-API-reference :doc:`statfuncs`. In particular, the default_stats_config
+are given in the `rcat_statistics.py (github)
+<https://github.com/jplind79/rcat/blob/master/src/rcat_statistics.py>`_. Also
+see API-reference :doc:`statfuncs`. In particular, the default_stats_config
 function in that module specifies the statistics possible to calculate along
 with their properties. Many of the properties (or settings) are common for each
 of the measures, for example resample resolution, thr or chunk dimension, while
@@ -55,13 +55,16 @@ item values.
     intervening time steps would be defined as follows in the  configuration
     file:
 
-    .. code-block:: bash
+    ::
 
        resample resolution': ['6H', 'sum']
 
     The documentation of and available options for the resampling function can
-    be found at the xarray webpage and pandas respectively (see DateOffset
-    Objects section for frequency string options).
+    be found `here (xarray)
+    <http://xarray.pydata.org/en/stable/time-series.html#resampling-and-grouped-operations>`_
+    and `here (pandas)
+    <https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html>`_
+    (see DateOffset Objects section for frequency string options).
 
     **chunk dimension**: An important feature behind Dask parallelization is
     the use of *blocked algorithms*; to divide the data into chunks and then
@@ -74,21 +77,26 @@ item values.
     the data is chunked along. However, if you want to calculate time series
     percentiles for each grid point then chunking should be done in space
     ('lat', 'lon'). The chunk dimension property has two options; time/space.
-    For example to chunk along time, set **chunk dimension': 'time'**
+    For example to chunk along time, set
+
+    ::
+
+       'chunk dimension': 'time'
 
     **pool data**: Boolean switch (True/False). Set to True if statistics
     should be done on pooled data, i.e. assembling all the grid points and time
     steps and then perform calculations. If you want to the pooling to be done
     over certain sub-regions, then you need to specify these in the regions
-    property in [config_main.ini](../src/config/config_main.ini).
+    property in `config_main.ini (github)
+    <https://github.com/jplind79/rcat/blob/master/src/config/config_main.ini>`_.
 
     **thr**: Thresholding of data. The value of this (None is the default)
     should be a dictionary with keys defining variables and values an integer
     of float; e.g.
 
-    .. code-block:: bash
+    ::
 
-       thr': {'pr': 0.1, 'tas': 273}
+       'thr': {'pr': 0.1, 'tas': 273}
 
 #. Specific settings and properties
     Here we list more specific settings and give some information of them.
@@ -100,7 +108,7 @@ item values.
     such as a percentile value. This can be specified with this property.
     Default value is mean. To use a percentile, set (for 95th percentile);
 
-    .. code-block:: bash
+    ::
 
        'stat method': 'percentile 95'
 
@@ -131,9 +139,9 @@ item values.
     stat* is set the same way. For example, if you want to calculate the annual
     maximum of the input data set.
 
-    .. code-block:: bash
+    ::
 
-       moment stat': ['Y', 'max']
+       'moment stat': ['Y', 'max']
 
 #. How do you add new statistical methods to RCAT?
     The code in RCAT is heavily based on `xarray <http://xarray.pydata.org/>`_
@@ -147,6 +155,9 @@ item values.
 
     For more elaborate statistics, using for example functions created by the
     user (using standard numpy/python code), it may be a bit more complex.
-    Xarray has a function called *apply_ufunc* which allows repeatedly applying
-    a user function to xarray objects containing Dask arrays in an automatic
-    way.
+    Xarray has a function called `apply_ufunc
+    <http://xarray.pydata.org/en/stable/generated/xarray.apply_ufunc.html#xarray.apply_ufunc>`_
+    which allows repeatedly applying a user function to xarray objects
+    containing Dask arrays in an automatic way. See `here
+    <http://xarray.pydata.org/en/stable/computation.html#comput-wrapping-custom>`_
+    for_some more information.

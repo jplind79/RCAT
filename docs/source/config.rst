@@ -15,8 +15,8 @@ words, this is your starting point when applying RCAT.
 
      .. code-block:: bash
 
-         mkdir -p $HOME/rcat_anlysis/test
-         cd $HOME/rcat_anlysis/test
+         mkdir -p $HOME/rcat_analysis/test
+         cd $HOME/rcat_analysis/test
          cp $HOME/git/rcat/config/config_main.ini .
 
 #. Configure settings in config_main.ini
@@ -34,7 +34,7 @@ words, this is your starting point when applying RCAT.
          Names of these sub-folders are inherited from the freq property set
          under variables in the **SETTINGS** section.
 
-         .. code-block:: bash
+         ::
 
             model = {
                'fpath': '/path/to/model/data',
@@ -43,7 +43,7 @@ words, this is your starting point when applying RCAT.
 
          Here's another example comparing two models:
 
-         .. code-block:: bash
+         ::
 
             model_his = {
                'fpath': '/path/to/model_1/data',
@@ -82,7 +82,7 @@ words, this is your starting point when applying RCAT.
          (variable) is another dictionary consiting of a number of specific
          settings:
 
-         .. code-block:: bash
+         ::
 
             variables = {
                 'psl': {'freq': 'day', 'units': 'hPa', 'scale factor': 0.01, 'accumulated': False, 'obs': ['ERA5', 'EOBS'], 'obs scale factor': 0.01, 'regrid to': 'ERA5', 'regrid method': 'bilinear'},
@@ -90,48 +90,49 @@ words, this is your starting point when applying RCAT.
                 'tas': {'freq': 'day', 'units': 'K', 'scale factor': None, 'accumulated': False, 'obs': ['ERA5', 'EOBS'], 'obs scale factor': None, 'regrid to': 'ERA5', 'regrid method': 'bilinear'},
             }
 
-         ``*`` *freq*: A string of the time resolution of input __model__ data. The string should
-         match any of the sub-folders under the path to model data, e.g. 'day', '1H',
-         '3H'. In effect, you may choose different time resolutions for different
-         variables in the analysis.
+         * *freq*: A string of the time resolution of input __model__ data. The
+           string should match any of the sub-folders under the path to model
+           data, e.g. 'day', '1H', '3H'. In effect, you may choose different
+           time resolutions for different variables in the analysis.
 
-         ``*`` *units*: The units of the variable data (which will appear in figures created in RCAT,
-         and thus should reflect the units after data have been manipulated through the analysis).
+         * *units*: The units of the variable data (which will appear in
+           figures created in RCAT, and thus should reflect the units after
+           data have been manipulated through the analysis).
 
-         ``*`` *scale factor*: A numeric factor (integer/float) that model data is
-         multiplied with, to convert to desired units (e.g. from J/m2 to W/m2)
-         and to ensure that all data (model and observations) have the same
-         units. If no scaling is to be done, set value to None. An arithmetic
-         exoression is not allowed; for example if data is to be divided by 10
-         you cannot define factor as 1/10, it must then be 0.1. It is assumed
-         that all model data will use the same factor..
+         * *scale factor*: A numeric factor (integer/float) that model data is
+           multiplied with, to convert to desired units (e.g. from J/m2 to
+           W/m2) and to ensure that all data (model and observations) have the
+           same units. If no scaling is to be done, set value to None. An
+           arithmetic exoression is not allowed; for example if data is to be
+           divided by 10 you cannot define factor as 1/10, it must then be 0.1.
+           It is assumed that all model data will use the same factor..
 
-         ``*`` *accumulated*: Boolean switch identifying variable data as
-         accumulated fields or not. If the
-         former (True), then data will be deaccumulated "on the fly" when
-         opening files of data.
+         * *accumulated*: Boolean switch identifying variable data as
+           accumulated fields or not. If the former (True), then data will be
+           deaccumulated "on the fly" when opening files of data.
 
-         ``*`` *obs*: String or list of strings with acronyms of observations to be
-         included in the analysis (for the variable of choice, and therefore
-         different observations can be chosen for different variables).
-         Available observations, and their acronyms, are specified in
-         [observations_metadata.py](../src/modules/observations_metadata.py).
-         In this file you can also add new observational data sets. The data
-         should be in standrad CF convention format and file names must include
-         (in a certain format) the years and months covered by the data.
+         * *obs*: String or list of strings with acronyms of observations to be
+           included in the analysis (for the variable of choice, and therefore
+           different observations can be chosen for different variables).
+           Available observations, and their acronyms, are specified in the
+           :doc:`observations_metadata`. In this module you can also add new
+           observational data sets. The data should be in standrad CF
+           convention format and file names must include (in a certain format)
+           the years and months covered by the
+           data.
 
-         ``*`` *obs scale factor*:As scale factor above but for observations. If
-         multiple observations are defined, some of which would need different
-         scale factors, a list of factors can be provided. However, if the same
-         factor should be used for all observations, it is enough to just
-         specify a single factor.
+         * *obs scale factor*:As scale factor above but for observations. If
+           multiple observations are defined, some of which would need
+           different scale factors, a list of factors can be provided. However,
+           if the same factor should be used for all observations, it is enough
+           to just specify a single factor.
 
-         ``*`` *regrid to*: If data is to be remapped to a common grid, you specify
-         the name (model name or observation acronym) here. If not, set to
-         None.
+         * *regrid to*: If data is to be remapped to a common grid, you specify
+           the name (model name or observation acronym) here. If not, set to
+           None.
 
-         ``*`` *regrid method*: String defining the interpolation method:
-         'conservative' or 'bilinear'.
+         * *regrid method*: String defining the interpolation method:
+           'conservative' or 'bilinear'.
 
          **regions**: A list of strings with region names, defining
          geographical areas data will be extracted from. If set, 2D statistical
@@ -144,15 +145,17 @@ words, this is your starting point when applying RCAT.
 
      - STATISTICS
          Another main section of the analysis configuration. Therefore, the
-         descripition of this segment is given separately, see :doc:`RCAT Statistics </statistics>`
+         descripition of this segment is given separately, see :doc:`RCAT
+         Statistics </statistics>`
 
      - PLOTTING
          This section is intended for the case you want to perform a general
-         evaluation/validation of the model. This means that (for the moment) a set of
-         standards plots (maps and line plots) can be done by RCAT for a set of standard
-         statistical output: annual, seasonal and diurnal cycles, pdf's, percentiles and
-         ASoP analysis. If plotting procedures for other statistics is wished for, they
-         need to be implemented in the RCAT [plotting module](../src/validation_plots.py).
+         evaluation/validation of the model. This means that (for the moment) a
+         set of standards plots (maps and line plots) can be done by RCAT for a
+         set of standard statistical output: annual, seasonal and diurnal
+         cycles, pdf's, percentiles and ASoP analysis. If plotting procedures
+         for other statistics is wished for, they need to be implemented in the
+         RCAT :doc:`plotting module <plots>`.
 
          **validation plot**: If validation plot is set to True, standard plots
          will be produced for the defined statistics. Otherwise, plotting can
@@ -168,7 +171,7 @@ words, this is your starting point when applying RCAT.
          refers to the reference model in the analysis which is the first model
          data set specified in the **MODELS** section.
 
-         .. code-block:: bash
+         ::
 
             map configure = {'proj': 'stere', 'res': 'l', 'zoom': 'geom', 'zoom_geom': [1700000, 2100000], 'lon_0': 16.5, 'lat_0': 63}
 
@@ -177,41 +180,39 @@ words, this is your starting point when applying RCAT.
          **map grid setup**: Settings for the map plot configuration, for
          example whether to use a colorbar or not (cbar_mode) and where to put
          it and the padding between panels. For more info, see the
-         image_grid_setup function in [plots.py](../src/modules/plots.py).
+         image_grid_setup function in the :doc:`plotting module <plots>`.
 
-
-         .. code-block:: bash
+         ::
 
             map grid setup = {'axes_pad': 0.5, 'cbar_mode': 'each', 'cbar_location': 'right', 'cbar_size': '5%%', 'cbar_pad': 0.03}
 
          **map kwargs**: Additional keyword arguments to be added in the
          matplotlib contour plot call, see the make_map_plot function in
-         [plots.py](../src/modules/plots.py)..
+         the :doc:`plotting module <plots>`.
 
          **line plot settings**: Likewise, settings for line plots can be made,
          e.g. line widths and styles as well as axes configurations. There are
-         a number of functions in [plots.py](../src/modules/plots.py) that
+         a number of functions in the :doc:`plotting module <plots>`. that
          handles line/scatter/box plots, see for example the fig_grid_setup and
          make_line_plot functions.
 
-         .. code-block:: bash
+         ::
 
             line grid setup = {'axes_pad': (11., 6.)}
             line kwargs = {'lw': 2.5}
 
      - SLURM
-         RCAT uses `Dask <https://docs.dask.org/>`_ to perform file
-         managing and statistical analysis in an efficient way through
-         parallelization. When applying Dask on queuing systems like PBS or
-         Slurm,
-         `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_
-         provides an excellent interface for handling such work flow. It is
-         used in RCAT and to properly use Dask and Dask-Jobqueue on an HPC
-         system you need to provide some information about that system and how
-         you plan to use it. By default, when Dask-Jobqueue is first imported a
-         configuration file is placed in ~/.config/dask/jobqueue.yaml. What is
-         set in this file are the default settings being used. On Bi/NSC we
-         have set up a default configuration file as below.
+         RCAT uses `Dask <https://docs.dask.org/>`_ to perform file managing
+         and statistical analysis in an efficient way through parallelization.
+         When applying Dask on queuing systems like PBS or Slurm,
+         `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_ provides an
+         excellent interface for handling such work flow. It is used in RCAT
+         and to properly use Dask and Dask-Jobqueue on an HPC system you need
+         to provide some information about that system and how you plan to use
+         it. By default, when Dask-Jobqueue is first imported a configuration
+         file is placed in ~/.config/dask/jobqueue.yaml. What is set in this
+         file are the default settings being used. On Bi/NSC we have set up a
+         default configuration file as below.
 
          .. code-block:: yaml
 
@@ -238,7 +239,7 @@ words, this is your starting point when applying RCAT.
          usuallt want to change in the **SLURM** section are the number of nodes
          to use and walltime:
 
-         .. code-block:: bash
+         ::
 
             nodes = 15
             slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
@@ -247,7 +248,7 @@ words, this is your starting point when applying RCAT.
          Bi/NSC there are fat nodes available. If you want to use fat nodes,
          you can specify this through
 
-         .. code-block:: bash
+         ::
 
             slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
 
@@ -261,3 +262,4 @@ words, this is your starting point when applying RCAT.
      .. code-block:: bash
 
         python $HOME/git/rcat/src/main.py -c config_main.ini
+
