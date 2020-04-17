@@ -255,7 +255,7 @@ words, this is your starting point when applying RCAT.
 #. Run RCAT
      When you have done your configuration and saved config_main.ini you can
      start the analysis step. The main program is located in the src directory
-     and called main.py. See point 1. :ref:`Setup folder structure
+     and called main.py. See point 1: :ref:`Setup folder structure
      <configuration>` and run main main.py from your analysis folder.
 
 
