@@ -15,7 +15,6 @@ import geosfuncs as gfunc
 import dask.array as da
 import numpy as np
 from dask.distributed import Client
-from dask_jobqueue import SLURMCluster
 import rcat_statistics as st
 
 import warnings
@@ -43,12 +42,22 @@ def get_settings(config_file):
         'map kwargs': conf_dict['PLOTTING']['map kwargs'],
         'line grid setup': conf_dict['PLOTTING']['line grid setup'],
         'line kwargs': conf_dict['PLOTTING']['line kwargs'],
-        'nodes': conf_dict['SLURM']['nodes'],
-        'slurm kwargs': conf_dict['SLURM']['slurm kwargs'],
+        'cluster type': conf_dict['CLUSTER']['cluster type'],
+        'nodes': conf_dict['CLUSTER']['nodes'],
+        'cluster kwargs': conf_dict['CLUSTER']['cluster kwargs'],
         'outdir': conf_dict['SETTINGS']['output dir'],
     }
 
     return d
+
+def local_cluster_setup():
+    """
+    Set up local-pc cluster
+
+    """
+    from dask.distributed import LocalCluster
+    cluster = LocalCluster(processes=False)
+    return cluster
 
 
 def slurm_cluster_setup(nodes=1, **kwargs):
@@ -62,6 +71,7 @@ def slurm_cluster_setup(nodes=1, **kwargs):
     **kwargs:
         Keyword arguments for cluster specifications
     """
+    from dask_jobqueue import SLURMCluster
     cluster = SLURMCluster(**kwargs)
     cluster.scale(nodes)
     return cluster
@@ -687,6 +697,7 @@ cdict = get_settings(config_file)
 #                                             #
 ###############################################
 
+
 # Create dirs
 stat_outdir = os.path.join(cdict['outdir'], 'stats')
 stat_names = [s.replace(' ', '_') for s in cdict['requested_stats']]
@@ -708,17 +719,25 @@ else:
     [os.makedirs(os.path.join(img_outdir, t)) for t in stat_names]
 
 
-# Set up SLURM client
-nnodes = cdict['nodes']
-sl_kwargs = cdict['slurm kwargs']
-cluster = slurm_cluster_setup(nodes=nnodes, **sl_kwargs)
-client = Client(cluster)
+# Set up distributed client
+if cdict['cluster type'] == 'local':
+    cluster = local_cluster_setup()
+    client = Client(cluster)
+elif cdict['cluster type'] == 'slurm':
+    nnodes = cdict['nodes']
+    sl_kwargs = cdict['cluster kwargs']
+    cluster = slurm_cluster_setup(nodes=nnodes, **sl_kwargs)
+    client = Client(cluster)
+else:
+    print("\n\tCluster type not implemented! Exiting..")
+    sys.exit()
 
 ###############################################
 #                                             #
 #       1. OPEN DATA FILES AND REMAPPING      #
 #                                             #
 ###############################################
+
 
 # Loop over time resolution of input data
 grid_coords = {}
