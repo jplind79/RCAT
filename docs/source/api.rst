@@ -1,5 +1,5 @@
-API-References
-==============
+modules
+=======
 
 .. toctree::
    :maxdepth: 4
@@ -14,5 +14,7 @@ API-References
    ini_reader
    observations_metadata
    plots
+   rcat_statistics
    sal
    statfuncs
+   validation_plots

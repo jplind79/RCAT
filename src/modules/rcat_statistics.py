@@ -49,7 +49,7 @@ def default_stats_config(stats):
             'stat method': 'mean',
             'thr': None,
             'pool data': False,
-            'chunk dimension': 'space'},
+            'chunk dimension': 'time'},
         'dcycle harmonic': {
             'vars': [],
             'resample resolution': None,
