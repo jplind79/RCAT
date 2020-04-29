@@ -9,11 +9,9 @@ steps, changes are made in different sections of the configuration file,
 experiment folder. Detailed information of what can be configured and how can be
 found in :ref:`configuration`.
 
-Part 1: How to calculate monthly and seasonal mean statistics?
-**************************************************************
+How to calculate monthly and seasonal mean statistics?
+******************************************************
 
-Outline
--------
 Daily data from two models is used as input for calculation of monthly and
 seasonal means at each point of their respective (native) grids. Statistical
 results are written to disk in netcdf files; a separate file for each model and
@@ -128,15 +126,11 @@ sub-folder *stats* under the user-defined output directory. An *img* folder
 is also created, however, it will be empty as no plotting have been done.
 
 
-Part 2: Adding comparison to observations and visualize results
-***************************************************************
+Adding comparison to observations and visualize results
+*******************************************************
 
-Outline
--------
-The same calculations are done as above although some modifications are done to
-include observations and results are plotted as well.
-
-Introduce the following changes:
+In order to include observations and visualize the end results, follow the
+procedure as in the previous example with the following changes introduced:
 
 #. Under **OBS** section, choose same years and months as models
 

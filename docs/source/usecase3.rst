@@ -21,13 +21,6 @@ configuration file, *src/config/config_main.ini*.
 Calculate diurnal cycles of mean CAPE and plot the results
 **********************************************************
 
-Outline
--------
-Diurnal cycles of CAPE will be calculated for each grid point in the
-domain of two models. Spatial averages are plotted for different regions.
-
-
-
 STEP 1: Data input
 ..................
 
@@ -137,12 +130,12 @@ directory in the *stats* and *imgs* sub-folders respectively
 Calculate diurnal cycles of 99th percentile CAPE values
 *******************************************************
 
-Outline
--------
-Perform similar calculations as above, however, instead of taking the mean value
-of each hour, the 99th percentile will be computed.  To this end we need to have
-all time steps available for the calculation and thus the *chunk dimension*
-should be changed from *'time'* (default) to *'space'*:
+Instead of the mean value for each hour in the diurnal cycle (at any grid point
+in the domain) it could be meaningful to use another statistical measure, for
+example the 99th percentile. To do this, in addition to changing the *stat
+method* value, one will need to have all time steps available for the
+calculation and thus the *chunk dimension* should be changed from *'time'*
+(default) to *'space'*:
 
 ::
 

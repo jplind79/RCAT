@@ -11,11 +11,9 @@ will be done in the configuration file, *src/config/config_main.ini*.
 Create hourly PDF statistics and visualize the results
 ******************************************************
 
-Outline
--------
-PDF's based on hourly data for historical and scenario simulations will be
-calculated for precipitation and T2m. Output statistics are then compared in
-line plots for specified regions.
+In the first example PDF's based on hourly data for historical and scenario
+simulations will be calculated for precipitation and T2m. Output statistics are
+then compared in line plots for specified regions.
 
 
 STEP 1: Data input
@@ -134,8 +132,6 @@ user-defined output directory.
 Calculate PDF's for daily maximum values instead
 ************************************************
 
-Outline
--------
 Imagine one would like to do the same kind of statistical analysis as above,
 however, with a different temporal resolution and/or time statistic on the input
 data. For example, let's assume that pdf's should be calculated for daily
