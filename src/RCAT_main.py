@@ -587,6 +587,10 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     vconf = get_variable_config(cdict['variables'][var], var)
     grdnme = grid_coords['target grid'][var]['gridname']
     st = stat.replace(' ', '_')
+    if stat == 'diurnal cycle':
+        stnm = "{}_{}".format(st, cdict['stats_conf'][stat]['dcycle stat'])
+    else:
+        stnm = st
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
         tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(
             ' ', '_')
@@ -603,7 +607,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     # Create dictionaries with list of files for models and obs
     _fm_list = {stat: [glob.glob(os.path.join(
         stat_outdir, '{}'.format(st), '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-            m, st, var, thrstr, tres, tstat, grdnme, yrs_d[m][0], yrs_d[m][1],
+            m, stnm, var, thrstr, tres, tstat, grdnme, yrs_d[m][0], yrs_d[m][1],
             get_month_string(mon_d[m]))))
                        for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
@@ -613,7 +617,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         _fo_list = {stat: [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-                o, st, var, thrstr, tres, tstat, grdnme,
+                o, stnm, var, thrstr, tres, tstat, grdnme,
                 yrs_d[o][0], yrs_d[o][1], get_month_string(mon_d[o]))))
             for o in obs_list]}
         fo_list = {s: [y for x in ll for y in x] for s, ll in _fo_list.items()}
@@ -654,7 +658,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         _fm_listr = {stat: {r:  [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                m, st, var, thrstr, tres, tstat, r.replace(' ', '_'), grdnme,
+                m, stnm, var, thrstr, tres, tstat, r.replace(' ', '_'), grdnme,
                 yrs_d[m][0], yrs_d[m][1], get_month_string(mon_d[m]))))
             for m in models] for r in cdict['regions']}}
         fm_listr = {s: {r: [y for x in _fm_listr[s][r] for y in x]
@@ -663,7 +667,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
             _fo_listr = {stat: {r: [glob.glob(os.path.join(
                 stat_outdir, '{}'.format(st),
                 '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                    o, st, var, thrstr, tres, tstat, r.replace(' ', '_'),
+                    o, stnm, var, thrstr, tres, tstat, r.replace(' ', '_'),
                     grdnme, yrs_d[o][0], yrs_d[o][1],
                     get_month_string(mon_d[o])))) for o in obs_list]
                 for r in cdict['regions']}}
