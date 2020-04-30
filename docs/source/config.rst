@@ -71,12 +71,13 @@ words, this is your starting point when applying RCAT.
      - SETTINGS
          **output dir**: The path for the output (statistics files, plots). If
          you re-run the analysis with the same output directory, you will
-         prompted to say whether to overwrite existing output. That is, if
-         agreed upon, already existing output files and figures will not be
-         removed but may be overwritten if the same model/obs data and
-         statistics is used again.
+         prompted to say whether to overwrite existing output. "overwrite" does
+         not mean that existing folder will be completely overwritten (deleted
+         and created again). The existing folder structure will be kept intact
+         together with output files. However, potentially some output
+         (statistics/figure files) with same names will be overwritten.
 
-         **variables**:One of the key settings in the configuration file. The
+         **variables**: One of the key settings in the configuration file. The
          value of this property is represented by a dictionary; the keys are
          strings of variable names ('pr', 'tas', ...) and the value of each key
          (variable) is another dictionary consiting of a number of specific
@@ -255,8 +256,8 @@ words, this is your starting point when applying RCAT.
 #. Run RCAT
      When you have done your configuration and saved config_main.ini you can
      start the analysis step. The main program is located in the src directory
-     and called RCAT_main.py. See point 1. :ref:`Setup folder structure
-     <configuration>` and run RCAT from your analysis folder.
+     and called RCAT_main.py. See point 1: :ref:`Setup folder structure
+     <configuration>` and run main RCAT_main.py from your analysis folder.
 
 
      .. code-block:: bash

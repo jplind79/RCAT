@@ -206,7 +206,7 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
 
 
 def regridding(data, data_name, var, target_grid, method):
-    print("\n** Regridding {} data **\n".format(data_name.upper()))
+    print("\t\t** Regridding {} data **\n".format(data_name.upper()))
 
     indata = data[data_name]['data']
 
@@ -261,12 +261,13 @@ def resampling(data, tresample):
     tr, fr = _get_freq(tresample[0])
     sec_resample = to_timedelta(tr, fr).total_seconds()
     if nsec != sec_resample:
+        print("\t\tResampling input data ...\n")
         data = eval("data.resample(time='{}', label='right').{}('time').\
                       dropna('time', 'all')".format(
                           tresample[0], tresample[1]))
     else:
-        print("Data is already at target resolution, skipping "
-              "resampling ...\n\n")
+        print("\t\tData is already at target resolution, skipping "
+              "resampling ...\n")
     return data
 
 
@@ -278,11 +279,11 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
     for v, f in vv.items():
         st_data[v] = {}
         for m in ddict[f][v]:
-            print("Calculate {} {} for {}\n".format(v, stat, m))
+            print("\tCalculate {} {} for {}\n".format(v, stat, m))
 
             if ddict[f][v][m] is None:
-                print("* Data not available for model {}".format(m))
-                print("* Moving on ...\n")
+                print("\t* Data not available for model {}, moving on".format(
+                    m))
             else:
                 indata = ddict[f][v][m]['data']
                 st_data[v][m] = {}
@@ -364,17 +365,22 @@ def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
     else:
         tstat = ''
     stat_name = stat.replace(' ', '_')
+    if stat in ('diurnal cycle'):
+        stat_fn = "{}_{}".format(stat_name, stat_dict['dcycle stat'])
+    else:
+        stat_fn = stat_name
+
     if regs is not None:
         for r in regs:
             rn = r.replace(' ', '_')
             data['regions'][r].attrs['Analysed time'] =\
                 "{}-{} | {}".format(sy, ey, tsuffix)
             fname = '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                label, stat_name, var, thr, tres, tstat, rn, grid, sy, ey,
+                label, stat_fn, var, thr, tres, tstat, rn, grid, sy, ey,
                 tsuffix)
             data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname))
     fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-        label, stat_name, var, thr, tres, tstat, grid, sy, ey, tsuffix)
+        label, stat_fn, var, thr, tres, tstat, grid, sy, ey, tsuffix)
     data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(sy, ey,
                                                                 tsuffix)
     data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
@@ -470,10 +476,12 @@ def get_variable_config(var_conf, var):
         'input resolution': var_conf['freq'],
         'units': var_conf['units'],
         'scale_factor': var_conf['scale factor'],
-        'obs_scale_factor': var_conf['obs scale factor'],
+        'obs_scale_factor': var_conf['obs scale factor'] if
+        'obs scale factor' in var_conf else None,
         'prep_func': get_prep_func(var_conf['accumulated']),
-        'regrid': var_conf['regrid to'],
-        'rgr_method': var_conf['regrid method'],
+        'regrid': var_conf['regrid to'] if 'regrid to' in var_conf else None,
+        'rgr_method': var_conf['regrid method'] if 'regrid method' in
+        var_conf else None,
     }
     return vdict
 
@@ -492,7 +500,7 @@ def get_mod_data(model, mconf, tres, var, cfactor, prep_func):
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
 
-    print("\n** Opening {} files **".format(model.upper()))
+    print("\t-- Opening {} files\n".format(model.upper()))
     if tres == 'mon':
         mod_data = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
     else:
@@ -518,7 +526,7 @@ def get_obs_data(obs, var, cfactor, sy, ey, mns):
     sdate = '{}{:02d}'.format(sy, np.min(mns))
     edate = '{}{:02d}'.format(ey, np.max(mns))
 
-    print("\n** Opening {} files **".format(obs.upper()))
+    print("\t-- Opening {} files\n".format(obs.upper()))
 
     # Open obs files
     obs_flist = obsmeta.get_file_list(var, obs, sdate, edate)
@@ -570,16 +578,19 @@ def get_obs_data(obs, var, cfactor, sy, ey, mns):
     return outdata
 
 
-def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
+def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
                   img_outdir, stat_outdir, stat):
     """
     Create a dictionary with settings for a validation plot procedure.
     """
     # Get some settings and meta data
-    var_conf = get_variable_config(cdict['variables'][var], var)
-    tres = var_conf['input resolution']
+    vconf = get_variable_config(cdict['variables'][var], var)
     grdnme = grid_coords['target grid'][var]['gridname']
     st = stat.replace(' ', '_')
+    if stat == 'diurnal cycle':
+        stnm = "{}_{}".format(st, cdict['stats_conf'][stat]['dcycle stat'])
+    else:
+        stnm = st
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
         tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(
             ' ', '_')
@@ -589,15 +600,14 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
              (cdict['stats_conf'][stat]['thr'] is not None) and
              (var in cdict['stats_conf'][stat]['thr']))
     if thrlg:
-        thrval = str(cdict['stats_conf'][stat]['thr'][v])
-        thrstr = "thr{}_".format(thrval.replace('.', ''))
+        thrstr = "thr{}_".format(str(cdict['stats_conf'][stat]['thr'][v]))
     else:
         thrstr = ''
 
     # Create dictionaries with list of files for models and obs
     _fm_list = {stat: [glob.glob(os.path.join(
         stat_outdir, '{}'.format(st), '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-            m, st, var, thrstr, tres, tstat, grdnme, yrs_d[m][0], yrs_d[m][1],
+            m, stnm, var, thrstr, tres, tstat, grdnme, yrs_d[m][0], yrs_d[m][1],
             get_month_string(mon_d[m]))))
                        for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
@@ -607,7 +617,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
         _fo_list = {stat: [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-                o, st, var, thrstr, tres, tstat, grdnme,
+                o, stnm, var, thrstr, tres, tstat, grdnme,
                 yrs_d[o][0], yrs_d[o][1], get_month_string(mon_d[o]))))
             for o in obs_list]}
         fo_list = {s: [y for x in ll for y in x] for s, ll in _fo_list.items()}
@@ -630,7 +640,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
         'variable': var,
         'time res': tres,
         'stat method': tstat,
-        'units': var_conf['units'],
+        'units': vconf['units'],
         'grid coords': grid_coords,
         'map configure': cdict['map configure'],
         'map grid setup': cdict['map grid setup'],
@@ -648,7 +658,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
         _fm_listr = {stat: {r:  [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                m, st, var, thrstr, tres, tstat, r.replace(' ', '_'), grdnme,
+                m, stnm, var, thrstr, tres, tstat, r.replace(' ', '_'), grdnme,
                 yrs_d[m][0], yrs_d[m][1], get_month_string(mon_d[m]))))
             for m in models] for r in cdict['regions']}}
         fm_listr = {s: {r: [y for x in _fm_listr[s][r] for y in x]
@@ -657,7 +667,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d,
             _fo_listr = {stat: {r: [glob.glob(os.path.join(
                 stat_outdir, '{}'.format(st),
                 '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                    o, st, var, thrstr, tres, tstat, r.replace(' ', '_'),
+                    o, stnm, var, thrstr, tres, tstat, r.replace(' ', '_'),
                     grdnme, yrs_d[o][0], yrs_d[o][1],
                     get_month_string(mon_d[o])))) for o in obs_list]
                 for r in cdict['regions']}}
@@ -727,9 +737,11 @@ grid_coords['target grid'] = {}
 data_dict = {}
 month_dd = {}
 year_dd = {}
+
+print("\n=== READ & PRE-PROCESS DATA ===")
 for var in cdict['variables']:
     tres = cdict['variables'][var]['freq']
-    print("\n\tVariable: {} -- Input resolution: {}".format(var, tres))
+    print("\n\tvariable: {}  |  input resolution: {}".format(var, tres))
 
     grid_coords['meta data'][var] = {}
     grid_coords['target grid'][var] = {}
@@ -784,7 +796,7 @@ for var in cdict['variables']:
 #                                             #
 ###############################################
 
-print("\n\t ---- Statistics ----\n")
+print("\n=== STATISTICS ===\n")
 stats_dict = {}
 for stat in cdict['stats_conf']:
     vrs = cdict['stats_conf'][stat]['vars']
@@ -804,18 +816,23 @@ for stat in cdict['stats_conf']:
 #                                             #
 ###############################################
 
+print("\n=== SAVE OUTPUT ===")
 for stat in cdict['stats_conf']:
-    print("\nWriting {} to disk ...".format(stat))
+    print("\n\twriting {} to disk ...".format(stat))
     for v in stats_dict[stat]:
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
                  (cdict['stats_conf'][stat]['thr'] is not None) and
                  (v in cdict['stats_conf'][stat]['thr']))
         if thrlg:
             thrval = str(cdict['stats_conf'][stat]['thr'][v])
-            thrstr = "thr{}_".format(thrval.replace('.', ''))
+            thrstr = "thr{}_".format(thrval)
         else:
             thrstr = ''
-        tres = cdict['variables'][v]['freq']
+        if cdict['stats_conf'][stat]['resample resolution'] is not None:
+            res_tres = cdict['stats_conf'][stat]['resample resolution']
+            tres = "_".join(res_tres)
+        else:
+            tres = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
         for m in stats_dict[stat][v]:
             time_suffix = get_month_string(month_dd[v][m])
@@ -833,13 +850,14 @@ for stat in cdict['stats_conf']:
 ###############################################
 
 if cdict['validation_plot']:
-    print('\n\n\t*** --- Entering plot section --- ***\n')
+    print('\n=== PLOTTING ===')
     import validation_plots as vplot
     statnames = list(stats_dict.keys())
     for sn in statnames:
         for v in stats_dict[sn]:
             plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
                                       cdict['variables'][v]['obs'], year_dd[v],
-                                      month_dd[v], img_outdir, stat_outdir, sn)
-            print("\t** Plotting: {} for {} **\n".format(sn, v))
+                                      month_dd[v], tres, img_outdir,
+                                      stat_outdir, sn)
+            print("\t\n** Plotting: {} for {} **".format(sn, v))
             vplot.plot_main(plot_dict, sn)
