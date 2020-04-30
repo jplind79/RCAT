@@ -43,8 +43,8 @@ def default_stats_config(stats):
         'diurnal cycle': {
             'vars': [],
             'resample resolution': None,
-            'hours': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-                      17, 18, 19, 20, 21, 22, 23],
+            'hours': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                      13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
             'dcycle stat': 'amount',
             'stat method': 'mean',
             'thr': None,
@@ -55,8 +55,8 @@ def default_stats_config(stats):
             'resample resolution': None,
             'pool data': False,
             'dcycle stat': 'amount',
-            'thr': 0.1,
-            'chunk dimension': 'space'},
+            'thr': None,
+            'chunk dimension': 'time'},
         'asop': {
             'vars': ['pr'],
             'resample resolution': None,
@@ -291,9 +291,10 @@ def diurnal_cycle(data, var, stat, stat_config):
     else:
         thr = in_thr
 
+    data = _check_hours(data)
+
     if dcycle_stat == 'amount':
         tstat = stat_config[stat]['stat method']
-        data = _check_hours(data)
         if 'percentile' in tstat:
             q = float(tstat.split(' ')[1])
             dcycle = data[var].groupby('time.hour').reduce(
@@ -306,12 +307,10 @@ def diurnal_cycle(data, var, stat, stat_config):
         errmsg = "For frequency analysis, a threshold ('thr') must be set!"
         assert thr is not None, errmsg
 
-        data_sub = data.where(data[var] >= thr)
-        data_sub = _check_hours(data_sub)
-        dcycle = data_sub.groupby('time.hour').count('time')
-        totdays = np.array([(data_sub['time.hour'].values == h).sum()
+        dcycle = data.groupby('time.hour').count('time')
+        totdays = np.array([(data['time.hour'].values == h).sum()
                             for h in np.arange(24)])
-        statnm = "Frequency | thr: {}".format(thr)
+        statnm = "Frequency | stat: counts | thr: {}".format(thr)
     else:
         print("Unknown configured diurnal cycle stat: {}".format(dcycle_stat))
         sys.exit()
