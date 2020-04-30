@@ -262,5 +262,9 @@ words, this is your starting point when applying RCAT.
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/main.py -c config_main.ini
+        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
 
+    .. note::
+
+        Don't forget to set $PYTHONPATH to the module folder in your RCAT
+        directory.
