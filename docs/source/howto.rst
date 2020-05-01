@@ -21,6 +21,12 @@ before continuation. The main configuration and setup of RCAT is done in
 along with) going through the examples below.
 
 
+.. note:: The Use Cases (and some parts of the source code) are in a few apects very
+        specific to the HPC system at the National Supercomputer Centre (NSC)
+        in Sweden; for example, available observation data sets and folder
+        structure of model output. In future updates of RCAT, we strive to make
+        it more general and flexible.
+
 Use Cases
 ---------
 
