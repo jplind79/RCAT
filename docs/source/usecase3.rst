@@ -74,7 +74,8 @@ The statistics, *diurnal cycle*, is specified under the *stats* key in the
 module. In default settings, *hours* is set to all 24 hours in a day. Since the
 data here is on 3 hourly resolution we specify these hours. The *stat method*
 (the statistical measure) for each hour is *mean* in default and it is kept
-here, and the data is chunked in the time dimension.
+here, and the data is chunked in the time dimension (also default so not
+specified here).
 
 ::
 
@@ -102,15 +103,17 @@ line plots for specified regions.
     line kwargs = {'lw': 2.5}
 
 
-STEP 5: Configure SLURM
-.......................
+STEP 5: Configure cluster
+.........................
 
-We will use 10 nodes (increase if needed) and a walltime of 2 hours.
+The number of nodes to be used in the selected SLURM cluster is set to 10
+(increase if needed) and a walltime of 2 hours.
 
 ::
 
+    cluster type = slurm
     nodes = 10
-    slurm kwargs = {'walltime': '02:00:00'}
+    cluster kwargs = {'walltime': '02:00:00'}
 
 
 STEP 6: Run RCAT
@@ -120,7 +123,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/main.py -c config_main.ini
+        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
 
 
 Output statistics and image files will be located under the user-defined output

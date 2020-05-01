@@ -98,17 +98,19 @@ Set validation plot to false -- no plotting done in this example.
     validation plot = False
 
 
-STEP 5: Configure SLURM
-.......................
+STEP 5: Configure cluster
+.........................
 
-Here one should set number of nodes to be used. In *slurm kwargs* a number of
-different SLURM options can be set, for example walltime which is here set to 2
-hours.
+Under the **CLUSTER** section one should specify which type of cluster to use.
+Here, it is configured for a SLURM cluster. *nodes* specify the number of nodes
+to be used. In *cluster kwargs* a number of different options can be set (here
+specific for SLURM), for example walltime which is set to 2 hours.
 
 ::
 
+    cluster type = slurm
     nodes = 10
-    slurm kwargs = {'walltime': '02:00:00'}
+    cluster kwargs = {'walltime': '02:00:00'}
 
 
 STEP 6: Run RCAT
@@ -118,7 +120,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/main.py -c config_main.ini
+        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
 
 
 If successfully completed, output statistics netcdf files will be located in the
