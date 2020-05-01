@@ -2,6 +2,7 @@
 Module script for plotting
 """
 import os
+import sys
 import xarray as xa
 import numpy as np
 import matplotlib as mpl
@@ -759,13 +760,17 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                                 for m in othr_mod]
 
     dcycle_stat = fmod[ref_model].attrs['Description'].\
-            split('|')[0].strip()
-    if dcycle_stat == 'amount':
+            split('|')[1].strip()
+    if dcycle_stat == 'Amount':
         dc_units = units
         fn_prfx = 'amnt'
-    else:
+    elif dcycle_stat == 'Frequency':
         dc_units = 'frequency'
         fn_prfx = 'freq'
+    else:
+        print("\n\tUnknown diurnal cycle statistic, exiting...")
+        sys.exit()
+
     thr = fmod[ref_model].attrs['Description'].\
             split('|')[3].split(':')[1].strip()
     season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
@@ -879,11 +884,15 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
         xdata = [[hours]*len(dlist[0]), [hours]*len(dlist[1])]
 
         dcycle_stat = fmod[ref_model].attrs['Description'].\
-                split('|')[0].strip()
-        if dcycle_stat == 'amount':
+                split('|')[1].strip()
+        if dcycle_stat == 'Amount':
             fn_prfx = 'amnt'
-        else:
+        elif dcycle_stat == 'Frequency':
             fn_prfx = 'freq'
+        else:
+            print("\n\tUnknown diurnal cycle statistic, exiting...")
+            sys.exit()
+
         thr = fmod[ref_model].attrs['Description'].\
                 split('|')[3].split(':')[1].strip()
         season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
