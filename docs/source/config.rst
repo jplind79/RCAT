@@ -202,56 +202,65 @@ words, this is your starting point when applying RCAT.
             line grid setup = {'axes_pad': (11., 6.)}
             line kwargs = {'lw': 2.5}
 
-     - SLURM
-         RCAT uses `Dask <https://docs.dask.org/>`_ to perform file managing
-         and statistical analysis in an efficient way through parallelization.
-         When applying Dask on queuing systems like PBS or Slurm,
-         `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_ provides an
-         excellent interface for handling such work flow. It is used in RCAT
-         and to properly use Dask and Dask-Jobqueue on an HPC system you need
-         to provide some information about that system and how you plan to use
-         it. By default, when Dask-Jobqueue is first imported a configuration
-         file is placed in ~/.config/dask/jobqueue.yaml. What is set in this
-         file are the default settings being used. On Bi/NSC we have set up a
-         default configuration file as below.
+     - CLUSTER
+        The last section control the cluster type. You can choose between local
+        pc and SLURM at the moment.
 
-         .. code-block:: yaml
+        **cluster type**: choose "local" for running on you local pc and
+        "slurm" if you want to run RCAT on a HPC with a SLURM job scheduler and
+        read information below. For local pc no other settings need to be made
+        in this section.
 
-            jobqueue:
-                slurm:
-                name: dask-worker
+        *SLURM*
+            RCAT uses `Dask <https://docs.dask.org/>`_ to perform file managing
+            and statistical analysis in an efficient way through parallelization.
+            When applying Dask on queuing systems like PBS or Slurm,
+            `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_ provides an
+            excellent interface for handling such work flow. It is used in RCAT
+            and to properly use Dask and Dask-Jobqueue on an HPC system you need
+            to provide some information about that system and how you plan to use
+            it. By default, when Dask-Jobqueue is first imported a configuration
+            file is placed in ~/.config/dask/jobqueue.yaml. What is set in this
+            file are the default settings being used. On Bi/NSC we have set up a
+            default configuration file as below.
 
-                # Dask worker options
-                cores: 16
-                memory: "64 GB"
-                processes: 1
+            .. code-block:: yaml
 
-                interface: ib0
-                death-timeout: 60
-                local-directory: $SNIC_TMP
+               jobqueue:
+                   slurm:
+                   name: dask-worker
 
-                # SLURM resource manager options
-                queue: null
-                project: null
-                walltime: '01:00:00'
-                job-extra: ['--exclusive']
+                   # Dask worker options
+                   cores: 16
+                   memory: "64 GB"
+                   processes: 1
 
-         When default settings have been set up, the main properties that you
-         usuallt want to change in the **SLURM** section are the number of nodes
-         to use and walltime:
+                   interface: ib0
+                   death-timeout: 60
+                   local-directory: $SNIC_TMP
 
-         ::
+                   # SLURM resource manager options
+                   queue: null
+                   project: null
+                   walltime: '01:00:00'
+                   job-extra: ['--exclusive']
 
-            nodes = 15
-            slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
+            When default settings have been set up, the main properties that you
+            usuallt want to change in the **CLUSTER** section are the number of nodes
+            to use and walltime:
 
-         **nodes**: Sometimes you might need more memory on the nodes, and on
-         Bi/NSC there are fat nodes available. If you want to use fat nodes,
-         you can specify this through
+            ::
 
-         ::
+               nodes = 15
+               slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
 
-            slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
+            **nodes**: Sometimes you might need more memory on the nodes, and on
+            Bi/NSC there are fat nodes available. If you want to use fat nodes,
+            you can specify this through
+
+            ::
+
+               slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
 
 #. Run RCAT
      When you have done your configuration and saved config_main.ini you can
