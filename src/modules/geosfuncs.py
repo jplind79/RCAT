@@ -10,18 +10,19 @@
 import sys
 import numpy as np
 import os
+from mpl_toolkits.basemap import Basemap
 
 
-def regions(area="", reg_print=False):
+def polygons(area="", poly_print=False):
     """
-    See available and retrieve regions from a region dictionary.
+    See available polygons and retrieve path to polygon files.
 
     Parameters
     ----------
     area: string
-        name of region to be extracted
-    reg_print: boolean
-        if available regions should be printed
+        name of polygon to be extracted
+    poly_print: boolean
+        if available polygons should be printed
 
     Returns
     -------
@@ -30,88 +31,31 @@ def regions(area="", reg_print=False):
     """
 
     # -------- Dictionary of predfined regions -------- #
-    reg_dir = "/home/sm_petli/dev/code/polygons/"
+    polypath = "../polygons/"
+    errmsg = "Folder to polygons does not seem to exist!"
+    assert os.path.exists(polypath), errmsg
 
-    reg_dict = {
-            "Sweden": "sweden_poly_6-12km.txt",
-            "Skane": "skane_poly.txt",
-            "Sweden flat": "sweden_no_mountains.txt",
-            "Sweden east coast": "sweden_east_coast.txt",
-            "Sweden north east coast": "sweden_northeast_coast.txt",
-            "North Sweden": "north_sweden.txt",
-            "South Sweden": "south_sweden.txt",
-            "Stockholm region": "stockholm_region.txt",
-            "Helsinki region": "helsinki_region.txt",
-            "Oslo region": "oslo_region.txt",
-            "Switzerland": "switzerland_poly_6-12km.txt",
-            "Norway": "norway_poly_6-12km.txt",
-            "South Norway": "south_norway_v2.txt",
-            "Mid Norway": "mid_norway.txt",
-            "Norwegian Sea": "norwegian_sea.txt",
-            "Norwegian Sea Large": "norwegian_sea_large.txt",
-            "Finland": "finland_poly.txt",
-            "Denmark": "denmark_poly.txt",
-            "Jutland interior": "jutland_interior_poly.txt",
-            "Netherlands": "netherlands.txt",
-            "Germany": "germany_poly_6-12km.txt",
-            "South Germany": "south_germany_poly.txt",
-            "Iberian peninsula": "iberian_poly_6-12km.txt",
-            "Spain": "spain_poly_6-12km.txt",
-            "France": "france_poly_6-12km.txt",
-            "Utd Kingdom": "UK_poly_6-12km.txt",
-            "EURO4M-APGD": "alp_poly.txt",
-            "Scandinavia": "Scand_poly.txt",
-            "Scandinavia Interior": "scandinavia_interior.txt",
-            "S Scandinavia": "south_scandinavia.txt",
-            "S Scandinavia Land": "south_scandinavia_land.txt",
-            "N Scandinavia Land": "north_scandinavia_land.txt",
-            "NE Scandinavia": "northeast_scandinavia.txt",
-            "NW Scandinavia": "northwest_scandinavia.txt",
-            "Central Europe": "MidEur_poly.txt",
-            "East Europe": "EastEur_poly.txt",
-            "S-E Europe": "SEastEur_poly.txt",
-            "West Europe": "WestEur_poly.txt",
-            "British Isles": "BIsles_poly_LS.txt",
-            "Mediterranean": "MedSea_poly.txt",
-            "USIS Sthlm": "usis_sthlm.txt",
-            "USIS Bologna": "usis_bologna.txt",
-            "USIS Amsterdam": "usis_amsterdam.txt",
-            "Crete": "crete_poly.txt",
-            "Crete domain": "crete_domain_v2.txt",
-            "NorCP analysis domain": "norcp_analysis_domain.txt",
-            "IMPRX SW Europe": "imprx_sweur_arome3_reduced100.txt",
-            "IMPRX SW Europe Land": "imprx_sweur_arome3_reduced100_land.txt",
-            "IMPRX SW Europe Sea": "imprx_sweur_arome3_reduced100_sea.txt",
-            "IMPRX CE Europe": "imprx_ceeur_arome3_reduced100.txt",
-            "IMPRX Nordic": "imprx_nordic_arome3_reduced100.txt",
-            "IMPRX Nordic Land": "imprx_nordic_arome3_reduced100_land.txt",
-            "IMPRX Nordic Sea": "imprx_nordic_arome3_reduced100_sea.txt",
-            "IMPRX Balticum": "imprx_balticum.txt",
-            "IMPRX PolBelUkr": "imprx_PolBelUkr.txt",
-            "IMPRX Po Valley N Adriatic": "imprx_Po_valley_N_AdriaticSea.txt",
-            "IMPRX West Mediterranean": "imprx_west_mediterranean.txt",
-            "IMPRX Hungary plains": "imprx_hungary_plains.txt",
-            "IMPRX Mid-Sweden": "imprx_mid_sweden.txt",
-            "Northernmost Scandinavia": "northernmost_scandinavia.txt",
-            }
+    polygons = os.listdir(polypath)
+    poly_dict = {s.split('.')[0].replace('_', ' '): s for s in polygons}
 
-    if reg_print:
+    if poly_print:
         print
-        print("Available regions:")
+        print("Available polygons/regions:")
         print
-        print([k for k in reg_dict])
+        print([k for k in poly_dict])
     else:
         try:
-            area_file = os.path.join(reg_dir, reg_dict[area])
+            area_file = os.path.join(polypath, poly_dict[area])
             return area_file
         except ValueError:
             print
-            print("Error! \n {0} is not a pre-defined area.".format(area))
+            print("ERROR! \n {0} is not a pre-defined area.".format(area))
 
 
-def reg_mask(xp, yp, area, data=None, iter_3d=None, cut_data=False):
+def mask_region(xp, yp, area, data=None, iter_3d=None, cut_data=False):
     """
     Routine to mask grid points outside a specified polygon.
+
     Parameters
     ----------
     xp,yp: numpy arrays
@@ -133,6 +77,7 @@ def reg_mask(xp, yp, area, data=None, iter_3d=None, cut_data=False):
         north/south/east/west grid point. This option will
         return not only masked and cut data but also cut lon/lat data as well
         as the box edges (as indices) in the x,y plane.
+
     Returns
     -------
     mask_out: boolean array
@@ -146,7 +91,9 @@ def reg_mask(xp, yp, area, data=None, iter_3d=None, cut_data=False):
         If cut_data is True, the tuples contain index of the edges of cropped
         region in x and y directions respectively.
     """
+
     from matplotlib.path import Path
+
     if data is not None:
         if iter_3d is not None:
             msg = ("\nERROR!\nIf iter_3d is set data array must be "
@@ -171,7 +118,7 @@ def reg_mask(xp, yp, area, data=None, iter_3d=None, cut_data=False):
         def coord_return(line):
             s = line.split()
             return list(map(float, s))
-        reg_file = regions(area)
+        reg_file = polygons(area)
         with open(reg_file, 'r') as ff:
             ff.readline()       # Skip first line
             poly = [coord_return(l) for l in ff.readlines()]
@@ -229,15 +176,15 @@ def reg_mask(xp, yp, area, data=None, iter_3d=None, cut_data=False):
     return masked_out
 
 
-def get_poly(print_areas=False):
+def create_polygon():
     """
     Retrieve polygon arbitrarily drawn interactively on a map
     by mouse clicking.
 
     Parameters
     ----------
-    print_areas: Boolean
-        Available regions are shown if set True.
+    print_zoom_areas: Boolean
+        Prints available zoom regions for polygon selection.
 
     Returns
     -------
@@ -246,7 +193,6 @@ def get_poly(print_areas=False):
     """
     import matplotlib.pyplot as plt
     import draw_polygon
-    from mpl_toolkits.basemap import Basemap
 
     def get_map(area, map_dict=None):
         # Create map object
@@ -366,10 +312,10 @@ def get_poly(print_areas=False):
 
     if area == 'print areas':
         print()
-        print("Available map areas:")
-        [print('{}\n'.format(ar)) for ar in map_dict.keys()]
+        print("Available map areas:\n")
+        [print('{}'.format(ar)) for ar in map_dict.keys()]
 
-        area = input("Ok, so what area have you chosen?\n\n>> ")
+        area = input("\n\nOk, so what area have you chosen?\n>> ")
         m = get_map(area, map_dict)
     elif area == 'latlon':
         m = get_map(area)
@@ -383,7 +329,7 @@ def get_poly(print_areas=False):
             try:
                 m = get_map(area, map_dict)
             except ValueError:
-                print("Nope! Something is wrong ... exiting")
+                print("Sorry! Something is wrong ... exiting")
                 sys.exit()
 
     s1 = "It's time to choose a polygon in the map soon to be shown ..."
@@ -401,21 +347,118 @@ def get_poly(print_areas=False):
 
     poly = [(x, y) for x, y in zip(lonpt, latpt)]
 
-    print()
-    print()
     s1 = "Do you want to write the polygon to disk?"
-    s2 = "Then, type 'write', it will be saved as 'poly.txt'"
+    s2 = "Then, type 'write' and instructions will follow."
     s3 = "If not, just press enter ..."
-    write = input('{}\n{}\n{}\n\n>> '.format(s1, s2, s3))
+    write = input('\n\n{}\n{}\n{}\n>> '.format(s1, s2, s3))
 
     if write == 'write':
-        f = open('poly.txt', 'w')
-        f.write(' '.join(str(s) for s in ('x', 'y')) + '\n')
-        for t in poly:
-            f.write(' '.join(str(s) for s in t) + '\n')
-        f.close()
+        s1 = "Type file directory path and file name as 'fdir, fname'"
+        s2 = "Make sure 'fname' is an appropriate name for the polygon."
+        s3 = ("N.B.\nIf polygon should be added to RCAT, make sure directory "
+              "path is set to: <path-to-rcat>/src/polygons")
+        file_info = input('\n{}\t\n{}\t\n{}\n>> '.format(s1, s2, s3))
+        file_info = file_info.split(',')
+
+        fdir = file_info[0].strip()
+        _fname = file_info[1].strip()
+        fname = "{}.txt".format(_fname.replace(' ', '_'))
+        with open(os.path.join(fdir, fname), 'w') as f:
+            f.write(' '.join(str(s) for s in ('x', 'y')) + '\n')
+            for t in poly:
+                f.write(' '.join(str(s) for s in t) + '\n')
 
     return poly
+
+
+def plot_polygon(polygon, savefig=False, figpath=None):
+    """
+    Plot polygon on map.
+
+    Parameters
+    ----------
+    polygon: string or list
+        Name of polygon as defined by poly_dict dictionary in 'polygons'
+        function, or list with polygon coordinates [[lon1, lat1], [lon2, lat2],
+        ..., [lon1, lat1]].
+    savefig: boolean
+        If True, figure is saved to 'figpath' location ('figpath' must be set!).
+        If false, figure is displayed on screen.
+    figpath: string
+        Path to folder for saved polygon figure.
+    """
+    import matplotlib.pyplot as plt
+    from datetime import datetime
+
+    # Colors
+    water = 'lightskyblue'
+    earth = 'cornsilk'
+
+    # Read polygon
+    if type(polygon).__name__ == 'str':
+        def coord_return(line):
+            s = line.split()
+            return list(map(float, s))
+        reg_file = polygons(polygon)
+        with open(reg_file, 'r') as ff:
+            ff.readline()       # Skip first line
+            poly = [coord_return(l) for l in ff.readlines()]
+        fname = '{}_polygon_plot.png'.format(polygon)
+    else:
+        poly = polygon
+        now = datetime.now().strftime('%y%m%dT%H%M')
+        fname = 'polygon_plot_{}.png'.format(now)
+
+    # Lats/lons
+    lons = [p[0] for p in poly]
+    lon_incr = (max(lons) - min(lons))*.2
+    lon_0 = (max(lons) + min(lons))/2
+
+    lats = [p[1] for p in poly]
+    lat_incr = (max(lats) - min(lats))*.2
+    lat_0 = (max(lats) + min(lats))/2
+
+    # Initalize figure
+    fig = plt.figure(figsize=[12, 13])
+    ax = fig.add_subplot(111)
+
+    mm = Basemap(resolution='i', projection='stere', ellps='WGS84',
+                 lon_0=lon_0, lat_0=lat_0,
+                 llcrnrlon=min(lons)-lon_incr, llcrnrlat=min(lats)-lat_incr,
+                 urcrnrlon=max(lons)+lon_incr, urcrnrlat=max(lats)+lat_incr,
+                 ax=ax)
+    mm.drawmapboundary(fill_color=water)
+    try:
+        mm.drawcoastlines()
+    except:
+        pass
+    try:
+        mm.fillcontinents(color=earth, lake_color=water)
+    except:
+        pass
+    try:
+        mm.drawcountries()
+    except:
+        pass
+
+    _draw_screen_poly(lats, lons, ax, mm, linewidth=4, color='m')
+
+    if savefig:
+        errmsg = "Error! 'figpath' must be set if saving figure"
+        assert figpath is not None, errmsg
+        plt.savefig(os.path.join(figpath, fname))
+    else:
+        plt.show()
+
+
+def _draw_screen_poly(lats, lons, ax, m, color='k', linewidth=3, alpha=1.0):
+    from matplotlib.patches import Polygon
+
+    x, y = m(lons, lats)
+    xy = list(zip(x, y))
+    poly = Polygon(xy, edgecolor=color, facecolor='none',
+                   lw=linewidth, alpha=alpha)
+    ax.add_patch(poly)
 
 
 def topo_mask(data, orog, orog_int):

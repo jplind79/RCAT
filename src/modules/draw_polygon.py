@@ -40,16 +40,16 @@ class Canvas(object):
         self.vert = []
         self.ax.set_title('LEFT: new point, MIDDLE: delete last point, RIGHT: close polygon')
 
-        self.x = [] 
+        self.x = []
         self.y = []
 
         self.mouse_button = {1: self._add_point, 2: self._delete_point, 3: self._close_polygon}
-        
+
     def set_location(self,event):
         if event.inaxes:
             self.x = event.xdata
             self.y = event.ydata
-               
+
     def _add_point(self):
         self.vert.append((self.x,self.y))
 
@@ -67,7 +67,7 @@ class Canvas(object):
 
         # Do whichever action correspond to the mouse button clicked
         self.mouse_button[event.button]()
-        
+
         x = [self.vert[k][0] for k in range(len(self.vert))]
         y = [self.vert[k][1] for k in range(len(self.vert))]
         self.path.set_data(x,y)
