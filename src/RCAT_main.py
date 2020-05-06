@@ -29,6 +29,7 @@ def get_settings(config_file):
     conf_dict = ini_reader.get_config_dict(config_file)
     d = {
         'models': conf_dict['MODELS'],
+        'obs metadata file': conf_dict['OBS']['metadata file'],
         'obs start year': conf_dict['OBS']['start year'],
         'obs end year': conf_dict['OBS']['end year'],
         'obs months': conf_dict['OBS']['months'],
@@ -526,12 +527,13 @@ def get_mod_data(model, mconf, tres, var, cfactor, prep_func):
     return outdata
 
 
-def get_obs_data(obs, var, cfactor, sy, ey, mns):
+def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     """
     Open obs data files.
     """
-    import observations_metadata as obsmeta
-    obs_dict = obsmeta.obs_data()
+    from importlib.machinery import SourceFileLoader
+    obs_meta = SourceFileLoader("obs_data", metadata_file).load_module()
+    obs_dict = obs_meta.obs_data()
 
     sdate = '{}{:02d}'.format(sy, np.min(mns))
     edate = '{}{:02d}'.format(ey, np.max(mns))
@@ -539,7 +541,7 @@ def get_obs_data(obs, var, cfactor, sy, ey, mns):
     print("\t-- Opening {} files\n".format(obs.upper()))
 
     # Open obs files
-    obs_flist = obsmeta.get_file_list(var, obs, sdate, edate)
+    obs_flist = obs_meta.get_file_list(var, obs, sdate, edate)
     f_obs = xa.open_mfdataset(obs_flist, combine='by_coords', parallel=True)
 
     # Extract years
@@ -770,6 +772,7 @@ for var in cdict['variables']:
         data_dict[tres].update({var: {}})
     var_conf = get_variable_config(cdict['variables'][var], var)
 
+    obs_metadata_file = cdict['obs metadata file']
     obs_name = cdict['variables'][var]['obs']
     obs_list = [obs_name] if not isinstance(obs_name, list) else obs_name
     obs_scf = var_conf['obs_scale_factor']
@@ -777,7 +780,7 @@ for var in cdict['variables']:
                if not isinstance(obs_scf, list) else obs_scf)
     if obs_name is not None:
         for oname, cfactor in zip(obs_list, obs_scf):
-            obs_data = get_obs_data(
+            obs_data = get_obs_data(obs_metadata_file,
                 oname, var, cfactor, cdict['obs start year'],
                 cdict['obs end year'], cdict['obs months'])
             data_dict[tres][var][oname] = obs_data

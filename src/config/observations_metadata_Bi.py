@@ -3,15 +3,19 @@
 #
 
 """
-Observation meta data should be added here
+This file contains information regarding observations used in RCAT.
+Paths to and file names (prefixes) of observations as well as some meta data
+should be added here.
+
+N.B.!
 The obs data filenames must include year and months that are covered by the
 specific file.
-The file pattern defined for each data set should have 'YYYYMM' wherever
-year and month occur in filename.
+The file pattern defined for each data set should have 'YYYYMM' at the
+locations in the file name where year and month occur.
 
 Ex.
-data filename = tas_day_ECMWF-ERA5_rean_r1i1p1_19970101-19971231.nc
-file pattern = tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc
+Full data filename: tas_day_ECMWF-ERA5_rean_r1i1p1_19970101-19971231.nc
+File pattern to set: tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc
 """
 
 import numpy as np
@@ -20,6 +24,12 @@ import glob
 
 
 def obs_data():
+    """
+    Dictionary with variables as top keys and available observations
+    directly below. For each observation data set, path and file pattern must
+    be defined.
+    """
+
     meta_dict = {
 
     # ------------------------------------------------------------------------
