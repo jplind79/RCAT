@@ -532,7 +532,7 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     Open obs data files.
     """
     from importlib.machinery import SourceFileLoader
-    obs_meta = SourceFileLoader("obs_data", metadata_file).load_module()
+    obs_meta = SourceFileLoader("obs_meta", metadata_file).load_module()
     obs_dict = obs_meta.obs_data()
 
     sdate = '{}{:02d}'.format(sy, np.min(mns))
