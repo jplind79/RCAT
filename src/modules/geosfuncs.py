@@ -11,6 +11,7 @@ import sys
 import numpy as np
 import os
 from mpl_toolkits.basemap import Basemap
+import argparse
 
 
 def polygons(area="", poly_print=False):
@@ -39,10 +40,8 @@ def polygons(area="", poly_print=False):
     poly_dict = {s.split('.')[0].replace('_', ' '): s for s in polygons}
 
     if poly_print:
-        print
-        print("Available polygons/regions:")
-        print
-        print([k for k in poly_dict])
+        print("\nAvailable polygons/regions:\n")
+        [print('\t{}'.format(ar)) for ar in poly_dict]
     else:
         try:
             area_file = os.path.join(polypath, poly_dict[area])
@@ -529,3 +528,36 @@ def find_geo_indices(lons, lats, x, y):
     ij_1d = np.linalg.norm(delta, axis=2).argmin()
     lat_idx, lon_idx = np.unravel_index(ij_1d, lons2d.shape)
     return lat_idx, lon_idx
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Script to create or plot polygons')
+    parser.add_argument('--purpose', '-p',  metavar='PURPOSE', type=str,
+                        help=('<Required> Purpose of application; either '
+                              '"create", "plot" or "printareas" for creating, '
+                              'plotting or printing available polygons '
+                              'respectively.'),
+                        required=True)
+    parser.add_argument('--area', '-a', metavar='POLYGON', type=str,
+                        help=('If purpose is to plot, this is the name of '
+                        'polygon to be plotted'))
+    parser.add_argument('--save', metavar='BOOLEAN', default=False,
+                        type=bool, help=('Wether to save polygon plot. Provide'
+                        ' also figpath (--figpath) if needed (defaults to ./)'))
+    parser.add_argument('--figpath', metavar='FILEPATH', default='./',
+                        type=str, help='Where to save polygon plot')
+    args = parser.parse_args()
+
+    if args.purpose == 'create':
+        create_polygon()
+    elif args.purpose == 'plot':
+        area = args.area
+        errmsg = "\n\tWhen plotting polygon, polygon name must be provided"
+        assert area is not None, errmsg
+
+        plot_polygon(area, args.save, args.figpath)
+    elif args.purpose == 'printareas':
+        polygons(poly_print=True)
+    else:
+        print("Unknown purpose of application (--purpose)!\nExiting...")
+        sys.exit()
