@@ -3,7 +3,7 @@
 RCAT Configuration
 ==================
 
-The main set up is done in the configuration file src/config/config_main.ini.
+The main set up is done in the **src/config/config_main.ini** configuration file.
 In this file you will set up paths to model data, which variables to analyze
 and how (define statistics), which observations to compare with etc. In other
 words, this is your starting point when applying RCAT.
@@ -62,11 +62,21 @@ words, this is your starting point when applying RCAT.
          difference plots will use first model in list as reference data.
 
      -  OBS
-         If observation data is to be used in the analysis, you will specify
-         here the time period and months for obs data. Thus, the same time
-         period will be used for all observations. Which observations to
-         include in the analysis is not defined here, but in the **SETTINGS**
-         section, in the variables property.
+         If observation data is to be used in the analysis, you will need to 
+         specify a meta data file by setting the full path to
+         *observations_metadata_NN.py* (located under <path-to-rcat>/src/config).
+         *NN* is any label that signifies the observation meta data for a
+         specific location or system (for example a HPC system). If such a
+         specific meta data file does not exist, it should be created
+         (SAMPLE_observations_metadata.py can be used as a template) and
+         modified. **N.B.** Change only the *obs_data* function -- where
+         observations are specified.
+
+         In addition, in this section one will specify the time period and
+         months for obs data. The same time period will be used for all
+         observations.  Which specific observations to include in the analysis
+         is not defined here, but in the **SETTINGS** section, in the variables
+         property.
 
      - SETTINGS
          **output dir**: The path for the output (statistics files, plots). If
@@ -80,7 +90,7 @@ words, this is your starting point when applying RCAT.
          **variables**: One of the key settings in the configuration file. The
          value of this property is represented by a dictionary; the keys are
          strings of variable names ('pr', 'tas', ...) and the value of each key
-         (variable) is another dictionary consiting of a number of specific
+         (variable) is another dictionary consisting of a number of specific
          settings:
 
          ::
@@ -91,7 +101,7 @@ words, this is your starting point when applying RCAT.
                 'tas': {'freq': 'day', 'units': 'K', 'scale factor': None, 'accumulated': False, 'obs': ['ERA5', 'EOBS'], 'obs scale factor': None, 'regrid to': 'ERA5', 'regrid method': 'bilinear'},
             }
 
-         * *freq*: A string of the time resolution of input __model__ data. The
+         * *freq*: A string of the time resolution of input model data. The
            string should match any of the sub-folders under the path to model
            data, e.g. 'day', '1H', '3H'. In effect, you may choose different
            time resolutions for different variables in the analysis.
@@ -104,23 +114,20 @@ words, this is your starting point when applying RCAT.
            multiplied with, to convert to desired units (e.g. from J/m2 to
            W/m2) and to ensure that all data (model and observations) have the
            same units. If no scaling is to be done, set value to None. An
-           arithmetic exoression is not allowed; for example if data is to be
+           arithmetic expression is not allowed; for example if data is to be
            divided by 10 you cannot define factor as 1/10, it must then be 0.1.
            It is assumed that all model data will use the same factor..
 
          * *accumulated*: Boolean switch identifying variable data as
            accumulated fields or not. If the former (True), then data will be
-           deaccumulated "on the fly" when opening files of data.
+           de-accumulated "on the fly" when opening files of data.
 
          * *obs*: String or list of strings with acronyms of observations to be
            included in the analysis (for the variable of choice, and therefore
            different observations can be chosen for different variables).
            Available observations, and their acronyms, are specified in the
-           :doc:`observations_metadata`. In this module you can also add new
-           observational data sets. The data should be in standrad CF
-           convention format and file names must include (in a certain format)
-           the years and months covered by the
-           data.
+           <path-to-rcat>/src/config/observations_metadata_NN.py file. In this
+           file you can also add new observational data sets. 
 
          * *obs scale factor*:As scale factor above but for observations. If
            multiple observations are defined, some of which would need
@@ -146,7 +153,7 @@ words, this is your starting point when applying RCAT.
 
      - STATISTICS
          Another main section of the analysis configuration. Therefore, the
-         descripition of this segment is given separately, see :doc:`RCAT
+         description of this segment is given separately, see :doc:`RCAT
          Statistics </statistics>`
 
      - PLOTTING
@@ -176,12 +183,12 @@ words, this is your starting point when applying RCAT.
 
             map configure = {'proj': 'stere', 'res': 'l', 'zoom': 'geom', 'zoom_geom': [1700000, 2100000], 'lon_0': 16.5, 'lat_0': 63}
 
-         For more settings, see the map_setup function in [plots.py](../src/modules/plots.py).
+         For more settings, see the map_setup function in the :doc:`plots module <plots>`.
 
          **map grid setup**: Settings for the map plot configuration, for
          example whether to use a colorbar or not (cbar_mode) and where to put
          it and the padding between panels. For more info, see the
-         image_grid_setup function in the :doc:`plotting module <plots>`.
+         image_grid_setup function in the :doc:`plots module <plots>`.
 
          ::
 
@@ -246,8 +253,8 @@ words, this is your starting point when applying RCAT.
                    job-extra: ['--exclusive']
 
             When default settings have been set up, the main properties that you
-            usuallt want to change in the **CLUSTER** section are the number of nodes
-            to use and walltime:
+            usually want to change in the **CLUSTER** section are the number of nodes
+            to use and wall time:
 
             ::
 
