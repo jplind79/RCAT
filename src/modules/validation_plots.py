@@ -220,7 +220,7 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.reg_mask(
+    mask = gfunc.mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -349,7 +349,7 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.reg_mask(
+    mask = gfunc.mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -586,7 +586,7 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.reg_mask(
+    mask = gfunc.mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -714,7 +714,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.reg_mask(
+    mask = gfunc.mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 

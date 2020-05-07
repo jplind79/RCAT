@@ -46,12 +46,19 @@ def polygons(area="", poly_print=False):
         print("\nAvailable polygons/regions:\n")
         [print('\t{}'.format(ar)) for ar in poly_dict]
     else:
-        try:
-            area_file = os.path.join(polypath, poly_dict[area])
-            return area_file
-        except ValueError:
-            print
-            print("ERROR! \n {0} is not a pre-defined area.".format(area))
+        # try:
+        #     area_file = os.path.join(polypath, poly_dict[area])
+        #     return area_file
+        # except ValueError:
+        #     print
+        #     print("ERROR! \n {0} is not a pre-defined area.".format(area))
+        errmsg = ("\n\n\tOohps! '{0}' is not a pre-defined area. Check polygon"
+                  " folder for the correct name or create a new "
+                  "polygon.").format(area)
+        assert area in poly_dict, errmsg
+
+        area_file = os.path.join(polypath, poly_dict[area])
+        return area_file
 
 
 def mask_region(xp, yp, area, data=None, iter_3d=None, cut_data=False):
