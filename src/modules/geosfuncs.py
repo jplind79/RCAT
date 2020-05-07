@@ -402,7 +402,7 @@ def plot_polygon(polygon, savefig=False, figpath=None):
         with open(reg_file, 'r') as ff:
             ff.readline()       # Skip first line
             poly = [coord_return(l) for l in ff.readlines()]
-        fname = '{}_polygon_plot.png'.format(polygon)
+        fname = '{}_polygon_plot.png'.format(polygon.replace(' ', '_'))
     else:
         poly = polygon
         now = datetime.now().strftime('%y%m%dT%H%M')
@@ -552,7 +552,7 @@ if __name__ == "__main__":
         create_polygon()
     elif args.purpose == 'plot':
         area = args.area
-        errmsg = "\n\tWhen plotting polygon, polygon name must be provided"
+        errmsg = ("\n\tWhen plotting polygon, polygon name must be provided")
         assert area is not None, errmsg
 
         plot_polygon(area, args.save, args.figpath)

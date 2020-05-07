@@ -142,7 +142,8 @@ words, this is your starting point when applying RCAT.
          and plotted for each of the regions. If the pool data option in
          statistics configuration (see below) is set to True, then data over
          regions will be pooled together before statistical calculations. If no
-         cropping of data is wanted, set this property to None.
+         cropping of data is wanted, set this property to None. Read more about
+         how to handle regions and polygons in RCAT :ref:`here <polygons_howto>`.
 
      - STATISTICS
          Another main section of the analysis configuration. Therefore, the
