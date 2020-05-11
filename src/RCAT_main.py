@@ -312,8 +312,9 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
                                                              stats_config)
                 if regions:
                     masks = {
-                        r: gfunc.reg_mask(data.lon.values, data.lat.values,
-                                          r, cut_data=False) for r in regions}
+                        r: gfunc.mask_region(
+                            data.lon.values, data.lat.values, r,
+                            cut_data=False) for r in regions}
                     if pool:
                         mdata = {r: get_masked_data(data, v, masks[r])
                                  for r in regions}
@@ -411,12 +412,12 @@ def get_masked_data(data, var, mask):
     #
     # def _mask_func(arr, axis=0, lons=None, lats=None, region=''):
     #     iter_3d = arr.shape[axis]
-    #     mdata = gfunc.reg_mask(lons, lats, region, arr, iter_3d=iter_3d,
-    #                            cut_data=True)[0]
+    #     mdata = gfunc.mask_region(lons, lats, region, arr, iter_3d=iter_3d,
+    #                               cut_data=True)[0]
     #     return mdata
 
-    # mask = gfunc.reg_mask(data.lon.values, data.lat.values, reg,
-    #                       cut_data=True)
+    # mask = gfunc.mask_region(data.lon.values, data.lat.values, reg,
+    #                          cut_data=True)
 
     # imask = mask[0]
     # mask_data = da.map_blocks(_mask_func, data[var].data, dtype=float,

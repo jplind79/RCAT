@@ -36,6 +36,12 @@ Use Cases
 
 #. :doc:`Diurnal Variations </usecase3>`
 
+
+RCAT polygons
+-------------
+
+* :doc:`How to create and plot polygons </polygons-howto>`
+
 .. toctree::
     :maxdepth: 0
     :hidden:
@@ -43,4 +49,5 @@ Use Cases
     usecase1
     usecase2
     usecase3
+    polygons-howto
 
