@@ -51,6 +51,7 @@ def get_settings(config_file):
 
     return d
 
+
 def local_cluster_setup():
     """
     Set up local-pc cluster
@@ -840,6 +841,7 @@ for stat in cdict['stats_conf']:
 ###############################################
 
 print("\n=== SAVE OUTPUT ===")
+tres_str = {}
 for stat in cdict['stats_conf']:
     print("\n\twriting {} to disk ...".format(stat))
     for v in stats_dict[stat]:
@@ -853,16 +855,16 @@ for stat in cdict['stats_conf']:
             thrstr = ''
         if cdict['stats_conf'][stat]['resample resolution'] is not None:
             res_tres = cdict['stats_conf'][stat]['resample resolution']
-            tres = "_".join(res_tres)
+            tres_str[stat] = "_".join(res_tres)
         else:
-            tres = cdict['variables'][v]['freq']
+            tres_str[stat] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
         for m in stats_dict[stat][v]:
             time_suffix = get_month_string(month_dd[v][m])
             st_data = stats_dict[stat][v][m]
             save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
                          year_dd[v][m][0], year_dd[v][m][1], time_suffix,
-                         cdict['stats_conf'][stat], tres, thrstr,
+                         cdict['stats_conf'][stat], tres_str[stat], thrstr,
                          cdict['regions'])
 
 
@@ -880,7 +882,7 @@ if cdict['validation_plot']:
         for v in stats_dict[sn]:
             plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
                                       cdict['variables'][v]['obs'], year_dd[v],
-                                      month_dd[v], tres, img_outdir,
+                                      month_dd[v], tres_str[sn], img_outdir,
                                       stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
             vplot.plot_main(plot_dict, sn)

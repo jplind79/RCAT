@@ -68,6 +68,7 @@ def plot_main(pltdict, statistic):
                       img_dir, grid_coords, map_conf, map_grid, map_sets,
                       line_grid, line_sets)
 
+
 def _map_grid_setup(map_grid_set):
     """
     Potentially modify map grid settings for map plots
@@ -94,11 +95,16 @@ def _map_configurations(map_conf_args, grid_conf_args, invar, ref_mod):
         }
     else:
         map_conf = map_conf_args.copy()
-        if 'zoom' in map_conf_args and map_conf_args['zoom'] == 'crnrs':
-            if 'crnr_vals' not in map_conf_args:
+        if 'zoom' in map_conf_args:
+            if map_conf_args['zoom'] == 'crnrs' and\
+               'crnr_vals' not in map_conf_args:
                 map_conf.update(
                     {'crnr_vals':
                      grid_conf_args['meta data'][invar][ref_mod]['crnrs']})
+            elif map_conf_args['zoom'] == 'geom':
+                errmsg = ("\t\tFor map plot with 'zoom': 'geom', 'zoom_geom' "
+                          "(zoom geometry -- width/height)must be set!")
+                assert 'zoom_geom' in map_conf_args, errmsg
         else:
             map_conf.update(
                 {'zoom': 'crnrs',
@@ -262,7 +268,7 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     figsize = (22, 14)
     figshape = (ndata + 1, 4)
     thr = fmod_msk[ref_model].attrs['Description'].\
-            split('|')[2].split(':')[1].strip()
+        split('|')[2].split(':')[1].strip()
     if thr != 'None':
         headtitle = '{} [{}] | Threshold: {}\n{}'.format(
             var, units, thr, ytitle)
@@ -504,7 +510,7 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
                 m.upper(), ref_mnme) for m in othr_mod]]
 
         thr = fmod[ref_model].attrs['Description'].\
-                split('|')[2].split(':')[1].strip()
+            split('|')[2].split(':')[1].strip()
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
