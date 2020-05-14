@@ -4,5 +4,6 @@ netCDF4
 numpy
 palettable
 pandas
+scikit-image
 scipy
 xarray
