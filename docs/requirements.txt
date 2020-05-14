@@ -1,9 +1,7 @@
-dask
+dask[complete]
 matplotlib
 netCDF4
-numpy
 palettable
-pandas
 scikit-image
 scipy
 xarray
