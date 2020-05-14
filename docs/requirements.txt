@@ -1,0 +1,8 @@
+dask
+matplotlib
+netCDF4
+numpy
+palettable
+pandas
+scipy
+xarray
