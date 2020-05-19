@@ -124,7 +124,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/src/RCAT_main.py -c config_main.ini
 
 
 Output statistics files will be located in the sub-folder *stats* under the

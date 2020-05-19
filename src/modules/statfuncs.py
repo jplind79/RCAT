@@ -1,11 +1,12 @@
 """
 Statistics module
----------------
+-----------------
 Functions for different statistical calculations.
 
 Created: Autumn 2016
 Authors: Petter Lind & David Lindstedt
 """
+
 import numpy as np
 import multiprocessing as mp
 from functools import reduce
@@ -94,6 +95,7 @@ def ehi(data, thr_95, axis=0, keepdims=False):
     EHI: float
         Excessive heat index
     """
+
     def ehi_calc(pdata, thr_95):
         if all(np.isnan(pdata)):
             print("All data missing/masked!")

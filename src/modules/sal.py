@@ -187,6 +187,7 @@ def L_stat(data, data_label, refdata, refdata_label):
         Dictionary with the calculated location components L1 and L2 as well as
         its composite L (L1 + L2).
     """
+
     from scipy.ndimage.measurements import center_of_mass
     from scipy.spatial.distance import pdist
 

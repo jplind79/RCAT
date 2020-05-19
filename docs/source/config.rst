@@ -17,7 +17,7 @@ words, this is your starting point when applying RCAT.
 
          mkdir -p $HOME/rcat_analysis/test
          cd $HOME/rcat_analysis/test
-         cp $HOME/git/rcat/config/config_main.ini .
+         cp <path-to-RCAT>/src/config/config_main.ini .
 
 #. Configure settings in config_main.ini
      Configuration is done in an .ini file which has a specific structure based
@@ -64,7 +64,7 @@ words, this is your starting point when applying RCAT.
      -  OBS
          If observation data is to be used in the analysis, you will need to 
          specify a meta data file by setting the full path to
-         *observations_metadata_NN.py* (located under <path-to-rcat>/src/config).
+         *observations_metadata_NN.py* (located under <path-to-RCAT>/src/config).
          *NN* is any label that signifies the observation meta data for a
          specific location or system (for example a HPC system). If such a
          specific meta data file does not exist, it should be created
@@ -126,7 +126,7 @@ words, this is your starting point when applying RCAT.
            included in the analysis (for the variable of choice, and therefore
            different observations can be chosen for different variables).
            Available observations, and their acronyms, are specified in the
-           <path-to-rcat>/src/config/observations_metadata_NN.py file. In this
+           <path-to-RCAT>/src/config/observations_metadata_NN.py file. In this
            file you can also add new observational data sets. 
 
          * *obs scale factor*:As scale factor above but for observations. If
@@ -279,7 +279,7 @@ words, this is your starting point when applying RCAT.
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/src/RCAT_main.py -c config_main.ini
 
     .. note::
 

@@ -123,7 +123,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/src/RCAT_main.py -c config_main.ini
 
 
 Output statistics and image files will be located under the user-defined output

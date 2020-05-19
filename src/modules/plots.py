@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 # Functions
 def figure_init(plottype='line', printtypes=False):
-    '''
+    """
     Setting up a figure object
 
     Parameters
@@ -25,7 +25,8 @@ def figure_init(plottype='line', printtypes=False):
         Type of plot to make
     printtypes: boolean
         If available plottypes should be printed on screen
-    '''
+    """
+
     pltypes = {
             'map': 'classic',
             'line': 'ggplot',
@@ -45,7 +46,7 @@ def image_grid_setup(figsize=(12, 12), fshape=(1, 1), **grid_kwargs):
     Set up the plot axes using mpl_toolkits.axes_grid1.ImageGrid
     Used primarily when plotting maps or for image analysis
     For more information on available settings:
-        https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html
+    https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html
 
     Parameters
     ----------

@@ -1,6 +1,6 @@
 """
 Atmospheric Function Module
----------------
+---------------------------
 Functions for different calculations wrt atmospheric physics
 
 Created: Autumn 2017
