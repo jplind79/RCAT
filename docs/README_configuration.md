@@ -130,10 +130,10 @@ String or list of strings with acronyms of observations to be included in the
 analysis (for the variable of choice, and therefore different observations can
 be chosen for different variables). Available observations, and their acronyms,
 are specified in
-[observations_metadata.py](../src/modules/observations_metadata.py). In this
-file you can also add new observational data sets. The data should be in
-standrad CF convention format and file names must include (in a certain format)
-the years and months covered by the data. 
+[SAMPLE_observations_metadata.py](../src/config/SAMPLE_observations_metadata.py).
+In this file you can also add new observational data sets. The data should be
+in standrad CF convention format and file names must include (in a certain
+format) the years and months covered by the data. 
 
 * *obs scale factor*
 

@@ -1,6 +1,6 @@
 """
 Config reader module
----------------
+--------------------
 Creates and return a dictionary built from a config file.
 
 Created: Autumn 2016

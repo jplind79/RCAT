@@ -12,7 +12,6 @@ modules
    geosfuncs
    grid_interpolation
    ini_reader
-   observations_metadata
    plots
    rcat_statistics
    sal

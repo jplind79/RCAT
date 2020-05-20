@@ -1,0 +1,7 @@
+dask[complete]
+matplotlib
+netCDF4
+palettable
+scikit-image
+scipy
+xarray

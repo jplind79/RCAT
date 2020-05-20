@@ -120,7 +120,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/src/RCAT_main.py -c config_main.ini
 
 
 If successfully completed, output statistics netcdf files will be located in the

@@ -20,8 +20,7 @@ statistics to be done, in a Python dictionary structure.
 The keys in stats are the statistical measures and values provides the
 settings/configurations to be applied to the specific statistical calculation.
 The statistics that are currently available in RCAT and their default settings
-are given in the `rcat_statistics.py (github)
-<https://github.com/jplind79/rcat/blob/master/src/rcat_statistics.py>`_. Also
+are given in the RCAT :doc:`rcat_statistics <rcat_statistics>`. Also
 see API-reference :doc:`statfuncs`. In particular, the default_stats_config
 function in that module specifies the statistics possible to calculate along
 with their properties. Many of the properties (or settings) are common for each
@@ -88,7 +87,7 @@ item values.
     steps and then perform calculations. If you want to the pooling to be done
     over certain sub-regions, then you need to specify these in the regions
     property in `config_main.ini (github)
-    <https://github.com/jplind79/rcat/blob/master/src/config/config_main.ini>`_.
+    <https://github.com/jplind79/RCAT/blob/master/src/config/config_main.ini>`_.
 
     **thr**: Thresholding of data. The value of this (None is the default)
     should be a dictionary with keys defining variables and values an integer
