@@ -139,9 +139,9 @@ def getcolormap(cmap_name, custom=False):
     if custom:
         cmap = color_dict[cmap_name]
     else:
-        msg = "Error retrieving colormap: {}.\nMake sure it exists in "
-        "Matplotlib's predefined colormaps, or change accordingly.".\
-            format(cmap_name)
+        msg = ("Error retrieving colormap: {}.\nMake sure it exists in "
+               "Matplotlib's predefined colormaps, or change "
+               "accordingly.").format(cmap_name)
         try:
             cmap = plt.cm.get_cmap(cmap_name)
         except ValueError:

@@ -7,6 +7,10 @@ Created: Spring 2015
 Updates:
         May 2020
 """
+import numpy as np
+from itertools import reduce
+import multiprocessing as mp
+from .bootstrap import block_bootstr, _mproc_get_bootsamples
 
 
 def freq_int_dist(data, keepdims=False, axis=0, bins=10, thr=None,

@@ -8,6 +8,9 @@ Created: Autumn 2016
 Updates:
         May 2020
 """
+import numpy as np
+import multiprocessing as mp
+
 
 def block_bootstr(data, block=5, nrep=500, nproc=1):
     """

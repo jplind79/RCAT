@@ -10,8 +10,7 @@ Updates:
 """
 
 import numpy as np
-import multiprocessing as mp
-from functools import reduce
+from .arithmetics import run_mean
 
 
 def hotdays_calc(data, thr_p75):
@@ -92,8 +91,9 @@ def ehi(data, thr_95, axis=0, keepdims=False):
             print("All data missing/masked!")
             ehi = np.nan
         else:
-            run_mean = moving_average(pdata, 3)
-            ehi = ((run_mean > thr_95)).sum()
+            # run_mean = moving_average(pdata, 3)
+            rmean = run_mean(pdata, 3)
+            ehi = ((rmean > thr_95)).sum()
 
         return ehi
 

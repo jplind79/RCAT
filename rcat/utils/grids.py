@@ -1,12 +1,11 @@
-#!/usr/bin/env python
-
 """
+Grid applications
+-----------------
 Functions to remap data given source and target grids
-Some utilities use python tool xESMF (which is dependent
-on ESMF and ESMPy, which needs to be installed).
+Some utilities use python tool xESMF.
 
 Author: Petter Lind (contributions from A. Prein)
-Date: 2019-01-30
+Date: Jan 2019
 """
 import numpy as np
 import logging

@@ -1,7 +1,7 @@
 """
 Atmospheric Function Module
----------------
-Functions for different calculations wrt atmospheric physics
+---------------------------
+Functions for calculations of various physical properties
 
 Created: Autumn 2017
 Authors: Petter Lind & David Lindstedt

@@ -10,6 +10,7 @@ Created: Spring 2019
 Updates:
         May 2020
 """
+import numpy as np
 
 
 def asop(data, keepdims=False, axis=0, bins=None, thr=None, return_bins=False):
