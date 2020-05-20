@@ -12,6 +12,57 @@ import numpy as np
 import logging
 
 
+def rotated_grid_transform(lons, lats, pole_lon, pole_lat, rot2reg=True):
+
+    # If lon/lat is 1D; create 2D meshgrid
+    lon, lat = np.meshgrid(lons, lats)\
+        if lats.ndim == 1 else (lons, lats)
+
+    lon = (lon*np.pi)/180  # Convert degrees to radians
+    lat = (lat*np.pi)/180
+
+    theta = 90 - pole_lat  # Rotation around y-axis
+    phi = pole_lon + 180  # Rotation around z-axis
+
+    # Convert degrees to radians
+    theta = (theta*np.pi)/180
+    phi = (phi*np.pi)/180
+
+    # Convert from spherical to cartesian coordinates
+    x = np.cos(lon)*np.cos(lat)
+    y = np.sin(lon)*np.cos(lat)
+    z = np.sin(lat)
+
+    if rot2reg:  # Rotated -> Regular
+
+        phi = -phi
+        theta = -theta
+
+        x_new = np.cos(theta)*np.cos(phi)*x + np.sin(phi)*y +\
+            np.sin(theta)*np.cos(phi)*z
+        y_new = -np.cos(theta)*np.sin(phi)*x + np.cos(phi)*y -\
+            np.sin(theta)*np.sin(phi)*z
+        z_new = -np.sin(theta)*x + np.cos(theta)*z
+
+    else:  # Regular -> Rotated
+
+        x_new = np.cos(theta)*np.cos(phi)*x + np.cos(theta)*np.sin(phi)*y +\
+            np.sin(theta)*z
+        y_new = -np.sin(phi)*x + np.cos(phi)*y
+        z_new = -np.sin(theta)*np.cos(phi)*x - np.sin(theta)*np.sin(phi)*y +\
+            np.cos(theta)*z
+
+    # Convert cartesian back to spherical coordinates
+    lon_trans = np.arctan2(y_new, x_new)
+    lat_trans = np.arcsin(z_new)
+
+    # Convert radians back to degrees
+    lon_trans = (lon_trans*180)/np.pi
+    lat_trans = (lat_trans*180)/np.pi
+
+    return lon_trans, lat_trans
+
+
 def fnCellCorners(rgrLon, rgrLat):
     '''
     File name: fnCellBoundaries
@@ -197,13 +248,12 @@ def _write_grid_info(lons_row, lons_cor, lats_row, lats_cor, nlon, nlat,
                 "degrees_east\nyname     = lat\nylongname = latitude\nyunits"
                 "    = degrees_north\nxsize     = {}\nysize     = {}\nxvals "
                 "    =\n{}\nxbounds     =\n{}\nyvals     =\n{}\nybounds     "
-                "=\n{}".format(
-                    lons.size, lons.shape[1], lons.shape[0],
-                    ln_row_str, ln_cor_str, lt_row_str, lt_cor_str))
+                "=\n{}".format(nlon*nlat, nlon, nlat, ln_row_str, ln_cor_str,
+                               lt_row_str, lt_cor_str))
 
     # Write to file
     with open(fname, 'w') as outfile:
-            outfile.write(grid_txt)
+        outfile.write(grid_txt)
 
 
 def fnRemapConOperator(rgrLonS, rgrLatS, rgrLonT, rgrLatT, rgrLonSBNDS=None,
@@ -394,7 +444,7 @@ def fnRemapCon(rgrLonS, rgrLatS, rgrLonT, rgrLatT, grOperator, rgrData):
                         rgrData[:, rgrSource[:, 0].astype('int'),
                                 rgrSource[:, 1].astype('int')],
                         weights=rgrSource[:, 2], axis=1)
-                except:
+                except RuntimeError:
                     logging.warn("stop")
                     stop()
     if len(rgrData.shape) == 4:
