@@ -33,10 +33,10 @@ def polygons(area="", poly_print=False):
 
     # -------- Dictionary of predfined regions -------- #
     file_dir = os.path.dirname(os.path.abspath(__file__))
-    p_dir = os.path.dirname(file_dir)
-    polypath = os.path.join(p_dir, 'polygons')
+    # p_dir = os.path.dirname(file_dir)
+    polypath = os.path.join(file_dir, 'polygons')
 
-    errmsg = "Folder to polygons does not seem to exist!"
+    errmsg = "Folder to polygons: {}, does not seem to exist!".format(polypath)
     assert os.path.exists(polypath), errmsg
 
     polygons = os.listdir(polypath)
