@@ -10,6 +10,7 @@ Created: Spring 2019
 Updates:
         May 2020
 """
+
 import numpy as np
 
 
@@ -128,8 +129,8 @@ def bins_calc(n):
     Calculates bins with edges according to Eq. 1 in Klingaman et al. (2017);
     https://www.geosci-model-dev.net/10/57/2017/
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     n: array/list
         1D array or list with bin numbers
 
@@ -138,6 +139,7 @@ def bins_calc(n):
     bn: array
         1D array of bin edges
     """
+
     bn = np.e**(np.log(0.005)+(n*(np.log(120)-np.log(0.005))**2/59)**(1/2))
 
     return bn

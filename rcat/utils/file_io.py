@@ -183,7 +183,8 @@ def write2netcdf(filename, filedir, dim, variables, global_attr=None,
     you can choose from 'NETCDF3_CLASSIC', 'NETCDF3_64BIT',
     'NETCDF4_CLASSIC', and 'NETCDF4' (default)
 
-    Parameters:
+    Parameters
+    ----------
         filename: str
             name of netcdf file to write to
         filedir: str
@@ -205,37 +206,36 @@ def write2netcdf(filename, filedir, dim, variables, global_attr=None,
     The dictionaries should be structured as described by the examples
     below:
 
-        dims_dict = {}
-        dims_dict['x'] = 154
-        dims_dict['y'] = 192
-        dims_dict['nv'] = 4
-        dims_dict['time'] = None
+    dims_dict = {}
+    dims_dict['x'] = 154
+    dims_dict['y'] = 192
+    dims_dict['nv'] = 4
+    dims_dict['time'] = None
 
-        vars_dict = {}
-        vars_dict = {'lon': {'values': lons, 'dims': ('y', 'x'),
-                             'attributes': {'long_name': 'longitude',
-                                            'standard_name': 'longitude',
-                                            'units': 'degrees_east',
-                                            '_CoordinateAxisType': 'Lon'}},
-                     'lat': {'values': lats, 'dims': ('y', 'x'),
-                             'attributes': {'long_name': 'latitude',
-                                            'standard_name': 'latitude',
-                                            'units': 'degrees_north',
-                                            '_CoordinateAxisType': 'Lat'}},
-                     'pr': {'values': pr, 'dims': ('time', 'y', 'x'),
-                            'attributes': {'long_name': 'precipitation',
-                                        'standard_name': 'precipitation flux',
-                                           'units': 'kg m-2 s-1',
-                                           'coordinates': 'lon lat',
-                                           '_FillValue': -9999.}}}
+    vars_dict = {}
+    vars_dict = {'lon': {'values': lons, 'dims': ('y', 'x'),
+                         'attributes': {'long_name': 'longitude',
+                                        'standard_name': 'longitude',
+                                        'units': 'degrees_east',
+                                        '_CoordinateAxisType': 'Lon'}},
+                 'lat': {'values': lats, 'dims': ('y', 'x'),
+                         'attributes': {'long_name': 'latitude',
+                                        'standard_name': 'latitude',
+                                        'units': 'degrees_north',
+                                        '_CoordinateAxisType': 'Lat'}},
+                 'pr': {'values': pr, 'dims': ('time', 'y', 'x'),
+                        'attributes': {'long_name': 'precipitation',
+                                    'standard_name': 'precipitation flux',
+                                       'units': 'kg m-2 s-1',
+                                       'coordinates': 'lon lat',
+                                       '_FillValue': -9999.}}}
 
-        glob_attr = {'description': 'some description of file',
-                     'history': 'Created ' + time.ctime(time.time()),
-                     'experiment': 'Fractions Skill Score analysis',
-                     'contact': 'petter.lind@smhi.se',
-                     'references': 'http://journals.ametsoc.org/doi/abs/\
-                                    10.1175/2007MWR2123.1'}
-
+    glob_attr = {'description': 'some description of file',
+                 'history': 'Created ' + time.ctime(time.time()),
+                 'experiment': 'Fractions Skill Score analysis',
+                 'contact': 'petter.lind@smhi.se',
+                 'references': 'http://journals.ametsoc.org/doi/abs/\
+                         10.1175/2007MWR2123.1'}
     """
 
     # Open file in write mode

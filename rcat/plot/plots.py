@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 # Functions
 def figure_init(plottype='line', printtypes=False):
-    '''
+    """
     Setting up a figure object
 
     Parameters
@@ -25,7 +25,8 @@ def figure_init(plottype='line', printtypes=False):
         Type of plot to make
     printtypes: boolean
         If available plottypes should be printed on screen
-    '''
+    """
+
     pltypes = {
             'map': 'classic',
             'line': 'ggplot',
@@ -45,7 +46,7 @@ def image_grid_setup(figsize=(12, 12), fshape=(1, 1), **grid_kwargs):
     Set up the plot axes using mpl_toolkits.axes_grid1.ImageGrid
     Used primarily when plotting maps or for image analysis
     For more information on available settings:
-        https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html
+    https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html
 
     Parameters
     ----------
@@ -60,12 +61,12 @@ def image_grid_setup(figsize=(12, 12), fshape=(1, 1), **grid_kwargs):
         fig: Figure object
         grid: AxesGrid object
 
-    Examples of **kwargs with default values:
+    Examples of ``**kwargs`` with default values:
         direction="row",
         axes_pad=0.02,
         add_all=True,
         share_all=False,
-        label_mode = "L",
+        label_mode="L",
         aspect=True,
         cbar_mode=None,
         cbar_location="right",
@@ -90,6 +91,7 @@ def get_nrow_ncol(npanels):
     Return number of rows and columns from a given total no
     of panels for a grid
     """
+
     from math import sqrt, floor, ceil
     nrow, ncol = (floor(sqrt(npanels)), ceil(npanels/(floor(sqrt(npanels)))))
     return (nrow, ncol)
@@ -97,7 +99,7 @@ def get_nrow_ncol(npanels):
 
 def fig_grid_setup(figsize=(12, 12), fshape=(1, 1), direction='row',
                    axes_pad=(None, None), **grid_kwargs):
-    '''
+    """
     Set up the plot axes using pyplot.subplots
 
     Parameters
@@ -116,7 +118,7 @@ def fig_grid_setup(figsize=(12, 12), fshape=(1, 1), direction='row',
     -------
         fig: Figure object
         grid: List with axes instances
-    '''
+    """
 
     fig, grid = plt.subplots(
                                 fshape[0],
@@ -139,7 +141,7 @@ def axes_settings(ax, figtitle=None, xlabel=None, ylabel=None, xtlabels=None,
                   ylim=None, color='k', fontsize='xx-large',
                   fontsize_lbls='xx-large', fontsize_title='xx-large',
                   ftitle_location='center'):
-    '''
+    """
     Configuration of axes; titles and labels
 
     Parameters
@@ -164,7 +166,7 @@ def axes_settings(ax, figtitle=None, xlabel=None, ylabel=None, xtlabels=None,
         ftitle_location: str
             Horizontal alignment of figure title; center (default),
             right or left.
-    '''
+    """
 
     if figtitle is not None:
         ax.set_title(figtitle, fontsize=fontsize_title, color=color,
@@ -189,7 +191,7 @@ def axes_settings(ax, figtitle=None, xlabel=None, ylabel=None, xtlabels=None,
 def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
                       time_mean=None, time_units=None, fontsize='x-large',
                       fontsize_htitle='xx-large'):
-    '''
+    """
     Settings for map plot axes
 
     Parameters
@@ -212,7 +214,8 @@ def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
             Size of font for figure title
         fontsize_htitle: string or int
             Size of font for suptitle
-    '''
+    """
+
     from itertools import cycle
 
     def map_label(axs, labels):
@@ -275,6 +278,7 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
         axs: Axes objects
             The axes objects created for each plot
     """
+
     if grid.size == 1:
         xd = [xdata] if isinstance(xdata[0],
                                    (list, tuple, np.ndarray)) else [[xdata]]
@@ -386,6 +390,7 @@ def make_raster_plot(data, grid=None, clevs=None, norm=None, cmap='viridis',
         rasters: Plot objects
             The raster plot objects created for each plot
     """
+
     # Single or multiple 2d data arrays
     iter_data = data if isinstance(data, (list, tuple)) else [data]
 
@@ -464,6 +469,7 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
         axs: Axes objects
             The axes objects created for each plot
     """
+
     if grid.size == 1:
 
         yd = [ydata] if isinstance(
@@ -585,6 +591,7 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
         axs: Axes objects
             The axes objects created for each plot
     """
+
     if grid.size == 1:
         ldata = [data] if not isinstance(data, (list, tuple)) else data
         idata = [ldata] if len(ldata) > 1 else ldata
@@ -715,6 +722,7 @@ def _decorate_box(ax, bp):
         ax: Axes handle
         bp: boxplot object; i.e. returned from pyplot.boxplot call
     """
+
     from itertools import cycle
 
     idx = [1, 5, 3, 7, 10, 6, 2, 8, 0, 11, 9, 4]
@@ -795,6 +803,7 @@ def gen_clevels(data, nsteps, robust=None):
             If to soften the max/min limits due to extreme values;
             "top"/"bottom"/"both", which end(s) to soften.
     """
+
     dmin = float('{:.2g}'.format(np.nanmin(data)))
     dmin = 0.0 if abs(dmin-0.0) < 1e-10 else dmin
     dmin = np.nanpercentile(data, 2) if robust in ('bottom', 'both') else dmin
@@ -853,6 +862,7 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
             list containing x,y arrays of the transformed longitudes
             to map coordinates
     """
+
     from mpl_toolkits.basemap import Basemap
 
     def _get_mapobj(ax, lats, lons):
@@ -959,6 +969,7 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
         mplots: List
             List with map plot instances
     """
+
     # Single or multiple 2d data arrays
     iter_data = data if isinstance(data, (list, tuple)) else [data]
 
@@ -1086,6 +1097,7 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
     -------
         cs: Contour plot object
     """
+
     if mesh:
         cs = m.pcolormesh(x, y, data,
                           cmap=cmap,
@@ -1143,6 +1155,7 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
             See
             http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.colorbar
     """
+
     cs = cs if isinstance(cs, list) else [cs]
     nplots = len(cs)
 

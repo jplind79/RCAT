@@ -8,7 +8,7 @@ Updates:
         May 2020
 """
 import numpy as np
-from itertools import reduce
+from functools import reduce
 import multiprocessing as mp
 from .bootstrap import block_bootstr, _mproc_get_bootsamples
 

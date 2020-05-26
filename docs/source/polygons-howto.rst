@@ -8,10 +8,10 @@ Polygons in RCAT
 Polygons are used in RCAT to extract or select data and statistics for specified
 sub-regions or areas. These consist of text files containing information of
 latitudes and longitudes for the area and are stored under
-*<path-to-rcat>/src/polygons*. The :doc:`geosfuncs <geosfuncs>` module use these
-polygons to do the extraction (with the *mask_region* function) and it also has
-a number of different help functions to create new polygons (for RCAT or
-elsewhere) and plot them conveniently.
+*<path-to-RCAT>/rcat/polygons/*. The :ref:`polygons` module use these polygons
+to do the extraction (with the *mask_region* function) and it also has a number
+of different help functions to create new polygons (for RCAT or elsewhere) and
+plot them conveniently.
 
 The following tutorial will describe some of this functionality along with a few
 examples.
@@ -20,15 +20,15 @@ examples.
 Plot a polygon
 ..............
 
-The :doc:`geosfuncs <geosfuncs>` module has a function called *plot_polygon*
+The :ref:`polygons` module has a function called *plot_polygon*
 which allows you to plot one of the existing polygons on map. There are a couple
 of ways to apply the function -- either from within python (or in a script)
 where the module is imported and plotting function calls can be made, or the
 function call can be made directly from command line::
 
-    >> import geosfuncs as gf
-    >> gf.plot_polygon?
-    Signature: gf.plot_polygon(polygon, savefig=False, figpath=None)
+    >> import rcat.utils.polygons as pg
+    >> pg.plot_polygon?
+    Signature: pg.plot_polygon(polygon, savefig=False, figpath=None)
     Docstring:
     Plot polygon on map.
 
@@ -45,15 +45,15 @@ function call can be made directly from command line::
         Path to folder for saved polygon figure.
 
 The *plot_polygon* function takes a polygon name as input chosen from the list
-of existing polygons in <path-to-rcat>/src/polygons. [Note that the polygon name
-is the text file name without '.txt' and underscores replaced by white space.]
-Also new polygons can be plotted if providing a list with polygon coordinates
-(not possible when executing function from command line!).  The keyword
-arguments allows to save the polygon plot, if not it is just displayed.
+of existing polygons in <path-to-RCAT>/rcat/utils/polygons. [Note that the
+polygon name is the text file name without '.txt' and underscores replaced by
+white space.] Also new polygons can be plotted if providing a list with polygon
+coordinates (not possible when executing function from command line!). The
+keyword arguments allows to save the polygon plot, if not it is just displayed.
 
 If you do not know which polygons are available, you can easily print them::
 
-    >> gf.polygons(poly_print=True)
+    >> pg.polygons(poly_print=True)
 
     Available polygons/regions:
 
@@ -80,7 +80,7 @@ If you do not know which polygons are available, you can easily print them::
 
 To plot the polygon of British Isles::
 
-    >> gf.plot_polygon('British Isles')
+    >> pg.plot_polygon('British Isles')
 
 This function call can be made directly from the command line. Run the 
 *geosfuncs.py* script (make sure it is executable) providing
