@@ -5,7 +5,7 @@ Use Case 1: Annual & and Seasonal Cycles
 
 In this example annual and seasonal statistics will be calculated and in most
 steps, changes are made in different sections of the configuration file,
-*src/config/config_main.ini*. It is recommended to copy this file to your
+*<path-to-RCAT>/config/config_main.ini*. It is recommended to copy this file to your
 experiment folder. Detailed information of what can be configured and how can be
 found in :ref:`configuration`.
 
@@ -64,9 +64,9 @@ and precipitation (*pr*) with daily data as input (*'freq'* set to *'day'*).
 
 ::
 
-    regions = ['Scandinavia']
+    regions = ['Fenno-Scandinavia']
 
-*regions* is a list of pre-defined regions -- see available regions in :doc:`geosfuncs <geosfuncs>` module.
+*regions* is a list of pre-defined regions -- see available regions in *<path-to-RCAT>/rcat/utils/polygons* folder (see also :ref:`Polygons` module).
 Statistics will be selected for the specified sub-regions.
 
 
@@ -83,8 +83,8 @@ Under **STATISTICS** seasonal and annual cycles are chosen.
         }
 
 The *'default'* property means that default options for the particular statistic are used.
-All default options can be seen in the *default_stats_config* function in the
-:doc:`statistics <rcat_statistics>` module. For seasonal cycle, we choose to
+All default options can be seen in the *default_stats_config* function in
+:ref:`RCAT Statistics <stats_control_functions>`. For seasonal cycle, we choose to
 use a threshold for precipitation of *1.0* and so calculation is only based on wet days.
 
 
@@ -120,7 +120,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
 
 
 If successfully completed, output statistics netcdf files will be located in the

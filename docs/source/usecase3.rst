@@ -15,7 +15,7 @@ be applied to calculate diurnal cycles of some model output using different
 statistical measures and how the splitting/chunking of data matters.
 
 Similar to :ref:`Use Case 1 <use_case_1>` most changes will be done in the
-configuration file, *src/config/config_main.ini*.
+configuration file, *<path-to-RCAT>/config/config_main.ini*.
 
 
 Calculate diurnal cycles of mean CAPE and plot the results
@@ -70,8 +70,9 @@ STEP 3: Select statistics
 
 The statistics, *diurnal cycle*, is specified under the *stats* key in the
 **STATISTICS** section. Default options for diurnal cycle is found in the
-*default_stats_config* function in the :doc:`statistics <rcat_statistics>`
-module. In default settings, *hours* is set to all 24 hours in a day. Since the
+*default_stats_config* function in :ref:`RCAT Statistics
+<stats_control_functions>`.
+In default settings, *hours* is set to all 24 hours in a day. Since the
 data here is on 3 hourly resolution we specify these hours. The *stat method*
 (the statistical measure) for each hour is *mean* in default and it is kept
 here, and the data is chunked in the time dimension (also default so not
@@ -123,7 +124,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
 
 
 Output statistics and image files will be located under the user-defined output

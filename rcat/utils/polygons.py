@@ -130,7 +130,7 @@ def mask_region(xp, yp, area, data=None, iter_3d=None, cut_data=False):
         reg_file = polygons(area)
         with open(reg_file, 'r') as ff:
             ff.readline()       # Skip first line
-            poly = [coord_return(l) for l in ff.readlines()]
+            poly = [coord_return(ln) for ln in ff.readlines()]
     else:
         poly = area
     reg_path = Path(np.array(poly))
@@ -203,7 +203,7 @@ def create_polygon():
     import matplotlib.pyplot as plt
     import draw_polygon
 
-    def get_map(area, map_dict=None):
+    def get_map(area, map_resolution='l', map_dict=None):
         # Create map object
         if area == 'latlon':
             s1 = "Type in southern-most latitude"
@@ -223,13 +223,13 @@ def create_polygon():
                         llcrnrlon=lon1, urcrnrlon=lon2,
                         lat_0=(lat1+lat2)/2, lon_0=(lon1+lon2)/2,
                         projection='stere',
-                        resolution='l')
+                        resolution=map_resolution)
         else:
             m = Basemap(ax=ax,
                         width=map_dict[area]['wdth'],
                         height=map_dict[area]['hght'],
                         projection=map_dict[area]['proj'],
-                        resolution='l',
+                        resolution=map_resolution,
                         lat_0=map_dict[area]['lat0'],
                         lon_0=map_dict[area]['lon0'])
         m.drawmapboundary(fill_color='#e6f2ff')
@@ -319,24 +319,30 @@ def create_polygon():
     s3 = "Type 'latlon' to choose area manually"
     area = input('{}\n{}\n{}\n\n>> '.format(s1, s2, s3))
 
+    mres = input("\nOne more thing before continuing -- what resolution would "
+                 "you like for the map?\nOptions are 'c' (crude), 'l' (low), "
+                 "'i' (intermediate), 'h' (high), 'f' (full).\nDefault is low"
+                 " -- if this is ok just press enter ...\n>> ")
+    mres = 'l' if not mres else mres
+
     if area == 'print areas':
         print()
         print("Available map areas:\n")
         [print('{}'.format(ar)) for ar in map_dict.keys()]
 
         area = input("\n\nOk, so what area have you chosen?\n>> ")
-        m = get_map(area, map_dict)
+        m = get_map(area, mres, map_dict)
     elif area == 'latlon':
-        m = get_map(area)
+        m = get_map(area, mres)
     else:
         try:
-            m = get_map(area, map_dict)
+            m = get_map(area, mres, map_dict)
         except ValueError:
             print("The area you provided is not available.\nPlease, try"
                   " again ...")
             area = input("What area would you like to show on map?\n\n>> ")
             try:
-                m = get_map(area, map_dict)
+                m = get_map(area, mres, map_dict)
             except ValueError:
                 print("Sorry! Something is wrong ... exiting")
                 sys.exit()
@@ -380,7 +386,7 @@ def create_polygon():
     return poly
 
 
-def plot_polygon(polygon, savefig=False, figpath=None):
+def plot_polygon(polygon, map_resolution='l', savefig=False, figpath=None):
     """
     Plot polygon on map.
 
@@ -390,8 +396,15 @@ def plot_polygon(polygon, savefig=False, figpath=None):
         Name of polygon as defined by poly_dict dictionary in 'polygons'
         function, or list with polygon coordinates [[lon1, lat1], [lon2, lat2],
         ..., [lon1, lat1]].
+    map_resolution: string
+        The resolution for the plotted map (resolution of boundary database to
+        use). Can be 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high),
+        'f' (full). Crude and low are installed by default. If higher
+        resolution is wanted ('i', 'h' or 'f') high-res data must be installed.
+        In conda this can be achieved by running:
+        conda install -c conda-forge basemap-data-hires
     savefig: boolean
-        If True, figure is saved to 'figpath' location ('figpath' must be set!).
+        If True, figure is saved to 'figpath' location ('figpath' must be set).
         If false, figure is displayed on screen.
     figpath: string
         Path to folder for saved polygon figure.
@@ -411,7 +424,7 @@ def plot_polygon(polygon, savefig=False, figpath=None):
         reg_file = polygons(polygon)
         with open(reg_file, 'r') as ff:
             ff.readline()       # Skip first line
-            poly = [coord_return(l) for l in ff.readlines()]
+            poly = [coord_return(ln) for ln in ff.readlines()]
         fname = '{}_polygon_plot.png'.format(polygon.replace(' ', '_'))
     else:
         poly = polygon
@@ -431,7 +444,7 @@ def plot_polygon(polygon, savefig=False, figpath=None):
     fig = plt.figure(figsize=[12, 13])
     ax = fig.add_subplot(111)
 
-    mm = Basemap(resolution='i', projection='stere', ellps='WGS84',
+    mm = Basemap(resolution=map_resolution, projection='stere', ellps='WGS84',
                  lon_0=lon_0, lat_0=lat_0,
                  llcrnrlon=min(lons)-lon_incr, llcrnrlat=min(lats)-lat_incr,
                  urcrnrlon=max(lons)+lon_incr, urcrnrlat=max(lats)+lat_incr,
@@ -439,15 +452,15 @@ def plot_polygon(polygon, savefig=False, figpath=None):
     mm.drawmapboundary(fill_color=water)
     try:
         mm.drawcoastlines()
-    except:
+    except ValueError:
         pass
     try:
         mm.fillcontinents(color=earth, lake_color=water)
-    except:
+    except ValueError:
         pass
     try:
         mm.drawcountries()
-    except:
+    except ValueError:
         pass
 
     _draw_screen_poly(lats, lons, ax, mm, linewidth=4, color='m')
@@ -539,9 +552,11 @@ def find_geo_indices(lons, lats, x, y):
     lat_idx, lon_idx = np.unravel_index(ij_1d, lons2d.shape)
     return lat_idx, lon_idx
 
+
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Script to create or plot polygons')
+    parser = argparse.ArgumentParser(
+        description='Script to create or plot polygons')
     parser.add_argument('--purpose', '-p',  metavar='PURPOSE', type=str,
                         help=('<Required> Purpose of application; either '
                               '"create", "plot" or "printareas" for creating, '
@@ -550,10 +565,23 @@ if __name__ == "__main__":
                         required=True)
     parser.add_argument('--area', '-a', metavar='POLYGON', type=str,
                         help=('If purpose is to plot, this is the name of '
-                        'polygon to be plotted'))
+                              'polygon to be plotted'))
+    parser.add_argument('--resolution', '-r', metavar='MAP_RESOLUTION',
+                        default='l', type=str,
+                        help=(
+                            'If purpose is to plot, this is the resolution '
+                            'of the drawn map (resolution of boundary database'
+                            ' to use). Can be "c" (crude), "l" (low), "i" '
+                            '(intermediate), "h" (high), "f" (full). Crude '
+                            'and low are installed by default. If higher '
+                            'resolution is wanted ("i", "h" or "f") high-res'
+                            ' data must be installed. In conda this can be '
+                            'achieved by running:\n conda install -c '
+                            'conda-forge basemap-data-hires.'))
     parser.add_argument('--save', metavar='BOOLEAN', default=False,
                         type=bool, help=('Wether to save polygon plot. Provide'
-                        ' also figpath (--figpath) if needed (defaults to ./)'))
+                                         ' also figpath (--figpath) if needed '
+                                         '(defaults to ./)'))
     parser.add_argument('--figpath', metavar='FILEPATH', default='./',
                         type=str, help='Where to save polygon plot')
     args = parser.parse_args()
@@ -565,7 +593,7 @@ if __name__ == "__main__":
         errmsg = ("\n\tWhen plotting polygon, polygon name must be provided")
         assert area is not None, errmsg
 
-        plot_polygon(area, args.save, args.figpath)
+        plot_polygon(area, args.resolution, args.save, args.figpath)
     elif args.purpose == 'printareas':
         polygons(poly_print=True)
     else:

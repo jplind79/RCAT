@@ -20,13 +20,13 @@ statistics to be done, in a Python dictionary structure.
 The keys in stats are the statistical measures and values provides the
 settings/configurations to be applied to the specific statistical calculation.
 The statistics that are currently available in RCAT and their default settings
-are given in the `rcat_statistics.py (github)
-<https://github.com/jplind79/rcat/blob/master/src/rcat_statistics.py>`_. Also
-see API-reference :doc:`statfuncs`. In particular, the default_stats_config
-function in that module specifies the statistics possible to calculate along
-with their properties. Many of the properties (or settings) are common for each
-of the measures, for example resample resolution, thr or chunk dimension, while
-others may be specific for the kind of statistics.
+are given in the `RCAT Statistics <stats_control_functions>` module. Some
+related information is also found in the API-reference :ref:`Statistics
+<statistics_functions>`. In particular, the default_stats_config function in
+that module specifies the statistics possible to calculate along with their
+properties. Many of the properties (or settings) are common for each of the
+measures, for example resample resolution, thr or chunk dimension, while others
+may be specific for the kind of statistics.
 
 If you set *default* as the key value in stats, as is the case for *annual cycle*
 in the code snippet above, then (obviously) the default settings will be used.
@@ -52,7 +52,7 @@ item values.
     <http://xarray.pydata.org>`_ resample function is applied here which builds
     on the similar function in the `pandas <https://pandas.pydata.org/>`_
     package. For example, resampling to 6 hourly data, taking the sum over
-    intervening time steps would be defined as follows in the  configuration
+    intervening time steps would be defined as follows in the configuration
     file:
 
     ::
@@ -83,12 +83,11 @@ item values.
 
        'chunk dimension': 'time'
 
-    **pool data**: Boolean switch (True/False). Set to True if statistics
-    should be done on pooled data, i.e. assembling all the grid points and time
-    steps and then perform calculations. If you want to the pooling to be done
-    over certain sub-regions, then you need to specify these in the regions
-    property in `config_main.ini (github)
-    <https://github.com/jplind79/rcat/blob/master/src/config/config_main.ini>`_.
+    **pool data**: Boolean switch (True/False). Set to True if statistics should
+    be done on pooled data, i.e. assembling all the grid points and time steps
+    and then perform calculations. If you want the pooling to be done over
+    certain sub-regions, then you need to specify these in the regions property
+    in the main configuration file, *<path-to-RCAT>/config/config_main.ini*.
 
     **thr**: Thresholding of data. The value of this (None is the default)
     should be a dictionary with keys defining variables and values an integer
@@ -129,7 +128,7 @@ item values.
     frequency intensity distribution) is computed.
 
     **normalized** (in Rxx): In the Rxx function (see
-    [statfuncs.py](../src/modules/statfuncs.py) module) the counts above the
+    `statistics <statistics_functions>` module) the counts above the
     threshold is normalized by the total number of values if this property is
     set to True.
 
@@ -143,21 +142,21 @@ item values.
 
        'moment stat': ['Y', 'max']
 
-#. How do you add new statistical methods to RCAT?
-    The code in RCAT is heavily based on `xarray <http://xarray.pydata.org/>`_
-    as well as `dask <https://docs.dask.org/>`_. Xarray has been interfaced
-    closely with dask applications so much of the things that can be done in
-    xarray, like many (basic) statistical calculations, are already dask
-    compliant and therefore relatively easy to implement in RCAT. If you would
-    like to include any new such feature, have a look in the
-    [rcat_statistics.py](../src/rcat_statistics.py) script, for example how the
-    implementation of 'seasonal cycle' has been done.
+#. How do you add new statistical methods to RCAT?  The code in RCAT is heavily
+   based on `xarray <http://xarray.pydata.org/>`_ as well as `dask
+   <https://docs.dask.org/>`_. Xarray has been interfaced closely with dask
+   applications so much of the things that can be done in xarray, like many
+   (basic) statistical calculations, are already dask compliant and therefore
+   relatively easy to implement in RCAT. If you would like to include any new
+   such feature, have a look in the :ref:`RCAT Statistics
+   <stats_calc_functions>` module, for example how the implementation of
+   'seasonal cycle' has been done.
 
-    For more elaborate statistics, using for example functions created by the
-    user (using standard numpy/python code), it may be a bit more complex.
-    Xarray has a function called `apply_ufunc
-    <http://xarray.pydata.org/en/stable/generated/xarray.apply_ufunc.html#xarray.apply_ufunc>`_
-    which allows repeatedly applying a user function to xarray objects
-    containing Dask arrays in an automatic way. See `here
-    <http://xarray.pydata.org/en/stable/computation.html#comput-wrapping-custom>`_
-    for_some more information.
+   For more elaborate statistics, using for example functions created by the
+   user (using standard numpy/python code), it may be a bit more complex.
+   Xarray has a function called `apply_ufunc
+   <http://xarray.pydata.org/en/stable/generated/xarray.apply_ufunc.html#xarray.apply_ufunc>`_
+   which allows repeatedly applying a user function to xarray objects
+   containing Dask arrays in an automatic way. See `here
+   <http://xarray.pydata.org/en/stable/computation.html#comput-wrapping-custom>`_
+   for_some more information.

@@ -5,7 +5,7 @@ Use Case 2: Probability distributions
 
 In the following RCAT is applied to calculate standard empirical probability
 distribution functions. Similar to :ref:`Use Case 1 <use_case_1>` most changes
-will be done in the configuration file, *src/config/config_main.ini*.
+will be done in the configuration file, *<path-to-RCAT>/config/config_main.ini*.
 
 
 Create hourly PDF statistics and visualize the results
@@ -81,8 +81,8 @@ using a step of 1 is defined here.
        'pdf': {'bins': {'pr': (0, 50, 1), 'tas': (264, 312, 1)}} 
         }
 
-Default options for pdf can be seen in the *default_stats_config* function in the
-:doc:`statistics <rcat_statistics>` module.
+See the *default_stats_config* function in :ref:`RCAT Statistics
+<stats_control_functions>` module for the default options for pdf.
 
 
 STEP 4: Plotting
@@ -124,7 +124,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python $HOME/git/rcat/src/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
 
 
 Output statistics files will be located in the sub-folder *stats* under the

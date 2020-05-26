@@ -8,9 +8,9 @@ Polygons in RCAT
 Polygons are used in RCAT to extract or select data and statistics for specified
 sub-regions or areas. These consist of text files containing information of
 latitudes and longitudes for the area and are stored under
-*<path-to-RCAT>/rcat/polygons/*. The :ref:`polygons` module use these polygons
+*<path-to-RCAT>/rcat/utils/polygons/*. The :ref:`polygons` module use these polygons
 to do the extraction (with the *mask_region* function) and it also has a number
-of different help functions to create new polygons (for RCAT or elsewhere) and
+of different help functions to create new polygons (for use in RCAT or elsewhere) and
 plot them conveniently.
 
 The following tutorial will describe some of this functionality along with a few
@@ -44,8 +44,8 @@ function call can be made directly from command line::
     figpath: string
         Path to folder for saved polygon figure.
 
-The *plot_polygon* function takes a polygon name as input chosen from the list
-of existing polygons in <path-to-RCAT>/rcat/utils/polygons. [Note that the
+The *plot_polygon* function takes a polygon name as input chosen from the
+collection of existing polygons in *<path-to-RCAT>/rcat/utils/polygons/*. [Note that the
 polygon name is the text file name without '.txt' and underscores replaced by
 white space.] Also new polygons can be plotted if providing a list with polygon
 coordinates (not possible when executing function from command line!). The
@@ -83,13 +83,13 @@ To plot the polygon of British Isles::
     >> pg.plot_polygon('British Isles')
 
 This function call can be made directly from the command line. Run the 
-*geosfuncs.py* script (make sure it is executable) providing
+*<path-to-RCAT>/rcat/utils/polygons.py* script (make sure it is executable) providing
 appropriate arguments:
 
 .. code-block:: bash
 
-    ./geosfuncs.py --help
-    ./geosfuncs.py -p plot -a "British Isles" --save True --figpath $HOME
+    ./polygons.py --help
+    ./polygons.py -p plot -a "British Isles" --save True --figpath $HOME
 
 
 Create a new polygon
@@ -104,7 +104,7 @@ From command line:
 
 .. code-block:: bash
 
-    ./geosfuncs.py -p create
+    ./polygons.py -p create
 
 The creation part is made by clicking pointer on a displayed map. If you want to
 save selected polygon to RCAT, make sure to provide correct folder path and an
@@ -113,7 +113,7 @@ check for example by printing available polygons:
 
 .. code-block:: bash
 
-    ./geosfuncs.py -p printareas
+    ./polygons.py -p printareas
 
 
 

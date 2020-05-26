@@ -1,6 +1,8 @@
 RCAT Statistics
 ===============
 
+.. _stats_control_functions:
+
 Functions controlling statistical calculations
 ----------------------------------------------
 
@@ -11,6 +13,7 @@ Functions controlling statistical calculations
    rcat.RCAT_stats.mod_stats_config
    rcat.RCAT_stats.calc_statistics
    
+.. _stats_calc_functions:
 
 Statistical functions
 ---------------------

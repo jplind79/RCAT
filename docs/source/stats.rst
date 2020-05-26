@@ -1,3 +1,5 @@
+.. _statistics_functions:
+
 Statistics
 ==========
 
