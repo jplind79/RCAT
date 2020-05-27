@@ -44,8 +44,7 @@ def default_stats_config(stats):
         'diurnal cycle': {
             'vars': [],
             'resample resolution': None,
-            'hours': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                      13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+            'hours': None,
             'dcycle stat': 'amount',
             'stat method': 'mean',
             'thr': None,
@@ -317,7 +316,8 @@ def diurnal_cycle(data, var, stat, stat_config):
         sys.exit()
 
     dcycle = dcycle.chunk({'hour': -1})
-    hrs = stat_config[stat]['hours']
+    _hrs = stat_config[stat]['hours']
+    hrs = _hrs if _hrs is not None else dcycle.hour
     st_data = dcycle.sel(hour=hrs)
     if dcycle_stat == 'frequency':
         st_data = st_data.assign({'ndays_per_hour': ('nday', totdays)})
