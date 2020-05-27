@@ -10,8 +10,8 @@ words, this is your starting point when applying RCAT.
 
 #. Setup folder structure
      If you don't want to pollute your cloned git repository we suggest you to
-     create a new folder for your analysis and copy the main configuration of
-     RCAT file to the new folder.
+     create a new folder for your analysis and copy the main RCAT configuration 
+     file to the new folder.
 
      .. code-block:: bash
 
@@ -20,8 +20,8 @@ words, this is your starting point when applying RCAT.
          cp <path-to-RCAT>/config/config_main.ini .
 
 #. Configure settings in config_main.ini
-     Configuration is done in an .ini file which has a specific structure based
-     on sections, properties and values. config_main.ini consists of a handful
+     A configuration .ini file has a specific structure based
+     on sections, properties and values. The RCAT config_main.ini file consists of a handful
      of these sections, for example **MODELS**, under which you specify certain
      properties or values. The latter may in some cases be common structures
      used in python like lists or dictionaries. Below follows a description of
@@ -56,10 +56,10 @@ words, this is your starting point when applying RCAT.
 
          Two different periods is set here because a simulation of historic
          period will be compared with a simulation of future climate. More
-         models can be added to the list, but note that the first model (e.g.
+         models can be added to the section, but note that the first model (e.g.
          model_his in the above example) will be the reference model. That is,
          if validation plot is True, and no obs data is specified, the
-         difference plots will use first model in list as reference data.
+         difference plots will use the first specified model in section as reference data.
 
      -  OBS
          If observation data is to be used in the analysis, you will need to 
@@ -189,7 +189,7 @@ words, this is your starting point when applying RCAT.
          **map grid setup**: Settings for the map plot configuration, for
          example whether to use a colorbar or not (cbar_mode) and where to put
          it and the padding between panels. For more info, see the
-         image_grid_setup function in the :doc:`plots module <plots>`.
+         *image_grid_setup* function in the :doc:`plots module <plots>`.
 
          ::
 
@@ -201,7 +201,7 @@ words, this is your starting point when applying RCAT.
 
          **line plot settings**: Likewise, settings for line plots can be made,
          e.g. line widths and styles as well as axes configurations. There are
-         a number of functions in the :doc:`plotting module <plots>`. that
+         a number of functions in the :doc:`plotting module <plots>` that
          handles line/scatter/box plots, see for example the fig_grid_setup and
          make_line_plot functions.
 

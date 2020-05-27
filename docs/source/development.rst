@@ -8,9 +8,7 @@ page on how to do improve the software.
 
 Contribution guidelines
 -----------------------
-* :PEP: 8
+* PEP 8
 * Modular
 * Writing tests
 * Code review
-* etc.
-
