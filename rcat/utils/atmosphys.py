@@ -1,7 +1,7 @@
 """
 Atmospheric Function Module
 ---------------------------
-Functions for different calculations wrt atmospheric physics
+Functions for calculations of various physical properties
 
 Created: Autumn 2017
 Authors: Petter Lind & David Lindstedt
@@ -37,6 +37,7 @@ def rh2sh(rh, T):
         Specific humidity in kg/kg
 
     """
+
     q = rh * 2.541e6 * np.exp(-5415.0 / T) * 18/29
     return(q)
 
@@ -58,6 +59,7 @@ def td2sh(Td, P):
     p, float/array of floats
         Specific humidity in g/kg
     """
+
     Td_C = Td - 273.15
     e = 6.112*np.exp((17.67*Td_C)/(Td_C + 243.5))
     q = (0.622 * e)/(P - (0.378 * e))
@@ -70,25 +72,35 @@ def sh2td(w, p):
     Returns dew point temperature (K) at mixing ratio w (kg/kg) and
     pressure p (Pa). Insert Td in 2.17 in Rogers&Yau and solve for Td
     """
+
     ep = e(w, p)
     return 243.5 * np.log(ep/611.2)/(17.67-np.log(ep/611.2)) + 273.15
 
 
 def es(T):
-    """Returns saturation vapor pressure (Pascal) at temperature T (Celsius)
-    Formula 2.17 in Rogers&Yau"""
+    """
+    Returns saturation vapor pressure (Pascal) at temperature T (Celsius)
+    Formula 2.17 in Rogers&Yau
+    """
+
     return 611.2*np.exp(17.67*T/(T+243.5))
 
 
 def e(w, p):
-    """Returns vapor pressure (Pa) at mixing ratio w (kg/kg) and pressure p (Pa)
-    Formula 2.18 in Rogers&Yau"""
+    """
+    Returns vapor pressure (Pa) at mixing ratio w (kg/kg) and pressure p (Pa)
+    Formula 2.18 in Rogers&Yau
+    """
+
     return w*p/(w+eps)
 
 
 def td(e):
-    """Returns dew point temperature (C) at vapor pressure e (Pa)
-    Insert Td in 2.17 in Rogers&Yau and solve for Td"""
+    """
+    Returns dew point temperature (C) at vapor pressure e (Pa)
+    Insert Td in 2.17 in Rogers&Yau and solve for Td
+    """
+
     return 243.5 * np.log(e/611.2)/(17.67-np.log(e/611.2))
 
 
@@ -141,6 +153,7 @@ def uv2wind(u, v):
         wind speed and wind direction respectively.
 
     """
+
     from math import pi
 
     DperR = 180/pi
@@ -173,6 +186,7 @@ def calc_vaisala(ddict, model, lower_plevel, upper_plevel):
     N2: array with floats
         The squared Brunt-Vaisala frequency
     """
+
     g = 9.81
     R = 287
     cp = 1005

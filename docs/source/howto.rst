@@ -16,7 +16,7 @@ Preparation
 To get started with the application examples it is expected that the RCAT
 environment has been installed. If not, go ahead and :doc:`do so </install>`
 before continuation. The main configuration and setup of RCAT is done in
-*src/config/config_main.ini*. It is therefore encouraged to read through the
+*<path-to-RCAT>/config/config_main.ini*. It is therefore encouraged to read through the
 :doc:`configuration </config>` and :doc:`statistics </statistics>` sections before (or
 along with) going through the examples below.
 

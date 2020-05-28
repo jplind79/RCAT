@@ -1,19 +1,9 @@
-modules
-=======
+API-reference
+==============
 
 .. toctree::
-   :maxdepth: 4
+  :maxdepth: 2
 
-   atmosfuncs
-   colors
-   convolve
-   draw_polygon
-   file_io
-   geosfuncs
-   grid_interpolation
-   ini_reader
-   plots
-   rcat_statistics
-   sal
-   statfuncs
-   validation_plots
+  user_api
+  internal_api
+

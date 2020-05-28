@@ -2,7 +2,8 @@ import sys
 import numpy as np
 import dask.array as da
 import xarray as xa
-import statfuncs as sf
+from rcat.stats import ASoP
+from rcat.stats import climateindex as ci
 from pandas import to_timedelta
 from copy import deepcopy
 
@@ -43,8 +44,7 @@ def default_stats_config(stats):
         'diurnal cycle': {
             'vars': [],
             'resample resolution': None,
-            'hours': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                      13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+            'hours': None,
             'dcycle stat': 'amount',
             'stat method': 'mean',
             'thr': None,
@@ -322,7 +322,8 @@ def diurnal_cycle(data, var, stat, stat_config):
         sys.exit()
 
     dcycle = dcycle.chunk({'hour': -1})
-    hrs = stat_config[stat]['hours']
+    _hrs = stat_config[stat]['hours']
+    hrs = _hrs if _hrs is not None else dcycle.hour
     st_data = dcycle.sel(hour=hrs)
     if dcycle_stat == 'frequency':
         st_data = st_data.assign({'ndays_per_hour': ('nday', totdays)})
@@ -461,7 +462,7 @@ def asop(data, var, stat, stat_config):
         nr_bins = np.arange(50)
     else:
         nr_bins = np.arange(stat_config[stat]['nr_bins'])
-    bins = [sf.bins_calc(n) for n in nr_bins]
+    bins = [ASoP.bins_calc(n) for n in nr_bins]
     bins = np.insert(bins, 0, 0.0)
     lbins = bins.size - 1
     in_thr = stat_config[stat]['thr']
@@ -470,7 +471,7 @@ def asop(data, var, stat, stat_config):
     else:
         thr = in_thr
     asop = xa.apply_ufunc(
-        sf.asop, data[var], input_core_dims=[['time']],
+        ASoP.asop, data[var], input_core_dims=[['time']],
         output_core_dims=[['factors', 'bins']], dask='parallelized',
         output_dtypes=[float], output_sizes={'factors': 2, 'bins': lbins},
         kwargs={'keepdims': True, 'axis': -1, 'bins': bins})
@@ -505,7 +506,7 @@ def Rxx(data, var, stat, stat_config):
     norm = stat_config[stat]['normalize']
 
     frq = xa.apply_ufunc(
-        sf.Rxx, data[var], input_core_dims=[['time']], dask='parallelized',
+        ci.Rxx, data[var], input_core_dims=[['time']], dask='parallelized',
         output_dtypes=[float],
         kwargs={'keepdims': True, 'axis': -1, 'thr': thr, 'normalize': norm})
 

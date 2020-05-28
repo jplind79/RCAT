@@ -9,8 +9,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import math
-import plots as rpl
-import geosfuncs as gfunc
+import rcat.plot.plots as rpl
+from rcat.utils.polygons import mask_region
 from copy import deepcopy
 
 # Colors
@@ -226,7 +226,7 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.mask_region(
+    mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -355,7 +355,7 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.mask_region(
+    mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -393,7 +393,7 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                                 for m in othr_mod]
 
     thr = fmod_msk[ref_model].attrs['Description'].\
-            split('|')[2].split(':')[1].strip()
+        split('|')[2].split(':')[1].strip()
 
     # figure settings
     figsize = (16, 18)
@@ -552,8 +552,8 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
 
         axs = rpl.make_line_plot(lgrid, ydata=dlist, **line_sets)
 
-        [l.set_color(lc) for l, lc in zip(axs[0].get_lines(), abs_colors)]
-        [l.set_color(lc) for l, lc in zip(
+        [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(), abs_colors)]
+        [ln.set_color(lc) for ln, lc in zip(
             list(axs[1].get_lines())[:len(dlist[1])], rel_colors)]
         # Legend
         legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
@@ -592,7 +592,7 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.mask_region(
+    mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -634,7 +634,7 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         ftitles = [ref_mnme] + ['{} - {}'.format(m.upper(), ref_mnme)
                                 for m in othr_mod]
     thr = fmod[ref_model].attrs['Description'].\
-            split('|')[2].split(':')[1].strip()
+        split('|')[2].split(':')[1].strip()
     season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
     seas = season.replace(' ', '')
 
@@ -720,7 +720,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
     domain = grid_coords['meta data'][var][ref_model]['domain']
-    mask = gfunc.mask_region(
+    mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
 
@@ -766,7 +766,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                                 for m in othr_mod]
 
     dcycle_stat = fmod[ref_model].attrs['Description'].\
-            split('|')[1].strip()
+        split('|')[1].strip()
     if dcycle_stat == 'Amount':
         dc_units = units
         fn_prfx = 'amnt'
@@ -778,7 +778,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         sys.exit()
 
     thr = fmod[ref_model].attrs['Description'].\
-            split('|')[3].split(':')[1].strip()
+        split('|')[3].split(':')[1].strip()
     season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
     seas = season.replace(' ', '')
 
@@ -839,8 +839,8 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     # Line plot diurnal cycle
     if fm_listr is not None:
         line_diurnal_cycle(fm_listr, fo_listr, models, nmod, ref_model, obs,
-                           var, tres, tstat, dc_units, ytitle, regions, img_dir,
-                           line_grid, line_sets)
+                           var, tres, tstat, dc_units, ytitle, regions,
+                           img_dir, line_grid, line_sets)
 
 
 def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
@@ -890,7 +890,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
         xdata = [[hours]*len(dlist[0]), [hours]*len(dlist[1])]
 
         dcycle_stat = fmod[ref_model].attrs['Description'].\
-                split('|')[1].strip()
+            split('|')[1].strip()
         if dcycle_stat == 'Amount':
             fn_prfx = 'amnt'
         elif dcycle_stat == 'Frequency':
@@ -900,7 +900,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             sys.exit()
 
         thr = fmod[ref_model].attrs['Description'].\
-                split('|')[3].split(':')[1].strip()
+            split('|')[3].split(':')[1].strip()
         season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
         seas = season.replace(' ', '')
         regnm = reg.replace(' ', '_')
@@ -910,12 +910,14 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
                 var, dcycle_stat, thr, reg, ytitle, seas)
             if obs is not None:
                 fn = ("{}_thr{}_{}{}_lnplot_diurnal_cycle_{}_{}_model_"
-                "{}_{}_{}.png").format(var, thr, tres, tstat, fn_prfx, regnm,
-                                       obslbl, ytitle.replace(' ', '_'), seas)
+                      "{}_{}_{}.png").format(
+                          var, thr, tres, tstat, fn_prfx, regnm, obslbl,
+                          ytitle.replace(' ', '_'), seas)
             else:
                 fn = ("{}_thr{}_{}{}_lnplot_diurnal_cycle_{}_{}_model_"
-                "{}_{}.png").format(var, thr, tres, tstat, fn_prfx, regnm,
-                                    ytitle.replace(' ', '_'), seas)
+                      "{}_{}.png").format(
+                          var, thr, tres, tstat, fn_prfx, regnm,
+                          ytitle.replace(' ', '_'), seas)
         else:
             headtitle = '{} ({}) |  {} | {} | {}'.format(var, dcycle_stat,
                                                          reg, ytitle, seas)
@@ -1018,7 +1020,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                 m.upper(), ref_mnme) for m in othr_mod]]
 
         thr = fmod[ref_model].attrs['Description'].\
-                split('|')[1].split(':')[1].strip()
+            split('|')[1].split(':')[1].strip()
         season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
         seas = season.replace(' ', '')
         regnm = reg.replace(' ', '_')
@@ -1028,7 +1030,8 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                 var, thr, reg, ytitle, seas)
             if obs is not None:
                 fn = '{}_thr{}_{}_pdf_{}_model_{}_{}_{}.png'.format(
-                    var, thr, tres, regnm, obslbl, ytitle.replace(' ', '_'), seas)
+                    var, thr, tres, regnm, obslbl,
+                    ytitle.replace(' ', '_'), seas)
             else:
                 fn = '{}_thr{}_{}_pdf_{}_model_{}_{}.png'.format(
                     var, thr, tres, regnm, ytitle.replace(' ', '_'), seas)
@@ -1061,9 +1064,9 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         if var == 'pr':
             axs[0].set_yscale('log')
 
-        [l.set_color(lc) for l, lc in zip(axs[0].get_lines(), abs_colors)]
-        [l.set_color(lc) for l, lc in zip(list(axs[1].get_lines())[:-1],
-                                          rel_colors)]
+        [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(), abs_colors)]
+        [ln.set_color(lc) for ln, lc in zip(list(axs[1].get_lines())[:-1],
+                                            rel_colors)]
         # Legend
         legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                            for c, l in zip(abs_colors, lg_lbls[0])]
@@ -1137,7 +1140,7 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         ftitles = ['{} - {}'.format(m.upper(), ref_mnme) for m in othr_mod]
 
     thr = fmod[ref_model].attrs['Description'].\
-            split('|')[1].split(':')[1].strip()
+        split('|')[1].split(':')[1].strip()
     season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
     seas = season.replace(' ', '')
 
@@ -1298,9 +1301,10 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
             axs = rpl.make_line_plot(lgrid, xdata=xdata, ydata=dlist_ff,
                                      axis_type='logx', **line_sets)
 
-            [l.set_color(lc) for l, lc in zip(axs[0].get_lines(), abs_colors)]
-            [l.set_color(lc) for l, lc in zip(list(axs[1].get_lines())[:-1],
-                                              rel_colors)]
+            [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(),
+                                                abs_colors)]
+            [ln.set_color(lc) for ln, lc in zip(list(axs[1].get_lines())[:-1],
+                                                rel_colors)]
             # Legend
             legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                                for c, l in zip(abs_colors, lg_lbls[0])]

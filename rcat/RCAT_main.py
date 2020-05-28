@@ -6,16 +6,16 @@
 import sys
 import os
 import glob
-import ini_reader
 import xarray as xa
 import xesmf as xe
 from itertools import product
-import grid_interpolation as remap
-import geosfuncs as gfunc
 import dask.array as da
 import numpy as np
 from dask.distributed import Client
-import rcat_statistics as st
+from rcat.utils import ini_reader
+from rcat.utils.polygons import mask_region
+import rcat.RCAT_stats as st
+import rcat.utils.grids as gr
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -145,11 +145,11 @@ def get_grids(nc, target_grid, method='bilinear'):
     if method == 'conservative':
         print("Calculating lat/lon bounds ...")
         print()
-        slon_b, slat_b = remap.fnCellCorners(nc.lon.values, nc.lat.values)
+        slon_b, slat_b = gr.fnCellCorners(nc.lon.values, nc.lat.values)
         s_grid = {'lon': nc.lon.values, 'lat': nc.lat.values,
                   'lon_b': slon_b, 'lat_b': slat_b}
-        tlon_b, tlat_b = remap.fnCellCorners(target_grid['lon'],
-                                             target_grid['lat'])
+        tlon_b, tlat_b = gr.fnCellCorners(target_grid['lon'],
+                                          target_grid['lat'])
         t_grid = {'lon': target_grid['lon'], 'lat': target_grid['lat'],
                   'lon_b': tlon_b, 'lat_b': tlat_b}
     else:
@@ -225,8 +225,8 @@ def regridding(data, data_name, var, target_grid, method):
     # This works. Replace with xarray apply_ufunc?
     data_dist = client.persist(indata[var].data)
     sgrid, tgrid, dim_val, dim_shape = get_grids(indata, target_grid, method)
-    regridder = remap.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method,
-                                                   reuse_weights=True))
+    regridder = gr.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method,
+                                                reuse_weights=True))
     wgts = client.scatter(regridder.weights, broadcast=True)
     rgr_data = da.map_blocks(_rgr_calc, data_dist, dtype=float,
                              chunks=(indata.chunks['time'],) + dim_val,
@@ -313,7 +313,7 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
                                                              stats_config)
                 if regions:
                     masks = {
-                        r: gfunc.mask_region(
+                        r: mask_region(
                             data.lon.values, data.lat.values, r,
                             cut_data=False) for r in regions}
                     if pool:
@@ -413,11 +413,11 @@ def get_masked_data(data, var, mask):
     #
     # def _mask_func(arr, axis=0, lons=None, lats=None, region=''):
     #     iter_3d = arr.shape[axis]
-    #     mdata = gfunc.mask_region(lons, lats, region, arr, iter_3d=iter_3d,
+    #     mdata = mask_region(lons, lats, region, arr, iter_3d=iter_3d,
     #                               cut_data=True)[0]
     #     return mdata
 
-    # mask = gfunc.mask_region(data.lon.values, data.lat.values, reg,
+    # mask = mask_region(data.lon.values, data.lat.values, reg,
     #                          cut_data=True)
 
     # imask = mask[0]
@@ -621,9 +621,8 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     # Create dictionaries with list of files for models and obs
     _fm_list = {stat: [glob.glob(os.path.join(
         stat_outdir, '{}'.format(st), '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-            m, stnm, var, thrstr, tres, tstat, grdnme, yrs_d[m][0], yrs_d[m][1],
-            get_month_string(mon_d[m]))))
-                       for m in models]}
+            m, stnm, var, thrstr, tres, tstat, grdnme, yrs_d[m][0],
+            yrs_d[m][1], get_month_string(mon_d[m])))) for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
 
     obs_list = [obs] if not isinstance(obs, list) else obs
@@ -782,9 +781,10 @@ for var in cdict['variables']:
                if not isinstance(obs_scf, list) else obs_scf)
     if obs_name is not None:
         for oname, cfactor in zip(obs_list, obs_scf):
-            obs_data = get_obs_data(obs_metadata_file,
-                oname, var, cfactor, cdict['obs start year'],
-                cdict['obs end year'], cdict['obs months'])
+            obs_data = get_obs_data(
+                obs_metadata_file, oname, var, cfactor,
+                cdict['obs start year'], cdict['obs end year'],
+                cdict['obs months'])
             data_dict[tres][var][oname] = obs_data
 
     mod_names = []
@@ -876,7 +876,7 @@ for stat in cdict['stats_conf']:
 
 if cdict['validation_plot']:
     print('\n=== PLOTTING ===')
-    import validation_plots as vplot
+    import rcat.RCAT_plots as rplot
     statnames = list(stats_dict.keys())
     for sn in statnames:
         for v in stats_dict[sn]:
@@ -885,4 +885,4 @@ if cdict['validation_plot']:
                                       month_dd[v], tres_str[sn], img_outdir,
                                       stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
-            vplot.plot_main(plot_dict, sn)
+            rplot.plot_main(plot_dict, sn)

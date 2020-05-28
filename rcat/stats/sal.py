@@ -166,12 +166,10 @@ def L_stat(data, data_label, refdata, refdata_label):
     """
     Function to determine the location component (L). It consists of two
     components, L1 and L2.
-    L1:
-        measures the normalized distance between the centers of mass of the
-        modelled and observed fields.
-    L2:
-        The second considers the averaged distance between the center of mass
-        of the total field and individual field objects.
+    L1: measures the normalized distance between the centers of mass of the
+    modelled and observed fields.
+    L2: The second considers the averaged distance between the center of mass
+    of the total field and individual field objects.
 
     Parameters
     ----------
