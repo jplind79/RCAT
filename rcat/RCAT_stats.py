@@ -148,10 +148,16 @@ def calc_statistics(data, var, stat, stat_config):
 def _check_hours(ds):
     if np.any(ds.time.dt.minute > 0):
         print("Shifting time stamps to whole hours!")
-        ds.time.values = ds.time.dt.ceil('H').values
+        ds = ds.assign_coords({'time': ds.time.dt.ceil('H').values})
     else:
         pass
     return ds
+    # if np.any(ds.time.dt.minute > 0):
+    #     print("Shifting time stamps to whole hours!")
+    #     ds.time.values = ds.time.dt.ceil('H').values
+    # else:
+    #     pass
+    # return ds
 
 
 def _get_freq(tf):
