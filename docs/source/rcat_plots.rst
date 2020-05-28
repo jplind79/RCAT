@@ -1,4 +1,4 @@
-RCAT_plots
+RCAT Plots
 ==========
 
 Module script for plotting
@@ -17,5 +17,5 @@ Module script for plotting
    rcat.RCAT_plots.pdf_plot
    rcat.RCAT_plots.map_asop
    rcat.RCAT_plots.line_asop
-   
+
 
