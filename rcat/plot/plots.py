@@ -1124,8 +1124,14 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
                                levels=clevs,
                                **map_kwargs)
 
-    m.drawcountries(linewidth=.7, color="#424242")
-    m.drawcoastlines(linewidth=1.0, color='#383838')
+    try:
+        m.drawcountries(linewidth=.7, color="#424242")
+    except ValueError:
+        pass
+    try:
+        m.drawcoastlines(linewidth=1.0, color='#383838')
+    except ValueError:
+        pass
 
     return cs
 
