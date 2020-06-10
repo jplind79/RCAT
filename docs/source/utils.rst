@@ -27,7 +27,7 @@ files.
 
 .. autosummary::
    :toctree: ./generated/
-    
+
     rcat.utils.file_io.ncdump
     rcat.utils.file_io.openFile
     rcat.utils.file_io.getDimensions
@@ -42,7 +42,7 @@ Routines to remap data given source and target grids.
 
 .. autosummary::
    :toctree: ./generated/
-    
+
     rcat.utils.grids.fnCellCorners
     rcat.utils.grids.calc_vertices
     rcat.utils.grids.fnRemapConOperator
@@ -71,7 +71,7 @@ Routine for Masking Data with Polygons.
 
 .. autosummary::
    :toctree: ./generated/
-   
+
     rcat.utils.polygons.polygons
     rcat.utils.polygons.mask_region
     rcat.utils.polygons.create_polygon
