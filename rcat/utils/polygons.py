@@ -201,7 +201,7 @@ def create_polygon():
         List with tuples of lat/lon coordinates for drawn polygon
     """
     import matplotlib.pyplot as plt
-    import draw_polygon
+    from rcat.utils import draw_polygon
 
     def get_map(area, map_resolution='l', map_dict=None):
         # Create map object
