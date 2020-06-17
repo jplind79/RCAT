@@ -542,6 +542,8 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
     """
     import re
 
+    print("\t-- Opening {} files\n".format(model.upper()))
+
     fyear = mconf['start year']
     lyear = mconf['end year']
     months = mconf['months']
@@ -549,8 +551,8 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
         range(fyear, lyear+1), months)]
 
     _flist = glob.glob(os.path.join(
-         # mconf['fpath'], '{}/{}_*.nc'.format(tres, var)))
-         mconf['fpath'], '{}/{}_*.nc'.format(var, var)))
+         mconf['fpath'], '{}/{}_*.nc'.format(tres, var)))
+         # mconf['fpath'], '{}/{}_*.nc'.format(var, var)))
 
     emsg = "Could not find any files at specified location, exiting ..."
     if not _flist:
@@ -567,7 +569,6 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
 
-    print("\t-- Opening {} files\n".format(model.upper()))
     if tres == 'mon':
         _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
     else:
