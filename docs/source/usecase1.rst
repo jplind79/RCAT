@@ -66,7 +66,7 @@ and precipitation (*pr*) with daily data as input (*'freq'* set to *'day'*).
 
     regions = ['Fenno-Scandinavia']
 
-*regions* is a list of pre-defined regions -- see available regions in *<path-to-RCAT>/rcat/utils/polygons* folder (see also :ref:`Polygons` module).
+*regions* is a list of pre-defined regions -- see available regions in *<path-to-RCAT>/rcat/utils/polygon_files* folder (see also :ref:`Polygons` module).
 Statistics will be selected for the specified sub-regions.
 
 

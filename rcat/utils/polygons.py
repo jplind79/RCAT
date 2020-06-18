@@ -11,6 +11,7 @@ import sys
 import numpy as np
 import os
 from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
 import argparse
 
 
@@ -200,7 +201,6 @@ def create_polygon():
     poly: list
         List with tuples of lat/lon coordinates for drawn polygon
     """
-    import matplotlib.pyplot as plt
     from rcat.utils import draw_polygon
 
     def get_map(area, map_resolution='l', map_dict=None):
@@ -409,7 +409,6 @@ def plot_polygon(polygon, map_resolution='l', savefig=False, figpath=None):
     figpath: string
         Path to folder for saved polygon figure.
     """
-    import matplotlib.pyplot as plt
     from datetime import datetime
 
     # Colors
