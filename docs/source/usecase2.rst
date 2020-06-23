@@ -28,10 +28,12 @@ only data for June, July and August is extracted.
 
    arome_his = {
         'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ECE_ALADIN_1985_2005/netcdf',
+        'grid type': 'reg', 'grid name': 'NEU-3',
         'start year': 1990, 'end year': 1994, 'months': [6,7,8]
         }
    arome_scn = {
         'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ECE_ALADIN_RCP85_2080_2100/netcdf',
+        'grid type': 'reg', 'grid name': 'NEU-3',
         'start year': 2090, 'end year': 2094, 'months': [6,7,8]
         }
 
@@ -45,9 +47,9 @@ Set output directory under the **SETTINGS** section.
 
 The key *variables* defines which variables to analyze along with some options
 regarding that particular variable. Since only models will be analyzed here,
-*'obs'* is set to None. Further, models will be kept at their respective grids,
-thus *'regrid to'* is also set to None. Statistics is configured for T2m (*tas*)
-and precipitation (*pr*) with hourly data as input (*'freq'* set to *'1H'*).
+*obs* is set to None. Further, models will be kept at their respective grids,
+thus *regrid to* is also set to None. Statistics is configured for T2m (*tas*)
+and precipitation (*pr*) with hourly data as input (*freq* set to *1H*).
 
 Specify regions the *regions* key for which statistics will be selected for.
 
@@ -56,8 +58,20 @@ Specify regions the *regions* key for which statistics will be selected for.
     output dir = /nobackup/rossby22/sm_petli/analysis/test_pdf_analysis
 
     variables = {
-        'pr': {'freq': '1H', 'units': 'mm', 'scale factor': None, 'accumulated': True, 'obs': None, 'regrid to': None},
-        'tas': {'freq': '1H', 'units': 'K', 'scale factor': None, 'accumulated': False, 'obs': None, 'regrid to': None},
+        'pr': {'freq': '1H', 
+               'units': 'mm', 
+               'scale factor': None, 
+               'accumulated': True, 
+               'obs': None, 
+               'var names': None,
+               'regrid to': None},
+        'tas': {'freq': '1H', 
+                'units': 'K', 
+                'scale factor': None, 
+                'accumulated': False, 
+                'obs': None, 
+                'var names': None,
+                'regrid to': None},
         }
 
     regions = ['Scandinavia']
@@ -124,7 +138,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/runtime/RCAT_main.py -c config_main.ini
 
 
 Output statistics files will be located in the sub-folder *stats* under the
