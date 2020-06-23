@@ -11,6 +11,7 @@ import sys
 import numpy as np
 import os
 from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
 import argparse
 
 
@@ -34,7 +35,7 @@ def polygons(area="", poly_print=False):
     # -------- Dictionary of predfined regions -------- #
     file_dir = os.path.dirname(os.path.abspath(__file__))
     # p_dir = os.path.dirname(file_dir)
-    polypath = os.path.join(file_dir, 'polygons')
+    polypath = os.path.join(file_dir, 'polygon_files')
 
     errmsg = "Folder to polygons: {}, does not seem to exist!".format(polypath)
     assert os.path.exists(polypath), errmsg
@@ -200,8 +201,7 @@ def create_polygon():
     poly: list
         List with tuples of lat/lon coordinates for drawn polygon
     """
-    import matplotlib.pyplot as plt
-    import draw_polygon
+    from rcat.utils import draw_polygon
 
     def get_map(area, map_resolution='l', map_dict=None):
         # Create map object
@@ -409,7 +409,6 @@ def plot_polygon(polygon, map_resolution='l', savefig=False, figpath=None):
     figpath: string
         Path to folder for saved polygon figure.
     """
-    import matplotlib.pyplot as plt
     from datetime import datetime
 
     # Colors

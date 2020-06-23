@@ -8,7 +8,7 @@ Polygons in RCAT
 Polygons are used in RCAT to extract or select data and statistics for specified
 sub-regions or areas. These consist of text files containing information of
 latitudes and longitudes for the area and are stored under
-*<path-to-RCAT>/rcat/utils/polygons/*. The :ref:`polygons` module use these polygons
+*<path-to-RCAT>/rcat/utils/polygon_files/*. The :ref:`polygons` module use these polygons
 to do the extraction (with the *mask_region* function) and it also has a number
 of different help functions to create new polygons (for use in RCAT or elsewhere) and
 plot them conveniently.
@@ -45,7 +45,7 @@ function call can be made directly from command line::
         Path to folder for saved polygon figure.
 
 The *plot_polygon* function takes a polygon name as input chosen from the
-collection of existing polygons in *<path-to-RCAT>/rcat/utils/polygons/*. [Note that the
+collection of existing polygons in *<path-to-RCAT>/rcat/utils/polygon_files/*. [Note that the
 polygon name is the text file name without '.txt' and underscores replaced by
 white space.] Also new polygons can be plotted if providing a list with polygon
 coordinates (not possible when executing function from command line!). The

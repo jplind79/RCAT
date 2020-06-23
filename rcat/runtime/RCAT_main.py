@@ -15,7 +15,7 @@ import numpy as np
 from dask.distributed import Client
 from rcat.utils import ini_reader
 from rcat.utils.polygons import mask_region
-import rcat.RCAT_stats as st
+import rcat.runtime.RCAT_stats as st
 import rcat.utils.grids as gr
 
 import warnings
@@ -717,8 +717,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     _fm_list = {stat: [glob.glob(os.path.join(
         stat_outdir, '{}'.format(st), '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
             m, stnm, var, thrstr, tres, tstat, grdnme, yrs_d[m][0],
-            yrs_d[m][1], get_month_string(mon_d[m]))))
-                       for m in models]}
+            yrs_d[m][1], get_month_string(mon_d[m])))) for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
 
     obs_list = [obs] if not isinstance(obs, list) else obs
@@ -978,7 +977,7 @@ for stat in cdict['stats_conf']:
 
 if cdict['validation_plot']:
     print('\n=== PLOTTING ===')
-    import rcat.RCAT_plots as rplot
+    import rcat.runtime.RCAT_plots as rplot
     statnames = list(stats_dict.keys())
     for sn in statnames:
         for v in stats_dict[sn]:
