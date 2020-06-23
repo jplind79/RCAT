@@ -38,8 +38,20 @@ words, this is your starting point when applying RCAT.
 
             model = {
                'fpath': '/path/to/model/data',
+               'grid type': 'reg', 'grid name': 'FPS-ALPS3',
                'start year': 1998, 'end year': 2000, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
             }
+         
+         Here you also set a couple of grid specifications - namely *grid type*
+         and *grid name*. Grid type defines the type of grid for the model
+         data; it can be set to either *rot* or *reg*. The former means that
+         model data is on rotated grid and the latter that it is on non-rotated
+         grid (i.e. regular, rectilinear, curvilinear). If data is on rotated
+         grid RCAT will de-rotate the grid. However, it requires that model
+         files include coordinate variables in accordance with CF conventions -
+         *rlon*/*rlat* for longitudes and latitudes as well as the variable
+         *rotated_pole* with attributes *grid_north_pole_longitude* and
+         *grid_north_pole_latitude*. 
 
          Here's another example comparing two models:
 
@@ -47,10 +59,12 @@ words, this is your starting point when applying RCAT.
 
             model_his = {
                'fpath': '/path/to/model_1/data',
+               'grid type': 'reg', 'grid name': 'FPS-ALPS3',
                'start year': 1985, 'end year': 2005, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
             }
             model_scn = {
                'fpath': '/path/to/model_2/data',
+               'grid type': 'reg', 'grid name': 'FPS-ALPS3',
                'start year': 2080, 'end year': 2100, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
             }
 
