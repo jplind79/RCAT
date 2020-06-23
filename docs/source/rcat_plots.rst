@@ -17,5 +17,3 @@ Module script for plotting
    rcat.runtime.RCAT_plots.pdf_plot
    rcat.runtime.RCAT_plots.map_asop
    rcat.runtime.RCAT_plots.line_asop
-
-

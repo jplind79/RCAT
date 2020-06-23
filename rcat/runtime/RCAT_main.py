@@ -8,6 +8,7 @@ import os
 import glob
 import xarray as xa
 import xesmf as xe
+import pandas as pd
 from itertools import product
 import dask.array as da
 import numpy as np
@@ -119,16 +120,30 @@ def get_grid_coords(nc, grid_coords):
                        lats[-1-x, x:-x][::-1][1:], lats[x:-x, x][::-1][1:]]
         return list(zip(lons_p, lats_p))
 
-    grid_coords['lat_0'] = nc['Lambert_Conformal'].attrs[
-        'latitude_of_projection_origin']
-    grid_coords['lon_0'] = nc['Lambert_Conformal'].attrs[
-        'longitude_of_central_meridian']
-    gp_bfr = 15
-    grid_coords['crnrs'] = [nc.lat.values[gp_bfr, gp_bfr],
-                            nc.lon.values[gp_bfr, gp_bfr],
-                            nc.lat.values[-gp_bfr, -gp_bfr],
-                            nc.lon.values[-gp_bfr, -gp_bfr]]
-    grid_coords['domain'] = _domain(nc.lat.values, nc.lon.values, gp_bfr)
+    # Domain center point
+    # grid_coords['lat_0'] = nc['Lambert_Conformal'].attrs[
+    #     'latitude_of_projection_origin']
+    # grid_coords['lon_0'] = nc['Lambert_Conformal'].attrs[
+    #     'longitude_of_central_meridian']
+
+    # If lon/lat is 1D; create 2D meshgrid
+    lons = nc.lon.values
+    lats = nc.lat.values
+    lon, lat = np.meshgrid(lons, lats)\
+        if lats.ndim == 1 else (lons, lats)
+
+    # Calculate domain mid point if not given
+    idx = tuple([np.int(i/2) for i in lat.shape])
+    lat0 = lat[idx]
+    lon0 = lon[idx]
+
+    grid_coords['lat_0'] = lat0
+    grid_coords['lon_0'] = lon0
+
+    gp_bfr = 1
+    grid_coords['crnrs'] = [lat[gp_bfr, gp_bfr], lon[gp_bfr, gp_bfr],
+                            lat[-gp_bfr, -gp_bfr], lon[-gp_bfr, -gp_bfr]]
+    grid_coords['domain'] = _domain(lat, lon, gp_bfr)
 
     return grid_coords
 
@@ -137,7 +152,7 @@ def get_grids(nc, target_grid, method='bilinear'):
     """
     Get and/or modify the source and target grids for interpolation
     """
-    # EDIT 15/11 2019 by Petter
+    # EDIT 15/11 2019 by Petter Lind
     # There's no consistent way to handle data where lon_bnds/lat_bnds are
     # already available, They may have different formats not all handled by
     # xesmf regridding tool. Thus, for now, calculation of grid corners is
@@ -185,14 +200,14 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             # Perform the regridding
             for m in mnames:
                 rgr_data = regridding(dd, m, v, target_grid,
-                                      vconf['rgr_method'])
+                                      vconf['rgr method'])
                 dd[m]['data'] = rgr_data
             if len(onames) > 1:
                 obslist = onames.copy()
                 obslist.remove(oname)
                 for obs in obslist:
                     rgr_data = regridding(dd, obs, v, target_grid,
-                                          vconf['rgr_method'])
+                                          vconf['rgr method'])
                     dd[obs]['data'] = rgr_data
         elif vconf['regrid'] in mnames:
             mname = vconf['regrid']
@@ -204,13 +219,30 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
                           'lat': {mname: target_grid['lat']}})
             for mod in modlist:
                 rgr_data = regridding(dd, mod, v, target_grid,
-                                      vconf['rgr_method'])
+                                      vconf['rgr method'])
                 dd[mod]['data'] = rgr_data
             if None not in onames:
                 for obs in onames:
                     rgr_data = regridding(dd, obs, v, target_grid,
-                                          vconf['rgr_method'])
+                                          vconf['rgr method'])
                     dd[obs]['data'] = rgr_data
+        elif isinstance(vconf['regrid'], dict):
+            target_grid = xa.open_dataset(vconf['regrid']['file'])
+            gridname = vconf['regrid']['name']
+            gdict.update({'lon': {gridname: target_grid['lon'].values},
+                          'lat': {gridname: target_grid['lat'].values}})
+            for mod in mnames:
+                rgr_data = regridding(dd, mod, v, target_grid,
+                                      vconf['rgr method'])
+                dd[mod]['data'] = rgr_data
+            if None not in onames:
+                for obs in onames:
+                    rgr_data = regridding(dd, obs, v, target_grid,
+                                          vconf['rgr method'])
+                    dd[obs]['data'] = rgr_data
+        else:
+            raise ValueError(("\n\n\tTarget grid name not found!\n"
+                              "Check 'regrid to' option in main config file"))
 
     gdict.update({'gridname': gridname})
 
@@ -272,6 +304,7 @@ def resampling(data, tresample):
     nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
     tr, fr = _get_freq(tresample[0])
     sec_resample = to_timedelta(tr, fr).total_seconds()
+    data = manage_chunks(data, 'time')
     if nsec != sec_resample:
         print("\t\tResampling input data ...\n")
         data = eval("data.resample(time='{}', label='right').{}('time').\
@@ -407,7 +440,7 @@ def get_masked_data(data, var, mask):
                            dims=data[var].dims)
     return data.where(mask_in, drop=True)
 
-    # P. Lind 2019-10-29
+    # Petter Lind 2019-10-29
     # N.B. For masking of large data sets, the code below might be a more
     # viable choice.
     #
@@ -457,9 +490,11 @@ def manage_chunks(data, chunk_dim):
         c_size = np.round(np.maximum(xsize, ysize)/n).astype(int)
         data = data.chunk({'time': data.time.size, xd: c_size, yd: c_size})
     else:
+        cmax = 250
         nchunks = len(data.chunks['time'])
-        if nchunks > 500:
-            rchunk_size = np.round(data.time.size/500).astype(int)
+        mxchunk = max(data.chunks['time'])
+        if nchunks > cmax or mxchunk > 3e3:
+            rchunk_size = np.round(data.time.size/cmax).astype(int)
             data = data.chunk({'time': rchunk_size})
 
     return data
@@ -480,52 +515,112 @@ def get_prep_func(deacc):
     return f
 
 
-def get_variable_config(var_conf, var):
+def get_variable_config(var_config, var):
     """
     Retrieve configuration info for variable var as defined in main
     configuration file,
     """
     vdict = {
-        'input resolution': var_conf['freq'],
-        'units': var_conf['units'],
-        'scale_factor': var_conf['scale factor'],
-        'obs_scale_factor': var_conf['obs scale factor'] if
-        'obs scale factor' in var_conf else None,
-        'prep_func': get_prep_func(var_conf['accumulated']),
-        'regrid': var_conf['regrid to'] if 'regrid to' in var_conf else None,
-        'rgr_method': var_conf['regrid method'] if 'regrid method' in
-        var_conf else None,
+        'var names': var_config['var names'],
+        'input resolution': var_config['freq'],
+        'units': var_config['units'],
+        'scale factor': var_config['scale factor'],
+        'obs scale factor': var_config['obs scale factor'] if
+        'obs scale factor' in var_config else None,
+        'prep func': get_prep_func(var_config['accumulated']),
+        'regrid': var_config['regrid to'] if 'regrid to' in
+        var_config else None,
+        'rgr method': var_config['regrid method'] if 'regrid method' in
+        var_config else None,
     }
     return vdict
 
 
-def get_mod_data(model, mconf, tres, var, cfactor, prep_func):
+def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
     """
     Open model data files where file path is dependent on time resolution tres.
     """
+    import re
+
+    print("\t-- Opening {} files\n".format(model.upper()))
+
+    fyear = mconf['start year']
+    lyear = mconf['end year']
+    months = mconf['months']
     date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
-        range(mconf['start year'], mconf['end year']+1), mconf['months'])]
-    _flist = [glob.glob(os.path.join(
-        mconf['fpath'], '{}/{}_*{}_{}.nc'.format(tres, var, tres, dd)))
-        for dd in date_list]
-    flist = [y for x in _flist for y in x]
+        range(fyear, lyear+1), months)]
+
+    _flist = glob.glob(os.path.join(
+         mconf['fpath'], '{}/{}_*.nc'.format(tres, var)))
+
+    emsg = "Could not find any files at specified location, exiting ..."
+    if not _flist:
+        print("\t\n{}".format(emsg))
+        sys.exit()
+
+    _file_dates = [re.split('-|_', f.rsplit('.')[-2])[-2:] for f in _flist]
+    file_dates = [(d[0][:6], d[1][:6]) for d in _file_dates]
+    fidx = [np.where([d[0] <= date <= d[1] for d in file_dates])[0][0]
+            for date in date_list]
+    flist = [_flist[i] for i in np.unique(fidx)]
+    flist.sort()
     if np.unique([len(f) for f in flist]).size > 1:
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
 
-    print("\t-- Opening {} files\n".format(model.upper()))
     if tres == 'mon':
-        mod_data = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
+        _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
     else:
-        mod_data = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
-                                     preprocess=prep_func)
+        _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
+                                   preprocess=prep_func)
+
+    # Time stamps
+    if 'units' in _mdata.time.attrs:
+        if _mdata.time.attrs['units'] == 'day as %Y%m%d.%f':
+            dates = [pd.to_datetime(d, format='%Y%m%d') +
+                     pd.to_timedelta((d % 1)*86400, unit='s').round('H')
+                     for d in _mdata.time.values]
+            _mdata['time'] = (('time',), dates)
+        else:
+            raise ValueError(("\n\n\tUnfortunately, at the moment the time "
+                              "units in file cannot be treated, change if "
+                              "possible"))
+
+    # Extract years
+    mdata = _mdata.where(((_mdata.time.dt.year >= fyear) &
+                          (_mdata.time.dt.year <= lyear) &
+                          (np.isin(_mdata.time.dt.month, months))),
+                         drop=True)
+
+    # Remove height dim
+    if 'height' in mdata.dims:
+        mdata = mdata.squeeze()
+
+    # Rename variable if not consistent with name in config_main.ini
+    if vnames is not None:
+        if model in vnames:
+            mdata = mdata.rename({vnames[model]['vname']: var})
+
     if cfactor is not None:
-        mod_data[var] *= cfactor
+        mdata[var] *= cfactor
 
-    grid = {'lon': mod_data.lon.values, 'lat': mod_data.lat.values}
-    gridname = 'grid_{}_{}'.format(model.upper(), mod_data.attrs['domain'])
+    # Model grid
+    gridname = 'grid_{}'.format(mconf['grid name'])
 
-    outdata = {'data': mod_data, 'grid': grid, 'gridname': gridname}
+    # - Unrotate grid if needed
+    if mconf['grid type'] == 'rot':
+        lon_reg, lat_reg = gr.rotated_grid_transform(
+            mdata.rlon, mdata.rlat,
+            mdata.rotated_pole.grid_north_pole_longitude,
+            mdata.rotated_pole.grid_north_pole_latitude)
+        mdata = mdata.assign_coords({'lon': (('y', 'x'), lon_reg),
+                                     'lat': (('y', 'x'), lat_reg)})
+        grid = {'lon': lon_reg, 'lat': lat_reg}
+    else:
+        grid = {'lon': mdata.lon.values, 'lat': mdata.lat.values}
+
+    outdata = {'data': mdata, 'grid': grid, 'gridname': gridname}
+
     return outdata
 
 
@@ -776,24 +871,29 @@ for var in cdict['variables']:
     obs_metadata_file = cdict['obs metadata file']
     obs_name = cdict['variables'][var]['obs']
     obs_list = [obs_name] if not isinstance(obs_name, list) else obs_name
-    obs_scf = var_conf['obs_scale_factor']
+    obs_scf = var_conf['obs scale factor']
     obs_scf = ([obs_scf]*len(obs_list)
                if not isinstance(obs_scf, list) else obs_scf)
     if obs_name is not None:
         for oname, cfactor in zip(obs_list, obs_scf):
             obs_data = get_obs_data(
                 obs_metadata_file, oname, var, cfactor,
-                cdict['obs start year'], cdict['obs end year'],
-                cdict['obs months'])
+                cdict['obs start year'],
+                cdict['obs end year'], cdict['obs months'])
             data_dict[tres][var][oname] = obs_data
 
     mod_names = []
-    for mod_name, settings in cdict['models'].items():
+    mod_scf = var_conf['scale factor']
+    mod_scf = ([mod_scf]*len(cdict['models'].keys())
+               if not isinstance(mod_scf, list) else mod_scf)
+    for (mod_name, settings), scf in zip(cdict['models'].items(), mod_scf):
         mod_names.append(mod_name)
         mod_data = get_mod_data(
-            mod_name, settings, tres, var, var_conf['scale_factor'],
-            var_conf['prep_func'])
+            mod_name, settings, tres, var, var_conf['var names'],
+            scf, var_conf['prep func'])
         data_dict[tres][var][mod_name] = mod_data
+
+        # Update grid information for plotting purposes
         if mod_name not in grid_coords['meta data'][var]:
             grid_coords['meta data'][var][mod_name] = {}
             get_grid_coords(mod_data['data'],
@@ -844,6 +944,7 @@ print("\n=== SAVE OUTPUT ===")
 tres_str = {}
 for stat in cdict['stats_conf']:
     print("\n\twriting {} to disk ...".format(stat))
+    tres_str[stat] = {}
     for v in stats_dict[stat]:
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
                  (cdict['stats_conf'][stat]['thr'] is not None) and
@@ -855,16 +956,16 @@ for stat in cdict['stats_conf']:
             thrstr = ''
         if cdict['stats_conf'][stat]['resample resolution'] is not None:
             res_tres = cdict['stats_conf'][stat]['resample resolution']
-            tres_str[stat] = "_".join(res_tres)
+            tres_str[stat][v] = "_".join(res_tres)
         else:
-            tres_str[stat] = cdict['variables'][v]['freq']
+            tres_str[stat][v] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
         for m in stats_dict[stat][v]:
             time_suffix = get_month_string(month_dd[v][m])
             st_data = stats_dict[stat][v][m]
             save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
                          year_dd[v][m][0], year_dd[v][m][1], time_suffix,
-                         cdict['stats_conf'][stat], tres_str[stat], thrstr,
+                         cdict['stats_conf'][stat], tres_str[stat][v], thrstr,
                          cdict['regions'])
 
 
@@ -882,7 +983,7 @@ if cdict['validation_plot']:
         for v in stats_dict[sn]:
             plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
                                       cdict['variables'][v]['obs'], year_dd[v],
-                                      month_dd[v], tres_str[sn], img_outdir,
+                                      month_dd[v], tres_str[sn][v], img_outdir,
                                       stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
             rplot.plot_main(plot_dict, sn)

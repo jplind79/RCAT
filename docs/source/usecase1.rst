@@ -28,10 +28,12 @@ Since the annual and seasonal cycles will be calculated, all months are chosen.
 
    arome = {
         'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ERAI_ALADIN_1997_2017/netcdf',
+        'grid type': 'reg', 'grid name': 'NEU-3',
         'start year': 1998, 'end year': 2002, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
         }
    aladin = {
         'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_ALADIN_ERAI_1997_2017/netcdf',
+        'grid type': 'reg', 'grid name': 'NEU-12',
         'start year': 1998, 'end year': 2002, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
         }
 
@@ -57,8 +59,20 @@ and precipitation (*pr*) with daily data as input (*'freq'* set to *'day'*).
 ::
 
     variables = {
-        'pr': {'freq': 'day', 'units': 'mm', 'scale factor': None, 'accumulated': True, 'obs': None, 'regrid to': None},
-        'tas': {'freq': 'day', 'units': 'K', 'scale factor': None, 'accumulated': False, 'obs': None, 'regrid to': None},
+        'pr': {'freq': 'day',
+               'units': 'mm', 
+               'scale factor': None, 
+               'accumulated': True, 
+               'obs': None, 
+               'var names': None,
+               'regrid to': None},
+        'tas': {'freq': 'day', 
+                'units': 'K', 
+                'scale factor': None, 
+                'accumulated': False, 
+                'obs': None, 
+                'var names': None,
+                'regrid to': None},
         }
 
 
@@ -120,7 +134,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/runtime/RCAT_main.py -c config_main.ini
 
 
 If successfully completed, output statistics netcdf files will be located in the
@@ -155,8 +169,24 @@ procedure as in the previous example with the following changes introduced:
     ::
     
         variables = {
-            'pr': {'freq': 'day', 'units': 'mm', 'scale factor': None, 'accumulated': True, 'obs': ['EOBS20', 'ERA5'], 'obs scale factor': [86400, 86400], 'regrid to': 'ERA5', 'regrid method': 'conservative'},
-            'tas': {'freq': 'day', 'units': 'K', 'scale factor': None, 'accumulated': False, 'obs': ['EOBS20', 'ERA5'], 'obs scale factor': None, 'regrid to': 'ERA5', 'regrid method': 'bilinear'},
+            'pr': {'freq': 'day', 
+                   'units': 'mm', 
+                   'scale factor': None, 
+                   'accumulated': True, 
+                   'obs': ['EOBS20', 'ERA5'], 
+                   'obs scale factor': [86400, 86400], 
+                   'var names': None,
+                   'regrid to': 'ERA5', 
+                   'regrid method': 'conservative'},
+            'tas': {'freq': 'day', 
+                    'units': 'K', 
+                    'scale factor': None, 
+                    'accumulated': False, 
+                    'obs': ['EOBS20', 'ERA5'], 
+                    'obs scale factor': None, 
+                    'var names': None,
+                    'regrid to': 'ERA5', 
+                    'regrid method': 'bilinear'},
             }
 
 #. Under **PLOTTING**, *validation plot* should be set to *True* to enable plotting.

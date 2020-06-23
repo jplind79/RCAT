@@ -31,10 +31,12 @@ years as well as months to analyze.
 
    arome = {
         'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ERAI_ALADIN_1997_2017/netcdf',
+        'grid type': 'reg', 'grid name': 'NEU-3',
         'start year': 1998, 'end year': 2002, 'months': [5,6,7,8,9]
         }
    aladin = {
         'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_ALADIN_ERAI_1997_2017/netcdf',
+        'grid type': 'reg', 'grid name': 'NEU-12',
         'start year': 1998, 'end year': 2002, 'months': [5,6,7,8,9]
         }
 
@@ -59,7 +61,14 @@ and finally plotted, for.
     output dir = /nobackup/rossby22/sm_petli/analysis/test_dcycle_analysis
 
     variables = {
-        'pcape': {'freq': '3H', 'units': 'J/kg', 'scale factor': None, 'accumulated': False, 'obs': None, 'regrid to': 'aladin', 'regrid method': 'bilinear'},
+        'pcape': {'freq': '3H', 
+                  'units': 'J/kg', 
+                  'scale factor': None, 
+                  'accumulated': False, 
+                  'obs': None, 
+                  'var names': None,
+                  'regrid to': 'aladin', 
+                  'regrid method': 'bilinear'},
         }
 
     regions = ['Sweden', 'Denmark', 'Norway', 'Finland']
@@ -124,7 +133,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/runtime/RCAT_main.py -c config_main.ini
 
 
 Output statistics and image files will be located under the user-defined output

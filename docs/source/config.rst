@@ -38,8 +38,22 @@ words, this is your starting point when applying RCAT.
 
             model = {
                'fpath': '/path/to/model/data',
+               'grid type': 'reg', 'grid name': 'FPS-ALPS3',
                'start year': 1998, 'end year': 2000, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
             }
+         
+         Here you also set a couple of grid specifications - namely *grid type*
+         and *grid name*. Grid type defines the type of grid the model data is currently on;
+         it can be set to either *rot* or *reg*. The former means that
+         model data is on a rotated grid and the latter that it is on a non-rotated
+         grid (i.e. regular, rectilinear, curvilinear). If data is on rotated
+         grid RCAT will de-rotate the grid. However, it requires that model
+         files include coordinate variables in accordance with CF conventions -
+         *rlon*/*rlat* for longitudes and latitudes as well as the variable
+         *rotated_pole* with attributes *grid_north_pole_longitude* and
+         *grid_north_pole_latitude*. Grid name is a user defined label for the
+         grid. If data is to be remapped to this model grid, the output
+         filenames from RCAT analysis will include this specified grid name.
 
          Here's another example comparing two models:
 
@@ -47,10 +61,12 @@ words, this is your starting point when applying RCAT.
 
             model_his = {
                'fpath': '/path/to/model_1/data',
+               'grid type': 'reg', 'grid name': 'FPS-ALPS3',
                'start year': 1985, 'end year': 2005, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
             }
             model_scn = {
                'fpath': '/path/to/model_2/data',
+               'grid type': 'reg', 'grid name': 'FPS-ALPS3',
                'start year': 2080, 'end year': 2100, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
             }
 
@@ -60,6 +76,10 @@ words, this is your starting point when applying RCAT.
          model_his in the above example) will be the reference model. That is,
          if validation plot is True, and no obs data is specified, the
          difference plots will use the first specified model in section as reference data.
+        
+         .. note:: If you want to see how RCAT uses defined file paths and other
+                information to retrieve lists of model data files, see the
+                *get_mod_data* function in *<path-to-RCAT/rcat/runtime/RCAT_main.py*. 
 
      -  OBS
          If observation data is to be used in the analysis, you will need to 
@@ -95,15 +115,42 @@ words, this is your starting point when applying RCAT.
 
          ::
 
-            variables = {
-                'psl': {'freq': 'day', 'units': 'hPa', 'scale factor': 0.01, 'accumulated': False, 'obs': ['ERA5', 'EOBS'], 'obs scale factor': 0.01, 'regrid to': 'ERA5', 'regrid method': 'bilinear'},
-                'pr': {'freq': 'day', 'units': 'mm', 'scale factor': None, 'accumulated': True, 'obs': 'EOBS', 'obs scale factor': 86400, 'regrid to': 'EOBS', 'regrid method': 'conservative'},
-                'tas': {'freq': 'day', 'units': 'K', 'scale factor': None, 'accumulated': False, 'obs': ['ERA5', 'EOBS'], 'obs scale factor': None, 'regrid to': 'ERA5', 'regrid method': 'bilinear'},
-            }
+                variables = {
+                 'tas': {
+                    'freq': 'day',
+                    'units': 'K',
+                    'scale factor': None,
+                    'accumulated': False,
+                    'obs': 'ERA5',
+                    'obs scale factor': None,
+                    'var names': {'model_1': {'prfx': 'tas', 'vname': 'var167'}},
+                    'regrid to': 'ERA5',
+                    'regrid method': 'bilinear'},
+                 'psl': {
+                    'freq': '3hr',
+                    'units': 'hPa',
+                    'scale factor': 0.01,
+                    'accumulated': False,
+                    'obs': None,
+                    'obs scale factor': None,
+                    'var names': None,
+                    'regrid to': None,
+                    'regrid method': 'bilinear'},
+                 'pr': {
+                    'freq': '1hr',
+                    'units': 'mm',
+                    'scale factor': 3600,
+                    'accumulated': False,
+                    'obs': 'EOBS20',
+                    'obs scale factor': 86400,
+                    'var names': None,
+                    'regrid to': {'name': 'NORCP12', 'file': '/nobackup/rossby20/sm_petli/data/grids/grid_norcp_ald12.nc'},
+                    'regrid method': 'conservative'},
+                    }
 
          * *freq*: A string of the time resolution of input model data. The
            string should match any of the sub-folders under the path to model
-           data, e.g. 'day', '1H', '3H'. In effect, you may choose different
+           data, e.g. 'day', '1hr', '3hr'. In effect, you may choose different
            time resolutions for different variables in the analysis.
 
          * *units*: The units of the variable data (which will appear in
@@ -129,15 +176,32 @@ words, this is your starting point when applying RCAT.
            <path-to-RCAT>/config/observations_metadata_NN.py file. In this
            file you can also add new observational data sets. 
 
-         * *obs scale factor*:As scale factor above but for observations. If
+         * *obs scale factor*: As scale factor above but for observations. If
            multiple observations are defined, some of which would need
            different scale factors, a list of factors can be provided. However,
            if the same factor should be used for all observations, it is enough
            to just specify a single factor.
 
+         * *var names*: Variable names specified in the top key of *variables*
+           usually refers to common names defined in CF conventions. However,
+           there might be cases where either the variable name specified in the
+           file name or of the variable in the file differ from these
+           conventions. Var names provides an option to account for this; it is
+           specified as a dictionary with keys *prfx* and *vname* for the file
+           name prefix and variable name respectively. If file formats follows
+           the conventions, and thus have same prefix and name as the top key
+           variable name, *var names* should be set to *None*. See code snippet
+           above for examples of both types of settings.
+           
          * *regrid to*: If data is to be remapped to a common grid, you specify
-           the name (model name or observation acronym) here. If not, set to
-           None.
+           either the name (model name or observation acronym) of a model
+           defined under **MODELS** section or an observation defined under
+           *obs* key. Or, if an external grid should be used, it can be set to a
+           dictionary with the *name* and *file* keys. *name* has the same
+           purpose as *grid name* in the **MODELS** section above. The value of
+           *file* must be the full path to a netcdf file that at least contains
+           *lon* and *lat* variables defining the target grid. If no remapping
+           is to be done, set *regrid to* to None.
 
          * *regrid method*: String defining the interpolation method:
            'conservative' or 'bilinear'.
@@ -279,7 +343,7 @@ words, this is your starting point when applying RCAT.
 
      .. code-block:: bash
 
-        python <path-to-RCAT>/rcat/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/rcat/runtime/RCAT_main.py -c config_main.ini
 
     .. note::
 
