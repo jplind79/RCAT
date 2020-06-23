@@ -140,7 +140,7 @@ def get_grid_coords(nc, grid_coords):
     grid_coords['lat_0'] = lat0
     grid_coords['lon_0'] = lon0
 
-    gp_bfr = 15
+    gp_bfr = 1
     grid_coords['crnrs'] = [lat[gp_bfr, gp_bfr], lon[gp_bfr, gp_bfr],
                             lat[-gp_bfr, -gp_bfr], lon[-gp_bfr, -gp_bfr]]
     grid_coords['domain'] = _domain(lat, lon, gp_bfr)
@@ -152,7 +152,7 @@ def get_grids(nc, target_grid, method='bilinear'):
     """
     Get and/or modify the source and target grids for interpolation
     """
-    # EDIT 15/11 2019 by Petter
+    # EDIT 15/11 2019 by Petter Lind
     # There's no consistent way to handle data where lon_bnds/lat_bnds are
     # already available, They may have different formats not all handled by
     # xesmf regridding tool. Thus, for now, calculation of grid corners is
@@ -229,8 +229,8 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
         elif isinstance(vconf['regrid'], dict):
             target_grid = xa.open_dataset(vconf['regrid']['file'])
             gridname = vconf['regrid']['name']
-            gdict.update({'lon': {gridname: target_grid['lon']},
-                          'lat': {gridname: target_grid['lat']}})
+            gdict.update({'lon': {gridname: target_grid['lon'].values},
+                          'lat': {gridname: target_grid['lat'].values}})
             for mod in mnames:
                 rgr_data = regridding(dd, mod, v, target_grid,
                                       vconf['rgr method'])
@@ -440,7 +440,7 @@ def get_masked_data(data, var, mask):
                            dims=data[var].dims)
     return data.where(mask_in, drop=True)
 
-    # P. Lind 2019-10-29
+    # Petter Lind 2019-10-29
     # N.B. For masking of large data sets, the code below might be a more
     # viable choice.
     #
@@ -552,7 +552,6 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
 
     _flist = glob.glob(os.path.join(
          mconf['fpath'], '{}/{}_*.nc'.format(tres, var)))
-         # mconf['fpath'], '{}/{}_*.nc'.format(var, var)))
 
     emsg = "Could not find any files at specified location, exiting ..."
     if not _flist:
@@ -946,6 +945,7 @@ print("\n=== SAVE OUTPUT ===")
 tres_str = {}
 for stat in cdict['stats_conf']:
     print("\n\twriting {} to disk ...".format(stat))
+    tres_str[stat] = {}
     for v in stats_dict[stat]:
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
                  (cdict['stats_conf'][stat]['thr'] is not None) and
@@ -957,16 +957,16 @@ for stat in cdict['stats_conf']:
             thrstr = ''
         if cdict['stats_conf'][stat]['resample resolution'] is not None:
             res_tres = cdict['stats_conf'][stat]['resample resolution']
-            tres_str[stat] = "_".join(res_tres)
+            tres_str[stat][v] = "_".join(res_tres)
         else:
-            tres_str[stat] = cdict['variables'][v]['freq']
+            tres_str[stat][v] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
         for m in stats_dict[stat][v]:
             time_suffix = get_month_string(month_dd[v][m])
             st_data = stats_dict[stat][v][m]
             save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
                          year_dd[v][m][0], year_dd[v][m][1], time_suffix,
-                         cdict['stats_conf'][stat], tres_str[stat], thrstr,
+                         cdict['stats_conf'][stat], tres_str[stat][v], thrstr,
                          cdict['regions'])
 
 
@@ -984,7 +984,7 @@ if cdict['validation_plot']:
         for v in stats_dict[sn]:
             plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
                                       cdict['variables'][v]['obs'], year_dd[v],
-                                      month_dd[v], tres_str[sn], img_outdir,
+                                      month_dd[v], tres_str[sn][v], img_outdir,
                                       stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
             rplot.plot_main(plot_dict, sn)
