@@ -368,10 +368,10 @@ def create_polygon():
     write = input('\n\n{}\n{}\n{}\n>> '.format(s1, s2, s3))
 
     if write == 'write':
-        s1 = "Type file directory path and file name as 'fdir, fname'"
+        s1 = "Type file directory path and file name as: fdir, fname"
         s2 = "Make sure 'fname' is an appropriate name for the polygon."
         s3 = ("N.B.\nIf polygon should be added to RCAT, make sure directory "
-              "path is set to: <path-to-rcat>/src/polygons")
+              "path is set to: <path-to-RCAT>/rcat/utils/polygon_files")
         file_info = input('\n{}\t\n{}\t\n{}\n>> '.format(s1, s2, s3))
         file_info = file_info.split(',')
 
@@ -572,7 +572,8 @@ if __name__ == "__main__":
                             'of the drawn map (resolution of boundary database'
                             ' to use). Can be "c" (crude), "l" (low), "i" '
                             '(intermediate), "h" (high), "f" (full). Crude '
-                            'and low are installed by default. If higher '
+                            'and low are installed by default. Default '
+                            'resolution is "low". If higher '
                             'resolution is wanted ("i", "h" or "f") high-res'
                             ' data must be installed. In conda this can be '
                             'achieved by running:\n conda install -c '
@@ -582,7 +583,8 @@ if __name__ == "__main__":
                                          ' also figpath (--figpath) if needed '
                                          '(defaults to ./)'))
     parser.add_argument('--figpath', metavar='FILEPATH', default='./',
-                        type=str, help='Where to save polygon plot')
+                        type=str, help=('Where to save polygon plot. '
+                                        'Defaults to ./'))
     args = parser.parse_args()
 
     if args.purpose == 'create':
