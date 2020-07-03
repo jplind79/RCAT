@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="RCAT",
-    version="1.0.1",
+    version="1.1",
     author="Petter Lind",
     author_email="petter.lind@smhi.se",
     description="Regional Climate Analysis Tool (RCAT)",
