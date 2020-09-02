@@ -18,11 +18,16 @@ cp = 1005.
 cv = 718.
 
 
-def rh2sh(rh, T):
+def rh2sh(rh, T, P=1013.25):
     """
     Convert relative humidity to specific humidity
     Code from:
     https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R
+    Equation for sh from standard literature, e.g. K. Emanuel (1994; eq. 4.1.4)
+    Reference:
+    * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:
+      Oxford University Press, 580 pp.
+
 
     Parameters
     ----------
@@ -30,16 +35,55 @@ def rh2sh(rh, T):
         Relative humidity in proportion, not percent
     T, float/array of floats
         Absolute temperature in Kelvin
+    P, float/array of floats
+        Pressure in hPa (mb)
 
     Returns
     -------
-    p,
+    sh,
         Specific humidity in kg/kg
 
     """
+    es = calc_es(T)
+    e = rh * es
+    sh = (eps * e) / (P - e*(1 - eps))
 
-    q = rh * 2.541e6 * np.exp(-5415.0 / T) * 18/29
-    return(q)
+    return(sh)
+
+
+def sh2rh(sh, T, P=1013.25):
+    """
+    Convert relative humidity to specific humidity
+    Code from:
+    https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R
+
+    Parameters
+    ----------
+    sh, float/array of floats
+        Specific humidity in kg/kg
+    T, float/array of floats
+        Absolute temperature in Kelvin
+    P, float/array of floats
+        Pressure in hPa (mb)
+
+    Returns
+    -------
+    rh,
+        Relative humidity in fraction (not percent)
+
+    """
+
+    es = calc_es(T)
+    e = calc_e_from_sh(sh, P)
+    rh = e / es
+    if isinstance(rh, (np.int, np.float)):
+        rh = 1 if rh > 1 else rh
+        rh = 0 if rh < 0 else rh
+    else:
+        rh[rh > 1] = 1
+        rh[rh < 0] = 0
+
+    return(rh)
 
 
 def td2sh(Td, P):
@@ -61,38 +105,88 @@ def td2sh(Td, P):
     """
 
     Td_C = Td - 273.15
-    e = 6.112*np.exp((17.67*Td_C)/(Td_C + 243.5))
-    q = (0.622 * e)/(P - (0.378 * e))
+    e = 6.112 * np.exp((17.67 * Td_C) / (Td_C + 243.5))
+    q = (eps * e)/(P - (0.378 * e))
 
     return(q)
 
 
-def sh2td(w, p):
+def sh2td(sh, p):
     """
-    Returns dew point temperature (K) at mixing ratio w (kg/kg) and
+    Returns dew point temperature (K) at mixing ratio sh (kg/kg) and
     pressure p (Pa). Insert Td in 2.17 in Rogers&Yau and solve for Td
     """
 
-    ep = e(w, p)
+    ep = calc_e_from_sh(sh, p)
     return 243.5 * np.log(ep/611.2)/(17.67-np.log(ep/611.2)) + 273.15
 
 
-def es(T):
+def vpd(rh, T):
     """
-    Returns saturation vapor pressure (Pascal) at temperature T (Celsius)
+    Calculate VPD - vapor pressure deficit from relative humidity and
+    temperature.
+    Code from:
+    https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R
+
+    Parameters
+    ----------
+    rh, float/array of floats
+        Relative humidity in fraction (not percent)
+    T, float/array of floats
+        Absolute temperature in Kelvin
+
+    Returns
+    -------
+    vpd,
+        Vapor pressure deficit (in hPa/mb)
+
+    """
+
+    e_sat = calc_es(T)
+    vpd = (((100 - rh)/100) * e_sat)
+
+    return vpd
+
+
+def calc_es(T):
+    """
+    Returns saturation vapor pressure in hPa at temperature T (Kelvin)
     Formula 2.17 in Rogers&Yau
     """
 
-    return 611.2*np.exp(17.67*T/(T+243.5))
+    Tc = T - 273.15  # Temperature in degrees Celcius
+
+    return 6.112 * np.exp(17.67 * Tc / (Tc + 243.5))
 
 
-def e(w, p):
+def calc_e_from_w(w, P=1013.25):
     """
-    Returns vapor pressure (Pa) at mixing ratio w (kg/kg) and pressure p (Pa)
-    Formula 2.18 in Rogers&Yau
+    Vapor pressure over liquid surface can be calculated from a variety of
+    different combinations of state variables.
+    Here, vapor pressure is calculated from mixing ratio w (kg/kg)
+    and pressure P. Formula is given in standard literature; e.g. eq. 2.18 in
+    Rogers&Yau (Cloud physics) and eq. 4.1.2 in Emanuel (1994).
+    Reference:
+    * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:
+      Oxford University Press, 580 pp.
     """
 
-    return w*p/(w+eps)
+    return w * P / (eps + w)
+
+
+def calc_e_from_sh(sh, P=1013.25):
+    """
+    Vapor pressure over liquid surface can be calculated from a variety of
+    different combinations of state variables.
+    Here, vapor pressure is calculated from specific humidity sh and pressure
+    P. Formula is given in standard literature; e.g. eq. 2.19 in Rogers & Yau
+    (Cloud physics) and eq. 4.1.4 in Emanuel (1994).
+    Reference:
+    * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:
+      Oxford University Press, 580 pp.
+    """
+
+    return sh * P / (sh*(1 - eps) + eps)
 
 
 def td(e):

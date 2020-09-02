@@ -301,7 +301,7 @@ def resampling(data, tresample):
     """
     from pandas import to_timedelta
     diff = data.time.values[1] - data.time.values[0]
-    nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
+    nsec = to_timedelta(diff).total_seconds()
     tr, fr = _get_freq(tresample[0])
     sec_resample = to_timedelta(tr, fr).total_seconds()
     data = manage_chunks(data, 'time')
@@ -500,21 +500,6 @@ def manage_chunks(data, chunk_dim):
     return data
 
 
-def get_prep_func(deacc):
-    """
-    Return function that either de-accumulate data
-    or slice it.
-    """
-    if deacc:
-        def f(data):
-            return data.diff(dim='time')
-    else:
-        def f(data):
-            return data.isel(time=slice(0, -1))
-
-    return f
-
-
 def get_variable_config(var_config, var):
     """
     Retrieve configuration info for variable var as defined in main
@@ -527,7 +512,7 @@ def get_variable_config(var_config, var):
         'scale factor': var_config['scale factor'],
         'obs scale factor': var_config['obs scale factor'] if
         'obs scale factor' in var_config else None,
-        'prep func': get_prep_func(var_config['accumulated']),
+        'deacc': var_config['accumulated'],
         'regrid': var_config['regrid to'] if 'regrid to' in
         var_config else None,
         'rgr method': var_config['regrid method'] if 'regrid method' in
@@ -536,7 +521,7 @@ def get_variable_config(var_config, var):
     return vdict
 
 
-def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
+def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     """
     Open model data files where file path is dependent on time resolution tres.
     """
@@ -553,7 +538,8 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
     _flist = glob.glob(os.path.join(
          mconf['fpath'], '{}/{}_*.nc'.format(tres, var)))
 
-    emsg = "Could not find any files at specified location, exiting ..."
+    emsg = ("Could not find any files at specified location:\n{}/{} "
+            "\n\nexiting ...".format(mconf['fpath'], tres))
     if not _flist:
         print("\t\n{}".format(emsg))
         sys.exit()
@@ -568,11 +554,11 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
 
-    if tres == 'mon':
-        _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
-    else:
+    if deacc:
         _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
-                                   preprocess=prep_func)
+                                   preprocess=(lambda arr: arr.diff('time')))
+    else:
+        _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
 
     # Time stamps
     if 'units' in _mdata.time.attrs:
@@ -589,8 +575,7 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, prep_func):
     # Extract years
     mdata = _mdata.where(((_mdata.time.dt.year >= fyear) &
                           (_mdata.time.dt.year <= lyear) &
-                          (np.isin(_mdata.time.dt.month, months))),
-                         drop=True)
+                          (np.isin(_mdata.time.dt.month, months))), drop=True)
 
     # Remove height dim
     if 'height' in mdata.dims:
@@ -890,7 +875,7 @@ for var in cdict['variables']:
         mod_names.append(mod_name)
         mod_data = get_mod_data(
             mod_name, settings, tres, var, var_conf['var names'],
-            scf, var_conf['prep func'])
+            scf, var_conf['deacc'])
         data_dict[tres][var][mod_name] = mod_data
 
         # Update grid information for plotting purposes

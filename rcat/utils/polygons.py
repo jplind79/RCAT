@@ -34,7 +34,6 @@ def polygons(area="", poly_print=False):
 
     # -------- Dictionary of predfined regions -------- #
     file_dir = os.path.dirname(os.path.abspath(__file__))
-    # p_dir = os.path.dirname(file_dir)
     polypath = os.path.join(file_dir, 'polygon_files')
 
     errmsg = "Folder to polygons: {}, does not seem to exist!".format(polypath)
@@ -47,12 +46,6 @@ def polygons(area="", poly_print=False):
         print("\nAvailable polygons/regions:\n")
         [print('\t{}'.format(ar)) for ar in poly_dict]
     else:
-        # try:
-        #     area_file = os.path.join(polypath, poly_dict[area])
-        #     return area_file
-        # except ValueError:
-        #     print
-        #     print("ERROR! \n {0} is not a pre-defined area.".format(area))
         errmsg = ("\n\n\tOohps! '{0}' is not a pre-defined area. Check polygon"
                   " folder for the correct name or create a new "
                   "polygon.").format(area)
@@ -142,9 +135,6 @@ def mask_region(xp, yp, area, data=None, iter_3d=None, cut_data=False):
         yp_r, xp_r = [(np.min(np.where(~mask)[i]),
                        np.max(np.where(~mask)[i]))
                       for i in range(2)]
-        # yp_r, xp_r = [(np.min(np.where(~mask)[i])-1,
-        #                np.max(np.where(~mask)[i])+1)
-        #               for i in range(2)]
         reg_x_edges, reg_y_edges = xp_r, yp_r
         xr = np.int(np.diff(xp_r)+1)
         yr = np.int(np.diff(yp_r)+1)
@@ -222,7 +212,7 @@ def create_polygon():
                         llcrnrlat=lat1, urcrnrlat=lat2,
                         llcrnrlon=lon1, urcrnrlon=lon2,
                         lat_0=(lat1+lat2)/2, lon_0=(lon1+lon2)/2,
-                        projection='stere',
+                        projection='lcc',
                         resolution=map_resolution)
         else:
             m = Basemap(ax=ax,

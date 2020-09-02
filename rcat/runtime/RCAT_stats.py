@@ -61,7 +61,7 @@ def default_stats_config(stats):
             'vars': ['pr'],
             'resample resolution': None,
             'pool data': False,
-            'nr_bins': 50,
+            'nr_bins': 80,
             'thr': None,
             'chunk dimension': 'space'},
         'pdf': {
@@ -71,6 +71,7 @@ def default_stats_config(stats):
             'bins': None,
             'normalized': False,
             'thr': None,
+            'dry event thr': None,
             'chunk dimension': 'space'},
         'percentile': {
             'vars': [],
@@ -152,12 +153,6 @@ def _check_hours(ds):
     else:
         pass
     return ds
-    # if np.any(ds.time.dt.minute > 0):
-    #     print("Shifting time stamps to whole hours!")
-    #     ds.time.values = ds.time.dt.ceil('H').values
-    # else:
-    #     pass
-    # return ds
 
 
 def _get_freq(tf):
@@ -169,6 +164,9 @@ def _get_freq(tf):
 
     if unit in ('M', 'Y'):
         freq = freq*30 if unit == 'M' else freq*365
+        unit = 'D'
+    elif unit[0] == 'Q':
+        freq = 90
         unit = 'D'
 
     return freq, unit
@@ -199,7 +197,7 @@ def moments(data, var, stat, stat_config):
         thr = in_thr
 
     diff = data.time.values[1] - data.time.values[0]
-    nsec = diff.astype('timedelta64[s]')/np.timedelta64(1, 's')
+    nsec = to_timedelta(diff).total_seconds()
     tr, fr = _get_freq(mstat[0])
     sec_resample = to_timedelta(tr, fr).total_seconds()
     expr = "data[var].resample(time='{}').{}('time').dropna('time', 'all')"\
@@ -416,6 +414,7 @@ def freq_int_dist(data, var, stat, stat_config):
     """
     Calculate frequency intensity distributions
     """
+    # Bins
     if var not in stat_config[stat]['bins']:
         dmn = data[var].min(skipna=True)
         dmx = data[var].max(skipna=True)
@@ -424,11 +423,22 @@ def freq_int_dist(data, var, stat, stat_config):
         bin_r = stat_config[stat]['bins'][var]
         bins = np.arange(bin_r[0], bin_r[1], bin_r[2])
     lbins = bins.size - 1
+
+    # Data threshold
     in_thr = stat_config[stat]['thr']
     if in_thr is not None:
         thr = None if var not in in_thr else in_thr[var]
     else:
         thr = in_thr
+
+    # Dry event threshold
+    in_dry_thr = stat_config[stat]['dry event thr']
+    if in_dry_thr is not None:
+        dry_thr = None if var not in in_dry_thr else in_dry_thr[var]
+    else:
+        dry_thr = in_dry_thr
+
+    # Normalization
     normalized = stat_config[stat]['normalized']
     if isinstance(normalized, bool):
         norm = normalized
@@ -445,7 +455,7 @@ def freq_int_dist(data, var, stat, stat_config):
         output_core_dims=[['bins']], dask='parallelized',
         output_dtypes=[float], output_sizes={'bins': lbins+1},
         kwargs={'keepdims': True, 'bins': bins, 'axis': -1, 'norm': norm,
-                'thr': thr, 'var': var})
+                'thr': thr, 'dry_event_thr': dry_thr})
     dims = list(pdf.dims)
     pdf_ds = pdf.to_dataset().transpose(dims[-1], dims[0], dims[1])
     st_data = pdf_ds.assign(bin_edges=['dry_events']+list(bins))
@@ -579,23 +589,20 @@ def _harmonic_linefit(data, keepdims=False, axis=0, var=None):
 
 
 def _pdf_calc(data, bins=None, norm=False, keepdims=False, axis=0, thr=None,
-              var=None):
+              dry_event_thr=None):
     """
     Calculate pdf
     """
-    def _compute(data1d, bins, lbins, norm=norm, thr=thr, v=var):
+    def _compute(data1d, bins, lbins, norm, thr, dry_thr):
         if all(np.isnan(data1d)):
             print("All data missing/masked!")
-            # hdata = np.repeat(np.nan, data1d.size)
             hdata = np.repeat(np.nan, lbins+1)
         else:
             if any(np.isnan(data1d)):
                 data1d = data1d[~np.isnan(data1d)]
 
-            if v == 'pr':
-                data1d[data1d < 0.0] = 0.0
-                # dry_events = np.sum(data1d < 0.001)
-                dry_events = np.sum(data1d < 0.1)
+            if dry_thr is not None:
+                dry_events = np.sum(data1d < dry_thr)
             else:
                 dry_events = None
 
@@ -633,13 +640,14 @@ def _pdf_calc(data, bins=None, norm=False, keepdims=False, axis=0, thr=None,
 
     if keepdims:
         hist = np.apply_along_axis(_compute, axis, data, bins=inbins,
-                                   lbins=lbins, norm=norm, thr=thr, v=var)
+                                   lbins=lbins, norm=norm, thr=thr,
+                                   dry_thr=dry_event_thr)
     else:
         if isinstance(data, np.ma.MaskedArray):
             data1d = data.compressed()
         else:
             data1d = np.array(data).ravel()
-        hist = _compute(data1d, bins=inbins, norm=norm, thr=thr, v=var,
-                        lbins=lbins)
+        hist = _compute(data1d, bins=inbins, lbins=lbins, norm=norm, thr=thr,
+                        dry_thr=dry_event_thr)
 
     return hist

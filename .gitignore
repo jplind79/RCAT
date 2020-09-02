@@ -20,3 +20,4 @@ __pycache__
 # Other
 docs/build
 docs/source/generated
+rcat/utils/polygon_files

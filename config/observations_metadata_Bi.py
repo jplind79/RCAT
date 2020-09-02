@@ -215,7 +215,7 @@ def obs_data():
         'EOBS': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'psl_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_EOBS_022_latlon' # noqa
+            'grid': None # noqa
         },
         'EOBS19': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
@@ -228,9 +228,10 @@ def obs_data():
             'grid': None
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
             'file pattern': 'psl_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
+            'grid': None # noqa
         },
         'EC-EARTH': {
             'path': '/nobackup/rossby20/sm_petli/data/EC_EARTH/RCP85',
