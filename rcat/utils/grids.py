@@ -226,6 +226,8 @@ def _write_grid_info(lons_row, lons_cor, lats_row, lats_cor, nlon, nlat,
         from datetime import datetime
         dtime = datetime.now().strftime('%Y-%m-%dT%H%M%S')
         fname = './grid_{}x{}_latlon_bounds_{}'.format(nlon, nlat, dtime)
+    else:
+        fname = filename
 
     lt_row = np.array_split(lats_row, np.ceil(lats_row.size/6).astype(np.int))
     lt_row_str = "\n".join([" ".join(str(item) for item in arr)

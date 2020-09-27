@@ -553,7 +553,6 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     if np.unique([len(f) for f in flist]).size > 1:
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
-
     if deacc:
         _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
                                    preprocess=(lambda arr: arr.diff('time')))

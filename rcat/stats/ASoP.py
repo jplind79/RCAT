@@ -124,7 +124,7 @@ def asop(data, keepdims=False, axis=0, bins=None, thr=None, return_bins=False):
     return results
 
 
-def bins_calc(n):
+def bins_calc(n, bintype='Klingaman'):
     """
     Calculates bins with edges according to Eq. 1 in Klingaman et al. (2017);
     https://www.geosci-model-dev.net/10/57/2017/
@@ -133,13 +133,19 @@ def bins_calc(n):
     ----------
     n: array/list
         1D array or list with bin numbers
+    bintype: str
+        The type of bins to be calculated; 'Klingaman' (see reference) or
+        'exp' for exponential bins.
 
     Returns
     -------
     bn: array
         1D array of bin edges
     """
-
-    bn = np.e**(np.log(0.005)+(n*(np.log(120)-np.log(0.005))**2/59)**(1/2))
+    if bintype == 'Klingaman':
+        # bn = np.e**(np.log(0.005)+(n*(np.log(120)-np.log(0.005))**2/59)**(1/2))
+        bn = 0.005*np.exp(np.sqrt(1.724*n))
+    elif bintype == 'exp':
+        bn = 0.02*np.exp(0.12*n)
 
     return bn
