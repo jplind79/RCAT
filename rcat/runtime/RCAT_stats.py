@@ -21,8 +21,8 @@ def default_stats_config(stats):
     """
     stats_dict = {
         'moments': {
-            'moment stat': ['D', 'mean'],
             'vars': [],
+            'moment stat': ['D', 'mean'],
             'resample resolution': None,
             'pool data': False,
             'thr': None,
@@ -49,14 +49,14 @@ def default_stats_config(stats):
             'stat method': 'mean',
             'thr': None,
             'pool data': False,
-            'chunk dimension': 'time'},
+            'chunk dimension': 'space'},
         'dcycle harmonic': {
             'vars': [],
             'resample resolution': None,
             'pool data': False,
             'dcycle stat': 'amount',
             'thr': None,
-            'chunk dimension': 'time'},
+            'chunk dimension': 'space'},
         'asop': {
             'vars': ['pr'],
             'resample resolution': None,
@@ -148,7 +148,7 @@ def calc_statistics(data, var, stat, stat_config):
 
 def _check_hours(ds):
     if np.any(ds.time.dt.minute > 0):
-        print("Shifting time stamps to whole hours!")
+        print("Shifting time stamps (upwards) to whole hours!")
         ds = ds.assign_coords({'time': ds.time.dt.ceil('H').values})
     else:
         pass
@@ -480,12 +480,12 @@ def asop(data, var, stat, stat_config):
         thr = None if var not in in_thr else in_thr[var]
     else:
         thr = in_thr
-    asop = xa.apply_ufunc(
+    asop_out = xa.apply_ufunc(
         ASoP.asop, data[var], input_core_dims=[['time']],
         output_core_dims=[['factors', 'bins']], dask='parallelized',
         output_dtypes=[float], output_sizes={'factors': 2, 'bins': lbins},
         kwargs={'keepdims': True, 'axis': -1, 'bins': bins})
-    dims = list(asop.dims)
+    dims = list(asop_out.dims)
 
     # N.B. This does not work in rcat yet! Variable name need still to be 'pr'
     # C = asop.isel(factors=0)
@@ -494,7 +494,7 @@ def asop(data, var, stat, stat_config):
     # C_ds = C.to_dataset().transpose(dims[-1], dims[0], dims[1])
     # FC_ds = FC.to_dataset().transpose(dims[-1], dims[0], dims[1])
     # asop_ds = = xa.Dataset.merge(C_ds, FC_ds)
-    asop_ds = asop.to_dataset().transpose(dims[-2], dims[-1], dims[0], dims[1])
+    asop_ds = asop_out.to_dataset().transpose(dims[-2], dims[-1], dims[0], dims[1])
     st_data = asop_ds.assign(bin_edges=bins, factors=['C', 'FC'])
     st_data.attrs['Description'] =\
         "ASoP analysis | threshold: {}".format(thr)
