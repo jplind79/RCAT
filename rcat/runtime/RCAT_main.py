@@ -496,10 +496,10 @@ def manage_chunks(data, chunk_dim):
         c_size = np.round(np.maximum(xsize, ysize)/n).astype(int)
         data = data.chunk({'time': data.time.size, xd: c_size, yd: c_size})
     else:
-        cmax = 250
+        cmax = 750
         nchunks = len(data.chunks['time'])
         mxchunk = max(data.chunks['time'])
-        if nchunks > cmax or mxchunk > 3e3:
+        if nchunks > cmax or mxchunk > 2e3:
             rchunk_size = np.round(data.time.size/cmax).astype(int)
             data = data.chunk({'time': rchunk_size})
 
