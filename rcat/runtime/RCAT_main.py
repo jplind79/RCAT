@@ -12,6 +12,7 @@ import pandas as pd
 from itertools import product
 import dask.array as da
 import numpy as np
+import re
 from dask.distributed import Client
 from rcat.utils import ini_reader
 from rcat.utils.polygons import mask_region
@@ -274,7 +275,7 @@ def regridding(data, data_name, var, target_grid, method):
         dims=['time', 'y', 'x'], attrs=indata.attrs.copy())
 
     dset = darr.to_dataset()
-    del data_dist, rgr_data
+    # del data_dist, rgr_data
 
     return dset
 
@@ -306,7 +307,6 @@ def resampling(data, tresample):
     sec_resample = to_timedelta(tr, fr).total_seconds()
     data = manage_chunks(data, 'time')
     if nsec != sec_resample:
-        print("\t\tResampling input data ...\n")
         data = eval("data.resample(time='{}', label='right').{}('time').\
                       dropna('time', 'all')".format(
                           tresample[0], tresample[1]))
@@ -337,13 +337,17 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
 
                 # Resampling of data
                 if stats_config[stat]['resample resolution'] is not None:
+                    print("\tResampling input data ...\n")
                     indata = resampling(
                         indata, stats_config[stat]['resample resolution'])
 
                 # Check chunking of data
                 data = manage_chunks(indata, chunk_dim)
+
+                # Calculate stats
                 st_data[v][m]['domain'] = st.calc_statistics(data, v, stat,
                                                              stats_config)
+
                 if regions:
                     masks = {
                         r: mask_region(
@@ -407,7 +411,9 @@ def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
     #             var: {'dtype': 'float32', '_FillValue': 1.e20}
     #             }
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
-        tstat = '_' + stat_dict['stat method'].replace(' ', '_')
+        _tstat = stat_dict['stat method'].partition(' ')[0]
+        tstat = '_' + re.sub(r'[^a-zA-Z0-9 \.\n]', '', _tstat).\
+                replace(' ', '_')
     else:
         tstat = ''
     stat_name = stat.replace(' ', '_')
@@ -553,6 +559,7 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     if np.unique([len(f) for f in flist]).size > 1:
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
+
     if deacc:
         _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
                                    preprocess=(lambda arr: arr.diff('time')))
