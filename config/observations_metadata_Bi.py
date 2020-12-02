@@ -187,6 +187,21 @@ def obs_data():
             'file pattern': 'pr_day_EC-EARTH_rcp85_r12i1p1_YYYYMM01_YYYYMM31.nc', # noqa
             'grid': None
         },
+        'Spain02': {
+            'path': '/nobackup/rossby20/sm_petli/data/Spain02/day',
+            'file pattern': 'pr_Spain02_v2_day_YYYYMM01_YYYYMM31.nc', # noqa
+            'grid': None
+        },
+        'SAFRAN': {
+            'path': '/nobackup/rossby20/sm_petli/data/SAFRAN/day',
+            'file pattern': 'pr_Meteo-France_SAFRAN_day_YYYYMM01_YYYYMM31.nc', # noqa
+            'grid': None
+        },
+        'EURO4M-APGD': {
+            'path': '/nobackup/rossby20/sm_petli/data/EURO4M/APGD/day',
+            'file pattern': 'pr_EURO4M-APGD_day_YYYYMM01_YYYYMM31.nc', # noqa
+            'grid': None
+        },
     },
 
     # ------------------------------------------------------------------------
