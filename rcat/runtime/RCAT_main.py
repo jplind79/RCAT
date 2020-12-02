@@ -192,7 +192,21 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
                 gdict['lat'].update({obs: dd[obs]['grid']['lat']})
         gridname = 'native_grid'
     else:
-        if vconf['regrid'] in onames:
+        if isinstance(vconf['regrid'], dict):
+            target_grid = xa.open_dataset(vconf['regrid']['file'])
+            gridname = vconf['regrid']['name']
+            gdict.update({'lon': {gridname: target_grid['lon'].values},
+                          'lat': {gridname: target_grid['lat'].values}})
+            for mod in mnames:
+                rgr_data = regridding(dd, mod, v, target_grid,
+                                      vconf['rgr method'])
+                dd[mod]['data'] = rgr_data
+            if None not in onames:
+                for obs in onames:
+                    rgr_data = regridding(dd, obs, v, target_grid,
+                                          vconf['rgr method'])
+                    dd[obs]['data'] = rgr_data
+        elif vconf['regrid'] in onames:
             oname = vconf['regrid']
             target_grid = dd[oname]['grid']
             gridname = dd[oname]['gridname']
@@ -219,20 +233,6 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             gdict.update({'lon': {mname: target_grid['lon']},
                           'lat': {mname: target_grid['lat']}})
             for mod in modlist:
-                rgr_data = regridding(dd, mod, v, target_grid,
-                                      vconf['rgr method'])
-                dd[mod]['data'] = rgr_data
-            if None not in onames:
-                for obs in onames:
-                    rgr_data = regridding(dd, obs, v, target_grid,
-                                          vconf['rgr method'])
-                    dd[obs]['data'] = rgr_data
-        elif isinstance(vconf['regrid'], dict):
-            target_grid = xa.open_dataset(vconf['regrid']['file'])
-            gridname = vconf['regrid']['name']
-            gdict.update({'lon': {gridname: target_grid['lon'].values},
-                          'lat': {gridname: target_grid['lat'].values}})
-            for mod in mnames:
                 rgr_data = regridding(dd, mod, v, target_grid,
                                       vconf['rgr method'])
                 dd[mod]['data'] = rgr_data
