@@ -661,7 +661,7 @@ def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
             but can be ordered.
     """
 
-    nsubgroups = np.array([len(v) for v in data.values()])
+    nsubgroups = np.array([len(v) for v in data.values()], dtype=object)
     assert len(np.unique(nsubgroups)) == 1,\
         "\n{}\n".format("Number of subgroups for each property "
                         "differ!")
