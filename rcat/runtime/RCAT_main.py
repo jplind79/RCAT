@@ -630,7 +630,22 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
 
     # Open obs files
     obs_flist = obs_meta.get_file_list(var, obs, sdate, edate)
-    f_obs = xa.open_mfdataset(obs_flist, combine='by_coords', parallel=True)
+
+    emsg = ("Could not find any {} files at specified location"
+            "\n\nexiting ...".format(obs.upper()))
+    if not obs_flist:
+        print("\t\n{}".format(emsg))
+        sys.exit()
+
+    date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
+        range(sy, ey+1), mns)]
+    _file_dates = [re.split('-|_', f.rsplit('.')[-2])[-2:] for f in obs_flist]
+    file_dates = [(d[0][:6], d[1][:6]) for d in _file_dates]
+    fidx = [np.where([d[0] <= date <= d[1] for d in file_dates])[0][0]
+            for date in date_list]
+    flist = [obs_flist[i] for i in np.unique(fidx)]
+    flist.sort()
+    f_obs = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
 
     # Extract years
     obs_data = f_obs.where(((f_obs.time.dt.year >= sy) &
