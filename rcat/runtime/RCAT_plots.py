@@ -154,6 +154,11 @@ def _mask_data(ds_in, var, mask):
     return ds_out
 
 
+def round_to_sign_digits(x, sig=2):
+    out = round(x, sig-int(np.floor(np.log10(abs(x))))-1) if not x == 0 else 0
+    return out
+
+
 def get_clevs(data, centered=False):
     from scipy.stats import skew
 
@@ -186,24 +191,28 @@ def get_clevs(data, centered=False):
         round_max = _round_up(abs_max, -1)
         round_min = _round_down(abs_min, -1)
 
-    nsteps = 15
     diff = round_max - round_min
     if diff < 1:
-        nz = np.floor(np.abs(np.log10(np.abs(diff))))
-        step = _round_down(diff/nsteps, nz+2)
-    elif 1 <= diff < 10:
-        step = .5
-    elif 10 <= diff < 25:
-        step = 1
-    elif 25 <= diff < 50:
-        step = 2.5
-    elif 50 <= diff < 150:
-        step = 5
-    elif 150 <= diff < 500:
-        step = 10
+        # nsteps = 15
+        # nz = np.floor(np.abs(np.log10(np.abs(diff))))
+        # nz = round(diff, -int(np.floor(np.log10(abs(diff)))))
+        # step = _round_down(diff/nsteps, nz+2)
+        _clevs = np.linspace(round_min, round_max, 14)
+        clevs = [round_to_sign_digits(x, 2) for x in _clevs]
     else:
-        step = 20
-    clevs = np.arange(round_min, round_max + step, step)
+        if 1 <= diff < 10:
+            step = .5
+        elif 10 <= diff < 25:
+            step = 1
+        elif 25 <= diff < 50:
+            step = 2.5
+        elif 50 <= diff < 150:
+            step = 5
+        elif 150 <= diff < 500:
+            step = 10
+        else:
+            step = 20
+        clevs = np.arange(round_min, round_max + step, step)
     return clevs
 
 
