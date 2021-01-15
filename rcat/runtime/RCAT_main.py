@@ -307,7 +307,7 @@ def resampling(data, tresample):
     sec_resample = to_timedelta(tr, fr).total_seconds()
     data = manage_chunks(data, 'time')
     if nsec != sec_resample:
-        data = eval("data.resample(time='{}', label='right').{}('time').\
+        data = eval("data.resample(time='{}').{}('time').\
                       dropna('time', 'all')".format(
                           tresample[0], tresample[1]))
     else:
@@ -393,9 +393,12 @@ def _get_freq(tf):
     d = [j.isdigit() for j in tf]
     freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
     unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
-
     if unit in ('M', 'Y'):
         freq = freq*30 if unit == 'M' else freq*365
+        unit = 'D'
+    elif unit[0] == 'Q':
+        # When resampling Quarters - set to 90 days
+        freq = 90
         unit = 'D'
 
     return freq, unit
