@@ -1165,6 +1165,9 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
     cs = cs if isinstance(cs, list) else [cs]
     nplots = len(cs)
 
+    # Tick label format
+    fmt = formatter if isinstance(formatter, list) else [formatter]*nplots
+
     if nplots != cbaxs.ngrids:
         ll = list(set(range(nplots)).symmetric_difference(
             set(range(cbaxs.ngrids))))
@@ -1176,7 +1179,7 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
                 if not isinstance(title, list) else title
 
     cbs = []
-    for i, ax in zip(range(nplots), cbaxs):
+    for i, ax, ft in zip(range(nplots), cbaxs, fmt):
         try:
             lvls = cs[i].levels
             # lvls = [round(i, 2) for i in lvls]
@@ -1185,7 +1188,7 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
             # lvls = [round(i, 2) for i in lvls]
 
         # Set format of tick labels
-        tlbls = [formatter.format(i) for i in lvls]
+        tlbls = [ft.format(i) for i in lvls]
 
         if 'ticks' not in cbar_kwargs:
             ticks = np.linspace(lvls[0], lvls[-1], len(lvls))
