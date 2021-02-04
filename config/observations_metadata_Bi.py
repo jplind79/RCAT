@@ -60,11 +60,6 @@ def obs_data():
             'file pattern': 'tas_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
             'grid': None
         },
-        'EC-EARTH': {
-            'path': '/nobackup/rossby20/sm_petli/data/EC_EARTH/RCP85',
-            'file pattern': 'tas_day_EC-EARTH_rcp85_r12i1p1_YYYYMM01_YYYYMM31.nc', # noqa
-            'grid': None
-        },
     },
 
     'tasmax': {
@@ -182,11 +177,6 @@ def obs_data():
             'file pattern': 'pr_Klimagrid_Denmark_1h_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': None
         },
-        'EC-EARTH': {
-            'path': '/nobackup/rossby20/sm_petli/data/EC_EARTH/RCP85',
-            'file pattern': 'pr_day_EC-EARTH_rcp85_r12i1p1_YYYYMM01_YYYYMM31.nc', # noqa
-            'grid': None
-        },
         'Spain02': {
             'path': '/nobackup/rossby20/sm_petli/data/Spain02/day',
             'file pattern': 'pr_Spain02_v2_day_YYYYMM01_YYYYMM31.nc', # noqa
@@ -247,11 +237,6 @@ def obs_data():
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
             'file pattern': 'psl_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
             'grid': None # noqa
-        },
-        'EC-EARTH': {
-            'path': '/nobackup/rossby20/sm_petli/data/EC_EARTH/RCP85',
-            'file pattern': 'psl_day_EC-EARTH_rcp85_r12i1p1_YYYYMM01_YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
