@@ -341,9 +341,9 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
                 if labels is not None:
                     pts.set_label(dlabels[i])
 
-                if np.any(xd > 0.0) and np.any(xd < 0.0):
+                if np.any(np.array(xd) > 0.0) and np.any(np.array(xd) < 0.0):
                     ax.axvline(color='k', lw=1, ls='--', alpha=.5)
-                if np.any(yd > 0.0) and np.any(yd < 0.0):
+                if np.any(np.array(yd) > 0.0) and np.any(np.array(yd) < 0.0):
                     ax.axhline(color='k', lw=1, ls='--', alpha=.5)
 
             if labels is not None:
@@ -562,7 +562,7 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
 
 
 def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
-                  **box_kwargs):
+                  box_colors=None, **box_kwargs):
     """
     Create a box plot
 
@@ -582,6 +582,8 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
         grouped: boolean
             Whether to plot grouped boxplot. If True, input data must be a
             dictionary. See _grouped_boxplot function for more info.
+        box_colors: array/list
+            Optional list of colors to be used for the boxes.
         **box_kwargs: keyword arguments
             arguments (key=value) that can be used in pyplot.boxplot
             See matplotlib.org for more information
@@ -621,12 +623,12 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
                 "\n{}\n".format("**Error**\nIf plotting grouped boxplot "
                                 "(grouped=True), then input data must "
                                 "be a dictionary.")
-            _grouped_boxplot(ax, bdata, group_names=lbls,
-                             leg_labels=lg_lbls, **box_kwargs)
+            _grouped_boxplot(ax, bdata, group_names=lbls, leg_labels=lg_lbls,
+                             box_colors=box_colors, **box_kwargs)
         else:
             bp = ax.boxplot(bdata, labels=lbls, patch_artist=True,
                             **box_kwargs)
-            _decorate_box(ax, bp)
+            _decorate_box(ax, bp, colors=box_colors)
             if leg_labels is not None:
                 cols = [bx.get_facecolor() for bx in bp['boxes']]
                 h = custom_legend(cols, lg_lbls)
@@ -634,9 +636,8 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
 
         ax.spines["left"].set_visible(True)
         ax.spines["bottom"].set_visible(True)
-        # ax.set_axis_bgcolor('#d6d6d6')
-        ax.set_facecolor('#d6d6d6')
-        ax.grid(True, lw=.6, color='white')
+        # ax.set_facecolor('#d6d6d6')
+        # ax.grid(True, lw=.6, color='white')
 
         axs.append(ax)
 
@@ -644,7 +645,8 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
 
 
 def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
-                     box_width=0.6, box_spacing=1.0, **box_kwargs):
+                     box_colors=None, box_width=0.6, box_spacing=1.0,
+                     **box_kwargs):
     """
     Draws a grouped boxplot.
 
@@ -676,7 +678,7 @@ def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
         label_pos.append(pos.mean())
         bp = ax.boxplot(d, positions=pos, widths=box_width, patch_artist=True,
                         **box_kwargs)
-        _decorate_box(ax, bp)
+        _decorate_box(ax, bp, colors=box_colors)
         cpos += nsubgroups + box_spacing
         bps.append(bp)
     if 'vert' in box_kwargs:
@@ -713,7 +715,7 @@ def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
     return bps
 
 
-def _decorate_box(ax, bp):
+def _decorate_box(ax, bp, colors=None):
     """
     Configuration of the boxes in a boxplot
 
@@ -721,38 +723,31 @@ def _decorate_box(ax, bp):
     ----------
         ax: Axes handle
         bp: boxplot object; i.e. returned from pyplot.boxplot call
+        colors: List/array of colors for the boxes
     """
 
     from itertools import cycle
 
-    idx = [1, 5, 3, 7, 10, 6, 2, 8, 0, 11, 9, 4]
-    colors = np.vstack((
-        mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
-        mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
-        mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
-    ))
-    colors[:, 3] = .8
-    facecolors = np.vstack((
-        mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
-        mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
-        mpl.cm.Paired(np.linspace(0, 1, 12))[idx],
-    ))
-    facecolors[:, 3] = .5
+    if colors is None:
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    bxcolors = [mpl.colors.to_rgba(c, alpha=.8) for c in colors]
+    facecolors = [mpl.colors.to_rgba(c, alpha=.5) for c in colors]
 
     # fill in each box with a color
     [box.set_facecolor(color=(c)) for box, c in
         zip(bp['boxes'], cycle(facecolors))]
     [box.set(edgecolor=c, lw=3) for box, c in
-        zip(bp['boxes'], cycle(colors))]
+        zip(bp['boxes'], cycle(bxcolors))]
 
     # change color of whiskers
     for (w1, w2), c in zip(zip(bp['whiskers'][0::2], bp['whiskers'][1::2]),
-                           cycle(colors)):
+                           cycle(bxcolors)):
         w1.set(color=c, linestyle='-', lw=2)
         w2.set(color=c, linestyle='-', lw=2)
 
     # draw a black line for the median
-    [m.set(color='grey', linewidth=2.5) for m in bp['medians']]
+    [m.set(color=c, linewidth=2.5) for m, c in zip(bp['medians'],
+                                                   cycle(bxcolors))]
 
     # Set fliers
     for flier in bp['fliers']:
@@ -1165,6 +1160,9 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
     cs = cs if isinstance(cs, list) else [cs]
     nplots = len(cs)
 
+    # Tick label format
+    fmt = formatter if isinstance(formatter, list) else [formatter]*nplots
+
     if nplots != cbaxs.ngrids:
         ll = list(set(range(nplots)).symmetric_difference(
             set(range(cbaxs.ngrids))))
@@ -1176,7 +1174,7 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
                 if not isinstance(title, list) else title
 
     cbs = []
-    for i, ax in zip(range(nplots), cbaxs):
+    for i, ax, ft in zip(range(nplots), cbaxs, fmt):
         try:
             lvls = cs[i].levels
             # lvls = [round(i, 2) for i in lvls]
@@ -1185,7 +1183,7 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
             # lvls = [round(i, 2) for i in lvls]
 
         # Set format of tick labels
-        tlbls = [formatter.format(i) for i in lvls]
+        tlbls = [ft.format(i) for i in lvls]
 
         if 'ticks' not in cbar_kwargs:
             ticks = np.linspace(lvls[0], lvls[-1], len(lvls))

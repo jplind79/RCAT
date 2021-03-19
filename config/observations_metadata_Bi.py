@@ -38,27 +38,22 @@ def obs_data():
         'EOBS': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'tas_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_EOBS_022_latlon' # noqa
         },
         'EOBS19': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
             'file pattern': 'tas_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'tas_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'NGCD': {
             'path': '/nobackup/rossby20/sm_petli/data/NGCD',
             'file pattern': 'tas_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
-            'grid': None
         },
     },
 
@@ -66,27 +61,22 @@ def obs_data():
         'EOBS': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'tasmax_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_EOBS_022_latlon' # noqa
         },
         'EOBS19': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
             'file pattern': 'tasmax_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'tasmax_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'tasmax_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'NGCD': {
             'path': '/nobackup/rossby20/sm_petli/data/NGCD',
             'file pattern': 'tasmax_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
-            'grid': None
         },
     },
 
@@ -94,27 +84,22 @@ def obs_data():
         'EOBS': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'tasmin_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_EOBS_022_latlon' # noqa
         },
         'EOBS19': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
             'file pattern': 'tasmin_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'tasmin_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'tasmin_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'NGCD': {
             'path': '/nobackup/rossby20/sm_petli/data/NGCD',
             'file pattern': 'tasmin_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
-            'grid': None
         },
     },
 
@@ -124,73 +109,59 @@ def obs_data():
         'EOBS': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'pr_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_EOBS_022_latlon' # noqa
         },
         'EOBS19': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
             'file pattern': 'pr_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'pr_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
-            'file pattern': 'pr_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
+            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERAI': {
             'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'pr_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'NGCD': {
             'path': '/nobackup/rossby20/sm_petli/data/NGCD',
             'file pattern': 'pr_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
-            'grid': None
         },
         'HIPRADv2.0': {
             'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code/masked', # noqa
             # 'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code', # noqa
             'file pattern': 'pr_HIPRAD2_1H_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'HIPRADv2.1': {
             'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h/masked',
             'file pattern': 'pr_HIPRAD2_1H_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'HIPRADv3': {
             'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/Nordic_v3/1h',
             'file pattern': 'pr_HIPRAD3_Nordic_1H_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'SENORGE': {
             'path': '/nobackup/rossby20/sm_petli/data/seNorge_pr/orig',
             'file pattern': 'pr_seNorge2_PREC1h_grid_YYYYMM.nc', # noqa
-            'grid': None
         },
         'Klimagrid': {
             'path': '/nobackup/rossby20/sm_petli/data/klimagrid/1h',
             'file pattern': 'pr_Klimagrid_Denmark_1h_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'Spain02': {
             'path': '/nobackup/rossby20/sm_petli/data/Spain02/day',
             'file pattern': 'pr_Spain02_v2_day_YYYYMM01_YYYYMM31.nc', # noqa
-            'grid': None
         },
         'SAFRAN': {
             'path': '/nobackup/rossby20/sm_petli/data/SAFRAN/day',
             'file pattern': 'pr_Meteo-France_SAFRAN_day_YYYYMM01_YYYYMM31.nc', # noqa
-            'grid': None
         },
         'EURO4M-APGD': {
             'path': '/nobackup/rossby20/sm_petli/data/EURO4M/APGD/day',
             'file pattern': 'pr_EURO4M-APGD_day_YYYYMM01_YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -200,7 +171,6 @@ def obs_data():
         'ERAI': {
             'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'cpr_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -210,7 +180,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'cape_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -220,23 +189,19 @@ def obs_data():
         'EOBS': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'psl_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None # noqa
         },
         'EOBS19': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
             'file pattern': 'psl_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'psl_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
         'ERA5': {
             # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
             'file pattern': 'psl_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None # noqa
         },
     },
 
@@ -246,7 +211,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rlds_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -256,12 +220,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'rsds_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/SW/CLARA-A2/day',  # noqa
             'file pattern': 'rsds_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -271,7 +233,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rlns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -281,7 +242,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rsns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -291,7 +251,6 @@ def obs_data():
         'METEOSAT': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/TOA/OLR/MSG/day',  # noqa
             'file pattern': 'rlnt_CMSAF_METEOSAT-MSG2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -301,7 +260,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'hfls_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -311,7 +269,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'hfss_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -321,12 +278,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'clt_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clt_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -336,12 +291,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'cll_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'cll_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -351,12 +304,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'clm_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clm_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -366,12 +317,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'clh_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clh_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -381,12 +330,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'clwvi_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clwvi_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -396,12 +343,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'clivi_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clivi_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -411,7 +356,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'prw_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -421,7 +365,6 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/3h',
             'file pattern': 'sc_3H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
     },
 
@@ -431,12 +374,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/3h',
             'file pattern': 'sd_3H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'seNorge': {
             'path': '/nobackup/rossby20/sm_petli/data/seNorge_snow/day',
             'file pattern': 'snw_b_seNorge_snowsim_v201_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -446,12 +387,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby20/sm_petli/data/ERA5_snow',
             'file pattern': 'snd_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': '/nobackup/rossby20/sm_petli/data/grids/grid_ERA5_EUR_latlon' # noqa
         },
         'seNorge': {
             'path': '/nobackup/rossby20/sm_petli/data/seNorge_snow/day',
             'file pattern': 'snd_seNorge_snowsim_v201_day_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -461,7 +400,6 @@ def obs_data():
         'ERAI': {
             'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'phi500_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -471,7 +409,6 @@ def obs_data():
         'ERAI': {
             'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'ta850_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 
@@ -481,7 +418,6 @@ def obs_data():
         'ERAI': {
             'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'hus850_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-            'grid': None
         },
     },
 

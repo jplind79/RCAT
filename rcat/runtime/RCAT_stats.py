@@ -147,9 +147,25 @@ def calc_statistics(data, var, stat, stat_config):
 
 
 def _check_hours(ds):
+    def _rounding(arr):
+        if np.any(arr.dt.minute > 0):
+            mod_time = [x.dt.ceil('H').values if x.dt.minute >= 30 else
+                        x.dt.floor('H').values for x in arr]
+            arr.values = mod_time
+        else:
+            pass
+        return arr
     if np.any(ds.time.dt.minute > 0):
-        print("Shifting time stamps (upwards) to whole hours!")
-        ds = ds.assign_coords({'time': ds.time.dt.ceil('H').values})
+        print("\t\t\tShifting time stamps to whole hours!\n")
+        if ds.time.size > 500:
+            ds_time = xa.DataArray(
+                ds.time.values, dims="time").chunk(int(ds.time.size/100))
+            mod_time = ds_time.map_blocks(_rounding)
+            ds = ds.assign_coords({'time': mod_time.values})
+        else:
+            mod_time = [x.dt.ceil('H').values if x.dt.minute >= 30 else
+                        x.dt.floor('H').values for x in ds.time]
+            ds = ds.assign_coords({'time': mod_time})
     else:
         pass
     return ds
@@ -295,6 +311,7 @@ def diurnal_cycle(data, var, stat, stat_config):
     else:
         thr = in_thr
 
+    # Check time stamps in data
     data = _check_hours(data)
 
     if dcycle_stat == 'amount':
@@ -494,7 +511,8 @@ def asop(data, var, stat, stat_config):
     # C_ds = C.to_dataset().transpose(dims[-1], dims[0], dims[1])
     # FC_ds = FC.to_dataset().transpose(dims[-1], dims[0], dims[1])
     # asop_ds = = xa.Dataset.merge(C_ds, FC_ds)
-    asop_ds = asop_out.to_dataset().transpose(dims[-2], dims[-1], dims[0], dims[1])
+    asop_ds = asop_out.to_dataset().transpose(dims[-2], dims[-1],
+                                              dims[0], dims[1])
     st_data = asop_ds.assign(bin_edges=bins, factors=['C', 'FC'])
     st_data.attrs['Description'] =\
         "ASoP analysis | threshold: {}".format(thr)

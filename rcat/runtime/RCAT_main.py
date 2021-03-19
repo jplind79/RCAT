@@ -36,10 +36,11 @@ def get_settings(config_file):
         'obs end year': conf_dict['OBS']['end year'],
         'obs months': conf_dict['OBS']['months'],
         'variables': conf_dict['SETTINGS']['variables'],
+        'var modification': conf_dict['SETTINGS']['variable modification'],
         'regions': conf_dict['SETTINGS']['regions'],
         'requested_stats': conf_dict['STATISTICS']['stats'],
         'stats_conf': st.mod_stats_config(conf_dict['STATISTICS']['stats']),
-        'validation_plot': conf_dict['PLOTTING']['validation plot'],
+        'validation plot': conf_dict['PLOTTING']['validation plot'],
         'map configure': conf_dict['PLOTTING']['map configure'],
         'map grid setup': conf_dict['PLOTTING']['map grid setup'],
         'map kwargs': conf_dict['PLOTTING']['map kwargs'],
@@ -159,8 +160,6 @@ def get_grids(nc, target_grid, method='bilinear'):
     # xesmf regridding tool. Thus, for now, calculation of grid corners is
     # always performed when method='conservative'
     if method == 'conservative':
-        print("Calculating lat/lon bounds ...")
-        print()
         slon_b, slat_b = gr.fnCellCorners(nc.lon.values, nc.lat.values)
         s_grid = {'lon': nc.lon.values, 'lat': nc.lat.values,
                   'lon_b': slon_b, 'lat_b': slat_b}
@@ -198,32 +197,27 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             gdict.update({'lon': {gridname: target_grid['lon'].values},
                           'lat': {gridname: target_grid['lat'].values}})
             for mod in mnames:
-                rgr_data = regridding(dd, mod, v, target_grid,
-                                      vconf['rgr method'])
-                dd[mod]['data'] = rgr_data
+                dd[mod]['data'] = regridding(dd, mod, v, target_grid,
+                                             vconf['rgr method'])
             if None not in onames:
                 for obs in onames:
-                    rgr_data = regridding(dd, obs, v, target_grid,
-                                          vconf['rgr method'])
-                    dd[obs]['data'] = rgr_data
+                    dd[obs]['data'] = regridding(dd, obs, v, target_grid,
+                                                 vconf['rgr method'])
         elif vconf['regrid'] in onames:
             oname = vconf['regrid']
             target_grid = dd[oname]['grid']
             gridname = dd[oname]['gridname']
             gdict.update({'lon': {oname: target_grid['lon']},
                           'lat': {oname: target_grid['lat']}})
-            # Perform the regridding
             for m in mnames:
-                rgr_data = regridding(dd, m, v, target_grid,
-                                      vconf['rgr method'])
-                dd[m]['data'] = rgr_data
+                dd[m]['data'] = regridding(dd, m, v, target_grid,
+                                           vconf['rgr method'])
             if len(onames) > 1:
                 obslist = onames.copy()
                 obslist.remove(oname)
                 for obs in obslist:
-                    rgr_data = regridding(dd, obs, v, target_grid,
-                                          vconf['rgr method'])
-                    dd[obs]['data'] = rgr_data
+                    dd[obs]['data'] = regridding(dd, obs, v, target_grid,
+                                                 vconf['rgr method'])
         elif vconf['regrid'] in mnames:
             mname = vconf['regrid']
             modlist = mnames.copy()
@@ -233,14 +227,12 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             gdict.update({'lon': {mname: target_grid['lon']},
                           'lat': {mname: target_grid['lat']}})
             for mod in modlist:
-                rgr_data = regridding(dd, mod, v, target_grid,
-                                      vconf['rgr method'])
-                dd[mod]['data'] = rgr_data
+                dd[mod]['data'] = regridding(dd, mod, v, target_grid,
+                                             vconf['rgr method'])
             if None not in onames:
                 for obs in onames:
-                    rgr_data = regridding(dd, obs, v, target_grid,
-                                          vconf['rgr method'])
-                    dd[obs]['data'] = rgr_data
+                    dd[obs]['data'] = regridding(dd, obs, v, target_grid,
+                                                 vconf['rgr method'])
         else:
             raise ValueError(("\n\n\tTarget grid name not found!\n"
                               "Check 'regrid to' option in main config file"))
@@ -258,8 +250,8 @@ def regridding(data, data_name, var, target_grid, method):
     # This works. Replace with xarray apply_ufunc?
     data_dist = client.persist(indata[var].data)
     sgrid, tgrid, dim_val, dim_shape = get_grids(indata, target_grid, method)
-    regridder = gr.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method,
-                                                reuse_weights=True))
+    regridder = gr.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method))
+    # regridder.clean_weight_file()
     wgts = client.scatter(regridder.weights, broadcast=True)
     rgr_data = da.map_blocks(_rgr_calc, data_dist, dtype=float,
                              chunks=(indata.chunks['time'],) + dim_val,
@@ -296,7 +288,7 @@ def _rgr_calc(data, wgts, out_dims):
     return outdata
 
 
-def resampling(data, tresample):
+def resampling(data, v, tresample):
     """
     Resample data to chosen time frequency and resample method.
     """
@@ -305,7 +297,6 @@ def resampling(data, tresample):
     nsec = to_timedelta(diff).total_seconds()
     tr, fr = _get_freq(tresample[0])
     sec_resample = to_timedelta(tr, fr).total_seconds()
-    data = manage_chunks(data, 'time')
     if nsec != sec_resample:
         data = eval("data.resample(time='{}', label='right').{}('time').\
                       dropna('time', 'all')".format(
@@ -316,21 +307,21 @@ def resampling(data, tresample):
     return data
 
 
-def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
+def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
     """
     Calculate statistics for variables and models/obs
     """
     st_data = {}
-    for v, f in vv.items():
+    for v in vlist:
         st_data[v] = {}
-        for m in ddict[f][v]:
+        for m in ddict[v]:
             print("\tCalculate {} {} for {}\n".format(v, stat, m))
 
-            if ddict[f][v][m] is None:
+            if ddict[v][m] is None:
                 print("\t* Data not available for model {}, moving on".format(
                     m))
             else:
-                indata = ddict[f][v][m]['data']
+                indata = ddict[v][m]['data']
                 st_data[v][m] = {}
                 if len(indata.data_vars) > 2:
                     indata = indata[v].to_dataset()
@@ -339,7 +330,7 @@ def calc_stats(ddict, vv, stat, pool, chunk_dim, stats_config, regions):
                 if stats_config[stat]['resample resolution'] is not None:
                     print("\tResampling input data ...\n")
                     indata = resampling(
-                        indata, stats_config[stat]['resample resolution'])
+                        indata, v, stats_config[stat]['resample resolution'])
 
                 # Check chunking of data
                 data = manage_chunks(indata, chunk_dim)
@@ -397,8 +388,28 @@ def _get_freq(tf):
     if unit in ('M', 'Y'):
         freq = freq*30 if unit == 'M' else freq*365
         unit = 'D'
+    elif unit[0] == 'Q':
+        # Quarterly frequencies - assuming average 90 days
+        freq = 90
+        unit = 'D'
 
     return freq, unit
+
+
+def _space_dim(ds):
+    """
+    Return labels for space dimensions in data set.
+
+    Space dimensions in different observations have different names. This
+    dictionary is created to account for that (to some extent), but in the
+    future this might be change/removed. For now, it's hard coded.
+    """
+    spcdim = {'x': ['x', 'X', 'lon', 'rlon'],
+              'y': ['y', 'Y', 'lat', 'rlat']}
+    xd = [x for x in ds.dims if x in spcdim['x']][0]
+    yd = [y for y in ds.dims if y in spcdim['y']][0]
+
+    return xd, yd
 
 
 def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
@@ -476,32 +487,36 @@ def get_masked_data(data, var, mask):
 
 def manage_chunks(data, chunk_dim):
     """
-    Re-chunk the data in other dimension or if number of chunks is too large.
+    Re-chunk the data in specified dimension.
     """
+    xd, yd = _space_dim(data)
+    xsize = data[xd].size
+    ysize = data[yd].size
+
+    # Rule of thumb: chunk size should at least be 1e6 elements
+    # http://xarray.pydata.org/en/stable/dask.html#chunking-and-performance
+    # Max chunksize just an arbitrary value to assert 'reasonable' chunking
+    min_chunksize = 1e6
+    max_chunksize = 1e8
+
     if chunk_dim == 'space':
-        # Space dimensions in different observations have different names. This
-        # dictionary is created to account for that (to some extent), but in
-        # the future this might be change/removed. For now, it's hard coded.
-        spcdim = {'x': ['x', 'X', 'lon', 'rlon'],
-                  'y': ['y', 'Y', 'lat', 'rlat']}
-        xd = [x for x in data.dims if x in spcdim['x']][0]
-        yd = [y for y in data.dims if y in spcdim['y']][0]
-
-        xsize = data[xd].size
-        ysize = data[yd].size
-
-        # Max number of chunks
-        cmax = 500
-        n = np.sqrt((xsize*ysize)/cmax)
-        c_size = np.round(np.maximum(xsize, ysize)/n).astype(int)
-        data = data.chunk({'time': data.time.size, xd: c_size, yd: c_size})
+        chunksize = np.mean(data.chunks[xd]) * np.mean(data.chunks[yd])\
+                * data.time.size
+        if chunksize < min_chunksize or chunksize > max_chunksize:
+            sub_size = np.sqrt(min_chunksize/data.time.size)
+            csize_x = int((xsize/sub_size))
+            csize_y = int((ysize/sub_size))
+            data = data.chunk({'time': -1, xd: csize_x, yd: csize_y})
+        else:
+            data = data.chunk({'time': -1})
     else:
-        cmax = 750
-        nchunks = len(data.chunks['time'])
-        mxchunk = max(data.chunks['time'])
-        if nchunks > cmax or mxchunk > 2e3:
-            rchunk_size = np.round(data.time.size/cmax).astype(int)
-            data = data.chunk({'time': rchunk_size})
+        chunksize = xsize * ysize * np.mean(data.chunks['time'])
+        if chunksize < min_chunksize or chunksize > max_chunksize:
+            sub_size = np.sqrt(min_chunksize/(xsize*ysize))
+            csize_t = int(data.time.size/sub_size)
+            data = data.chunk({'time': csize_t, xd: xsize, yd: ysize})
+        else:
+            data = data.chunk({xd: xsize, yd: ysize})
 
     return data
 
@@ -527,6 +542,42 @@ def get_variable_config(var_config, var):
     return vdict
 
 
+def variabel_modification(dd, nv_dd, funargs, mlist, olist):
+    """
+    Create new or modify existing variables.
+    """
+    from inspect import signature
+    out_dd = {}
+    expression = nv_dd['expression']
+    func = eval(f"lambda {funargs}: {expression}")
+    args = list(signature(func).parameters)
+    _modlist = nv_dd['models']
+    _obslist = nv_dd['obs']
+    if _modlist is not None:
+        modlist = _modlist if isinstance(_modlist, list) else mlist \
+                if _modlist == 'all' else [_modlist]
+        for m in modlist:
+            input_data = [dd[nv_dd['input'][a]][m]['data'][nv_dd['input'][a]]
+                          for a in args]
+            _new_data = xa.apply_ufunc(
+                func, *input_data, input_core_dims=[[]]*len(input_data),
+                dask='parallelized', output_dtypes=[float],
+            )
+            new_data = _new_data.to_dataset(name=new_var)
+            out_dd[m] = {'data': new_data}
+    if _obslist is not None:
+        obslist = _obslist if isinstance(_obslist, list) else olist \
+                if _obslist == 'all' else [_obslist]
+        for o in obslist:
+            input_data = {k: dd[v][o]['data'][v]
+                          for k, v in nv_dd['input'].items()}
+            _new_data = func(**input_data)
+            new_data = _new_data.to_dataset(name=new_var)
+            out_dd[o] = {'data': new_data}
+
+    return out_dd
+
+
 def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     """
     Open model data files where file path is dependent on time resolution tres.
@@ -541,30 +592,40 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
         range(fyear, lyear+1), months)]
 
-    _flist = glob.glob(os.path.join(
-         mconf['fpath'], '{}/{}_*.nc'.format(tres, var)))
+    file_path = os.path.join(mconf['fpath'], f'{tres}/{var}/{var}_*.nc')
+    _flist = glob.glob(file_path)
 
-    emsg = ("Could not find any files at specified location:\n{}/{} "
-            "\n\nexiting ...".format(mconf['fpath'], tres))
+    emsg = ("Could not find any files at specified location:\n{file_path} "
+            "\n\nexiting ...")
     if not _flist:
         print("\t\n{}".format(emsg))
         sys.exit()
 
     _file_dates = [re.split('-|_', f.rsplit('.')[-2])[-2:] for f in _flist]
     file_dates = [(d[0][:6], d[1][:6]) for d in _file_dates]
-    fidx = [np.where([d[0] <= date <= d[1] for d in file_dates])[0][0]
+    fidx = [np.where([d[0] <= date <= d[1] for d in file_dates])[0]
             for date in date_list]
-    flist = [_flist[i] for i in np.unique(fidx)]
+    flist = [_flist[i] for i in np.unique(np.hstack(fidx))]
     flist.sort()
+
     if np.unique([len(f) for f in flist]).size > 1:
         flngth = np.unique([len(f) for f in flist])
         flist = [f for f in flist if len(f) == flngth[0]]
 
+    # Chunk sizes in temporal and spatial dimensions
+    ch_t = mconf['chunks_time']
+    ch_x = mconf['chunks_x']
+    ch_y = mconf['chunks_y']
+
     if deacc:
-        _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True,
-                                   preprocess=(lambda arr: arr.diff('time')))
+        _mdata = xa.open_mfdataset(
+            flist, combine='by_coords', parallel=True,
+            chunks={**ch_t, **ch_x, **ch_y},
+            preprocess=(lambda arr: arr.diff('time')))
     else:
-        _mdata = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
+        _mdata = xa.open_mfdataset(
+            flist, combine='by_coords', parallel=True,
+            chunks={**ch_t, **ch_x, **ch_y})
 
     # Time stamps
     if 'units' in _mdata.time.attrs:
@@ -605,12 +666,14 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
             mdata.rotated_pole.grid_north_pole_longitude,
             mdata.rotated_pole.grid_north_pole_latitude)
         mdata = mdata.assign_coords({'lon': (('y', 'x'), lon_reg),
-                                     'lat': (('y', 'x'), lat_reg)})
+                                     'lat': (('y', 'x'), lat_reg)}).\
+            swap_dims({'rlon': 'x', 'rlat': 'y'})
         grid = {'lon': lon_reg, 'lat': lat_reg}
     else:
         grid = {'lon': mdata.lon.values, 'lat': mdata.lat.values}
 
-    outdata = {'data': mdata, 'grid': grid, 'gridname': gridname}
+    outdata = {'data': mdata.unify_chunks(),
+               'grid': grid, 'gridname': gridname}
 
     return outdata
 
@@ -659,13 +722,8 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     lons = obs_data.lon.values
     lats = obs_data.lat.values
 
-    # Space dimensions in different observations have different names. This
-    # dictionary is created to account for that (to some extent), but in the
-    # future this might be change/removed. For now, it's hard coded.
-    spcdim = {'x': ['x', 'X', 'lon', 'rlon'],
-              'y': ['y', 'Y', 'lat', 'rlat']}
-    xd = [x for x in obs_data.dims if x in spcdim['x']][0]
-    yd = [y for y in obs_data.dims if y in spcdim['y']][0]
+    # Labels for space dimensions
+    xd, yd = _space_dim(obs_data)
 
     # Make sure lon/lat elements are in ascending order
     if lons.ndim == 1:
@@ -684,10 +742,7 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
             obs_data = obs_data.reindex({yd: np.flipud(obs_data[yd])})
 
     grid = {'lon': lons, 'lat': lats}
-    if obs_dict[var][obs]['grid'] is not None:
-        gridname = obs_dict[var][obs]['grid'].split('/')[-1]
-    else:
-        gridname = 'grid_{}'.format(obs.upper())
+    gridname = 'grid_{}'.format(obs.upper())
 
     outdata = {'data': obs_data, 'grid': grid, 'gridname': gridname}
     return outdata
@@ -863,16 +918,14 @@ year_dd = {}
 
 print("\n=== READ & PRE-PROCESS DATA ===")
 for var in cdict['variables']:
+    data_dict[var] = {}
+    var_conf = get_variable_config(cdict['variables'][var], var)
+
     tres = cdict['variables'][var]['freq']
     print("\n\tvariable: {}  |  input resolution: {}".format(var, tres))
 
     grid_coords['meta data'][var] = {}
     grid_coords['target grid'][var] = {}
-    if tres not in data_dict:
-        data_dict[tres] = {var: {}}
-    else:
-        data_dict[tres].update({var: {}})
-    var_conf = get_variable_config(cdict['variables'][var], var)
 
     obs_metadata_file = cdict['obs metadata file']
     obs_name = cdict['variables'][var]['obs']
@@ -886,7 +939,7 @@ for var in cdict['variables']:
                 obs_metadata_file, oname, var, cfactor,
                 cdict['obs start year'],
                 cdict['obs end year'], cdict['obs months'])
-            data_dict[tres][var][oname] = obs_data
+            data_dict[var][oname] = obs_data
 
     mod_names = []
     mod_scf = var_conf['scale factor']
@@ -897,7 +950,7 @@ for var in cdict['variables']:
         mod_data = get_mod_data(
             mod_name, settings, tres, var, var_conf['var names'],
             scf, var_conf['deacc'])
-        data_dict[tres][var][mod_name] = mod_data
+        data_dict[var][mod_name] = mod_data
 
         # Update grid information for plotting purposes
         if mod_name not in grid_coords['meta data'][var]:
@@ -916,8 +969,32 @@ for var in cdict['variables']:
     ##################################
     #  1B REMAP DATA TO COMMON GRID  #
     ##################################
-    remap_func(data_dict[tres][var], var, var_conf, mod_names, obs_list,
+    remap_func(data_dict[var], var, var_conf, mod_names, obs_list,
                grid_coords['target grid'][var])
+
+#############################################
+#  1C MODIFICATION & CREATION OF VARIABLES  #
+#############################################
+if cdict['var modification'] is not None:
+    # Modification/manipulation of variables
+    for new_var, nv_dict in cdict['var modification'].items():
+        arglist = list(nv_dict['input'].keys())
+        inargs = ",".join(arglist)
+        data_dict[new_var] = variabel_modification(data_dict, nv_dict, inargs,
+                                                   mod_names, obs_list)
+
+        # Change parameters and dictionaries accordingly
+        cdict['variables'][new_var] = \
+            cdict['variables'][nv_dict['input'][arglist[0]]]
+        month_dd[new_var] = month_dd[nv_dict['input'][arglist[0]]]
+        year_dd[new_var] = year_dd[nv_dict['input'][arglist[0]]]
+        grid_coords['target grid'][new_var] =\
+            grid_coords['target grid'][nv_dict['input'][arglist[0]]]
+
+        # Remove input variables if 'replace' in config_main.ini is set to True
+        if nv_dict['replace']:
+            [data_dict.pop(v) for k, v in nv_dict['input'].items()]
+            [cdict['variables'].pop(v) for k, v in nv_dict['input'].items()]
 
 
 ###############################################
@@ -930,12 +1007,11 @@ print("\n=== STATISTICS ===\n")
 stats_dict = {}
 for stat in cdict['stats_conf']:
     vrs = cdict['stats_conf'][stat]['vars']
-    vlist = list(cdict['variables'].keys()) if not vrs \
+    varlist = list(cdict['variables'].keys()) if not vrs \
         else [vrs] if not isinstance(vrs, list) else vrs
-    vrfrq = {v: cdict['variables'][v]['freq'] for v in vlist}
     pool = cdict['stats_conf'][stat]['pool data']
     chunk_dim = cdict['stats_conf'][stat]['chunk dimension']
-    stats_dict[stat] = calc_stats(data_dict, vrfrq, stat, pool,
+    stats_dict[stat] = calc_stats(data_dict, varlist, stat, pool,
                                   chunk_dim, cdict['stats_conf'],
                                   cdict['regions'])
 
@@ -981,7 +1057,7 @@ for stat in cdict['stats_conf']:
 #                                             #
 ###############################################
 
-if cdict['validation_plot']:
+if cdict['validation plot']:
     print('\n=== PLOTTING ===')
     import rcat.runtime.RCAT_plots as rplot
     statnames = list(stats_dict.keys())
