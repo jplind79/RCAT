@@ -10,7 +10,7 @@ import xarray as xa
 import xesmf as xe
 import pandas as pd
 from itertools import product
-import dask.array as da
+# import dask.array as da
 import numpy as np
 import re
 from dask.distributed import Client
@@ -180,7 +180,7 @@ def get_grids(nc, target_grid, method='bilinear'):
     return s_grid, t_grid, outdims, outdims_shape
 
 
-def remap_func(dd, v, vconf, mnames, onames, gdict):
+def regrid_func(dd, v, vconf, mnames, onames, gdict):
     if vconf['regrid'] is None:
         gdict.update(
             {'lon': {m: dd[m]['grid']['lon'] for m in mnames},
@@ -197,12 +197,12 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             gdict.update({'lon': {gridname: target_grid['lon'].values},
                           'lat': {gridname: target_grid['lat'].values}})
             for mod in mnames:
-                dd[mod]['data'] = regridding(dd, mod, v, target_grid,
-                                             vconf['rgr method'])
+                dd[mod]['data'] = regrid_calc(dd, mod, v, target_grid,
+                                              vconf['rgr method'])
             if None not in onames:
                 for obs in onames:
-                    dd[obs]['data'] = regridding(dd, obs, v, target_grid,
-                                                 vconf['rgr method'])
+                    dd[obs]['data'] = regrid_calc(dd, obs, v, target_grid,
+                                                  vconf['rgr method'])
         elif vconf['regrid'] in onames:
             oname = vconf['regrid']
             target_grid = dd[oname]['grid']
@@ -210,14 +210,14 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             gdict.update({'lon': {oname: target_grid['lon']},
                           'lat': {oname: target_grid['lat']}})
             for m in mnames:
-                dd[m]['data'] = regridding(dd, m, v, target_grid,
-                                           vconf['rgr method'])
+                dd[m]['data'] = regrid_calc(dd, m, v, target_grid,
+                                            vconf['rgr method'])
             if len(onames) > 1:
                 obslist = onames.copy()
                 obslist.remove(oname)
                 for obs in obslist:
-                    dd[obs]['data'] = regridding(dd, obs, v, target_grid,
-                                                 vconf['rgr method'])
+                    dd[obs]['data'] = regrid_calc(dd, obs, v, target_grid,
+                                                  vconf['rgr method'])
         elif vconf['regrid'] in mnames:
             mname = vconf['regrid']
             modlist = mnames.copy()
@@ -227,12 +227,12 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
             gdict.update({'lon': {mname: target_grid['lon']},
                           'lat': {mname: target_grid['lat']}})
             for mod in modlist:
-                dd[mod]['data'] = regridding(dd, mod, v, target_grid,
-                                             vconf['rgr method'])
+                dd[mod]['data'] = regrid_calc(dd, mod, v, target_grid,
+                                              vconf['rgr method'])
             if None not in onames:
                 for obs in onames:
-                    dd[obs]['data'] = regridding(dd, obs, v, target_grid,
-                                                 vconf['rgr method'])
+                    dd[obs]['data'] = regrid_calc(dd, obs, v, target_grid,
+                                                  vconf['rgr method'])
         else:
             raise ValueError(("\n\n\tTarget grid name not found!\n"
                               "Check 'regrid to' option in main config file"))
@@ -242,50 +242,21 @@ def remap_func(dd, v, vconf, mnames, onames, gdict):
     return dd, gdict
 
 
-def regridding(data, data_name, var, target_grid, method):
+def regrid_calc(data, data_name, var, target_grid, method):
     print("\t\t** Regridding {} data **\n".format(data_name.upper()))
 
     indata = data[data_name]['data']
 
-    # This works. Replace with xarray apply_ufunc?
-    data_dist = client.persist(indata[var].data)
+    # Get grid info
     sgrid, tgrid, dim_val, dim_shape = get_grids(indata, target_grid, method)
+
+    # Regridding
     regridder = gr.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method))
     # regridder.clean_weight_file()
-    wgts = client.scatter(regridder.weights, broadcast=True)
-    rgr_data = da.map_blocks(_rgr_calc, data_dist, dtype=float,
-                             chunks=(indata.chunks['time'],) + dim_val,
-                             wgts=wgts, out_dims=dim_val)
-    rgr_data = client.persist(rgr_data)  # IS THIS NEEDED?
-
-    # Contain dask in xarray dataset
-    darr = xa.DataArray(
-        rgr_data, name=var,
-        coords={'lon': (dim_shape['lon'], target_grid['lon']),
-                'lat': (dim_shape['lat'], target_grid['lat']),
-                'time': indata.time.values},
-        dims=['time', 'y', 'x'], attrs=indata.attrs.copy())
-
-    dset = darr.to_dataset()
-    # del data_dist, rgr_data
+    ds_rgr = regridder(indata[var])
+    dset = ds_rgr.to_dataset()
 
     return dset
-
-
-def _rgr_calc(data, wgts, out_dims):
-    """
-    Regrid data with sparse matrix multiplication
-    For more info, see xESMF python module docs and code
-    """
-    s = data.shape
-    Ny_in, Nx_in = (s[-2], s[-1])
-    indata_flat = data.reshape(-1, Ny_in*Nx_in)
-    outdata_flat = wgts.dot(indata_flat.T).T
-    N_extra_list = s[0:-2]
-    Ny_out, Nx_out = out_dims
-    outdata = outdata_flat.reshape([*N_extra_list, Ny_out, Nx_out])
-
-    return outdata
 
 
 def resampling(data, v, tresample):
@@ -512,7 +483,7 @@ def manage_chunks(data, chunk_dim):
     else:
         chunksize = xsize * ysize * np.mean(data.chunks['time'])
         if chunksize < min_chunksize or chunksize > max_chunksize:
-            sub_size = np.sqrt(min_chunksize/(xsize*ysize))
+            sub_size = min_chunksize/(xsize*ysize)
             csize_t = int(data.time.size/sub_size)
             data = data.chunk({'time': csize_t, xd: xsize, yd: ysize})
         else:
@@ -684,7 +655,7 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     """
     from importlib.machinery import SourceFileLoader
     obs_meta = SourceFileLoader("obs_meta", metadata_file).load_module()
-    obs_dict = obs_meta.obs_data()
+    # obs_dict = obs_meta.obs_data()
 
     sdate = '{}{:02d}'.format(sy, np.min(mns))
     edate = '{}{:02d}'.format(ey, np.max(mns))
@@ -969,8 +940,8 @@ for var in cdict['variables']:
     ##################################
     #  1B REMAP DATA TO COMMON GRID  #
     ##################################
-    remap_func(data_dict[var], var, var_conf, mod_names, obs_list,
-               grid_coords['target grid'][var])
+    regrid_func(data_dict[var], var, var_conf, mod_names, obs_list,
+                grid_coords['target grid'][var])
 
 #############################################
 #  1C MODIFICATION & CREATION OF VARIABLES  #
@@ -1025,7 +996,6 @@ for stat in cdict['stats_conf']:
 print("\n=== SAVE OUTPUT ===")
 tres_str = {}
 for stat in cdict['stats_conf']:
-    print("\n\twriting {} to disk ...".format(stat))
     tres_str[stat] = {}
     for v in stats_dict[stat]:
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
@@ -1043,6 +1013,7 @@ for stat in cdict['stats_conf']:
             tres_str[stat][v] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
         for m in stats_dict[stat][v]:
+            print(f"\n\twriting {m.upper()} - {v} - {stat} to disk ...")
             time_suffix = get_month_string(month_dd[v][m])
             st_data = stats_dict[stat][v][m]
             save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
