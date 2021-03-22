@@ -341,9 +341,9 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
                 if labels is not None:
                     pts.set_label(dlabels[i])
 
-                if np.any(xd > 0.0) and np.any(xd < 0.0):
+                if np.any(np.array(xd) > 0.0) and np.any(np.array(xd) < 0.0):
                     ax.axvline(color='k', lw=1, ls='--', alpha=.5)
-                if np.any(yd > 0.0) and np.any(yd < 0.0):
+                if np.any(np.array(yd) > 0.0) and np.any(np.array(yd) < 0.0):
                     ax.axhline(color='k', lw=1, ls='--', alpha=.5)
 
             if labels is not None:
