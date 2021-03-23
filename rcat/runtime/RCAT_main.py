@@ -269,13 +269,73 @@ def resampling(data, v, tresample):
     tr, fr = _get_freq(tresample[0])
     sec_resample = to_timedelta(tr, fr).total_seconds()
     if nsec != sec_resample:
-        data = eval("data.resample(time='{}', label='right').{}('time').\
+        data = eval("data.resample(time='{}').{}('time').\
                       dropna('time', 'all')".format(
                           tresample[0], tresample[1]))
     else:
         print("\t\tData is already at target resolution, skipping "
               "resampling ...\n")
     return data
+
+
+def conditional_data(condition, cvar, cdata, indata):
+    """
+    Sub-select data conditional on other data
+    """
+    import operator
+
+    def _get_cond_mask(darr, thr_type, relate, q=95, thr=0,
+                       expand=None, axis=0):
+        ops = {'>': operator.gt,
+               '<': operator.lt,
+               '>=': operator.ge,
+               '<=': operator.le,
+               '=': operator.eq}
+        if thr_type == 'percentile':
+            mask = np.apply_along_axis(
+                # (lambda x: ops[relate](x, np.percentile(x, q=q))),
+                (lambda x: x >= np.percentile(x, q=q)),
+                axis=axis, arr=darr)
+        elif thr_type == 'static':
+            mask = np.apply_along_axis((lambda x: ops[relate](x, thr)),
+                                       axis=axis, arr=darr)
+        if expand is not None:
+            mask = np.repeat(mask, expand, axis=axis)
+
+        return mask
+
+    if 'percentile' in condition['condition'][1]:
+        inthr = 'percentile'
+        q = float(condition['condition'][1].split(' ')[1])
+    else:
+        inthr = 'static'
+        q = condition['condition'][1]
+    relate = condition['condition'][0]
+
+    if 'resample resolution' in condition:
+        print("\t\tResampling conditional data ...\n")
+        tres = condition['resample resolution']
+        cdata = resampling(cdata, tres)
+
+    cdata = manage_chunks(cdata, 'space')
+
+    if cdata.time.size != indata.time.size:
+        expand = indata.time.size/cdata.time.size
+    else:
+        expand = None
+
+    _mask = xa.apply_ufunc(
+        _get_cond_mask, cdata[cvar], input_core_dims=[['time']],
+        output_core_dims=[['time']], dask='parallelized',
+        output_dtypes=[float], exclude_dims={'time'},
+        dask_gufunc_kwargs={'output_sizes': {'time': indata.time.size}},
+        kwargs={'thr_type': inthr, 'relate': relate, 'q': q,
+                'expand': expand, 'axis': -1})
+    dims = list(_mask.dims)
+    mask = _mask.transpose(dims[-1], dims[0], dims[1])
+    sub_data = indata.where(mask)
+
+    return sub_data
 
 
 def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
@@ -305,6 +365,22 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
 
                 # Check chunking of data
                 data = manage_chunks(indata, chunk_dim)
+
+                # Conditional analysis; sample data according to condition
+                # (static threshold or percentile).
+                if stats_config[stat]['cond analysis'] is not None:
+                    cond = stats_config[stat]['cond analysis']
+                    vcond, ccond = zip(*cond.items())
+                    vcond = vcond[0]
+                    ccond = ccond[0]
+                    # assert vcond in st_data, msg.format(vcond, v)
+                    print("\t\tPerforming conditional sub-selection\n")
+                    frq = [v for v, k in ddict.items()
+                           if vcond in list(k.keys())][0]
+                    sub_data = conditional_data(
+                        ccond, vcond, ddict[frq][vcond][m]['data'], indata)
+
+                    data = manage_chunks(sub_data, chunk_dim)
 
                 # Calculate stats
                 st_data[v][m]['domain'] = st.calc_statistics(data, v, stat,
@@ -355,7 +431,6 @@ def _get_freq(tf):
     d = [j.isdigit() for j in tf]
     freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
     unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
-
     if unit in ('M', 'Y'):
         freq = freq*30 if unit == 'M' else freq*365
         unit = 'D'

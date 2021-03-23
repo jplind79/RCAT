@@ -11,11 +11,11 @@
 
 # Import necessary modules
 import numpy as np
-import scipy.signal
+from scipy import signal
 
 """
 This module includes functions to perform convolution, for example
-image smoothing, using scipy's convolution routines.
+image smoothing, partly using scipy's convolution routines.
 """
 
 
@@ -50,40 +50,110 @@ def kernel_gen(n, ktype='square', kfun='mean'):
     return kernel
 
 
-def convolve2Dfunc(data, kernel, fft=False,
-                   fftn=np.fft.fftn, ifftn=np.fft.ifftn):
-    ''' Function that filters the input 2D data matrix with a user defined
-    kernel. Set fft to True if you want to use fast fourier transform to speed
-    things up when data matrix is large.
-    '''
+def filtering(data, wgts, mode='valid', dim=1, axis=None, fft=False,
+              fftn=np.fft.fftn, ifftn=np.fft.ifftn):
+    """
+    1D and 2D filtering procedures.
 
-    if fft:
-        if isinstance(data, np.ma.MaskedArray):
-            mask = data.mask                                    # Get the mask
-            data_arr = np.ma.filled(data, 0)        # Set masked values to zero
-            # The filtering
-            data_conv = convolve_fft(data_arr, kernel, fftn=fftn, ifftn=ifftn)
-            data_conv[mask] = np.nan
+    Filters input data, both 1D and 2D, with user defined weights. Set fft to
+    True for fast fourier transform to speed things up when data is large.
 
-        else:
-            assert isinstance(data, np.ndarray),\
-                    "*** Error***\nData must be a numpy array"
-            data_conv = convolve_fft(data, kernel, fftn=fftn, ifftn=ifftn)
+    Parameters
+    ----------
+    data: array
+        Data to be filtered.
+    wgts: array/list
+        The weights (kernel) to be used in the filtering.
+    mode: str
+        String indicating the size of output (see
+        https://docs.scipy.org/doc/scipy/reference/signal.html)
+    dim: int
+        If 1 one-dimensional filtering is performed and if 'axis' is also set,
+        1D-filtering is applied along this axis. If dim=2 two-dimensional
+        filtering is applied.
+    fft: boolean
+        Set True to use fast fourier transform in the 2D filtering.
+
+    Returns
+    -------
+    data_conv: array
+        Convoluted data
+    """
+    if isinstance(data, np.ma.MaskedArray):
+        mask = data.mask    # Set masked values to zero
+        indata = np.ma.filled(data, 0)
     else:
-        if isinstance(data, np.ma.MaskedArray):
-            mask = data.mask                                    # Get the mask
-            data_arr = np.ma.filled(data, 0)        # Set masked values to zero
-            # The filtering
-            data_conv = scipy.signal.convolve2d(data_arr, kernel, mode='same',
-                                                boundary='symm')
-            data_conv[mask] = np.nan
+        indata = np.copy(data)
+
+    if dim == 1:
+        # One-dimensional filtering
+        if axis is None:
+            data_conv = signal.convolve(indata, wgts, mode=mode)
         else:
-            assert isinstance(data, np.ndarray),\
-                    "*** Error***\nData must be a numpy array"
-            data_conv = scipy.signal.convolve2d(data, kernel, mode='same',
-                                                boundary='symm')
+            data_conv = np.apply_along_axis(signal.convolve, axis, indata,
+                                            wgts, mode=mode)
+    elif dim == 2:
+        # Two-dimensional filtering
+        if fft:
+            data_conv = convolve_fft(indata, wgts, fftn=fftn, ifftn=ifftn)
+        else:
+            data_conv = signal.convolve2d(indata, wgts, mode=mode,
+                                          boundary='symm')
+
+    # Set values in mask to NaN (if masked array)
+    if isinstance(data, np.ma.MaskedArray):
+        data_conv[mask] = np.nan
 
     return data_conv
+
+
+def lanczos_filter(window, cutoff, cutoff_2=None, ftype='lowpass'):
+    """
+    Calculate weights for a low pass Lanczos filter.
+
+    Parameters
+    ----------
+    window: int
+        The length of the filter window.
+
+    cutoff: float
+        The cutoff frequency in inverse time steps.
+    cutoff_2: float
+        The second cutoff frequency in inverse time steps. Only used if ftype
+        is 'bandpass'
+    ftype: str
+        The type of cutoff filtering: 'lowpass', 'highpass' or 'bandpass'.
+
+    Returns
+    -------
+    wgts: vector
+        Array with calculated weights.
+
+    """
+    def _low_pass_filter(win, cut):
+        order = ((win - 1) // 2) + 1
+        nwts = 2 * order + 1
+        w = np.zeros([nwts])
+        n = nwts // 2
+        w[n] = 2 * cut
+        k = np.arange(1., n)
+        sigma = np.sin(np.pi * k / n) * n / (np.pi * k)
+        firstfactor = np.sin(2. * np.pi * cut * k) / (np.pi * k)
+        w[n-1:0:-1] = firstfactor * sigma
+        w[n+1:-1] = firstfactor * sigma
+        return w[1:-1]
+
+    if ftype == 'lowpass':
+        wgts_out = _low_pass_filter(window, cutoff)
+    elif ftype == 'highpass':
+        wgts_out = (-1) * _low_pass_filter(window, cutoff)
+    elif ftype == 'bandpass':
+        assert cutoff_2 is not None, "cutoff_2 must be set for ftype bandpass"
+        wgts1 = _low_pass_filter(window, cutoff)
+        wgts2 = _low_pass_filter(window, cutoff_2)
+        wgts_out = wgts2 - wgts1
+
+    return wgts_out
 
 
 def fft_prep(array, kernel, fill_value, boundary='fill', psf_pad=False,

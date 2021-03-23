@@ -3,6 +3,8 @@ import numpy as np
 import dask.array as da
 import xarray as xa
 from rcat.stats import ASoP
+from rcat.stats import convolve
+from rcat.stats import event_duration as eda
 from rcat.stats import climateindex as ci
 from pandas import to_timedelta
 from copy import deepcopy
@@ -26,6 +28,7 @@ def default_stats_config(stats):
             'resample resolution': None,
             'pool data': False,
             'thr': None,
+            'cond analysis': None,
             'chunk dimension': 'time'},
         'seasonal cycle': {
             'vars': [],
@@ -33,6 +36,7 @@ def default_stats_config(stats):
             'pool data': False,
             'stat method': 'mean',
             'thr': None,
+            'cond analysis': None,
             'chunk dimension': 'time'},
         'annual cycle': {
             'vars': [],
@@ -40,6 +44,7 @@ def default_stats_config(stats):
             'pool data': False,
             'stat method': 'mean',
             'thr': None,
+            'cond analysis': None,
             'chunk dimension': 'time'},
         'diurnal cycle': {
             'vars': [],
@@ -47,7 +52,9 @@ def default_stats_config(stats):
             'hours': None,
             'dcycle stat': 'amount',
             'stat method': 'mean',
+            'method kwargs': None,
             'thr': None,
+            'cond analysis': None,
             'pool data': False,
             'chunk dimension': 'space'},
         'dcycle harmonic': {
@@ -56,6 +63,7 @@ def default_stats_config(stats):
             'pool data': False,
             'dcycle stat': 'amount',
             'thr': None,
+            'cond analysis': None,
             'chunk dimension': 'space'},
         'asop': {
             'vars': ['pr'],
@@ -63,6 +71,19 @@ def default_stats_config(stats):
             'pool data': False,
             'nr_bins': 80,
             'thr': None,
+            'cond analysis': None,
+            'chunk dimension': 'space'},
+        'eda': {
+            'vars': ['pr'],
+            'resample resolution': None,
+            'pool data': False,
+            'duration bins': np.arange(1, 51),
+            'event statistic': 'amount',
+            'statistic bins': [.1, .2, .5, 1, 2, 5, 10, 20, 50, 100, 150, 200],
+            'dry events': False,
+            'dry bins': None,
+            'event thr': 0.1,
+            'cond analysis': None,
             'chunk dimension': 'space'},
         'pdf': {
             'vars': [],
@@ -71,6 +92,7 @@ def default_stats_config(stats):
             'bins': None,
             'normalized': False,
             'thr': None,
+            'cond analysis': None,
             'dry event thr': None,
             'chunk dimension': 'space'},
         'percentile': {
@@ -79,6 +101,7 @@ def default_stats_config(stats):
             'pool data': False,
             'pctls': [95, 99],
             'thr': None,
+            'cond analysis': None,
             'chunk dimension': 'space'},
         'Rxx': {
             'vars': ['pr'],
@@ -86,6 +109,21 @@ def default_stats_config(stats):
             'pool data': False,
             'normalize': False,
             'thr': 1.0,
+            'cond analysis': None,
+            'chunk dimension': 'space'},
+        'signal filtering': {
+            'vars': [],
+            'resample resolution': None,
+            'pool data': False,
+            'filter': 'lanczos',
+            'cutoff type': 'lowpass',
+            'window': 61,
+            'mode': 'same',
+            '1st cutoff': None,
+            '2nd cutoff': None,
+            'filter dim': 1,
+            'thr': None,
+            'cond analysis': None,
             'chunk dimension': 'space'},
             }
 
@@ -131,7 +169,9 @@ def _stats(stat):
         'dcycle harmonic': dcycle_harmonic_fit,
         'pdf': freq_int_dist,
         'asop': asop,
+        'eda': eda_calc,
         'Rxx': Rxx,
+        'signal filtering': filtering,
     }
     return p[stat]
 
@@ -280,16 +320,31 @@ def annual_cycle(data, var, stat, stat_config):
     else:
         thr = in_thr
     if 'percentile' in tstat:
-        q = float(tstat.split(' ')[1])
-        st_data = data[var].groupby('time.month').reduce(
-            _dask_percentile, dim='time', q=q, allow_lazy=True)
-        st_data = st_data.to_dataset()
+        q = tstat.partition(' ')[2]
+        errmsg = ("Make sure percentile(s) in stat method is given correctly; "
+                  "i.e. with a white space e.g. 'percentile 95'")
+        if not q:
+            raise ValueError(errmsg)
+        else:
+            q = [float(q)] if q.isdigit() else eval(q)
+        ac_pctls = xa.apply_ufunc(
+            _percentile_func, data[var].groupby('time.month'),
+            input_core_dims=[['time']], output_core_dims=[['pctls']],
+            dask='parallelized',
+            dask_gufunc_kwargs={'output_sizes': {'pctls': len(q)}},
+            output_dtypes=[float],
+            kwargs={'q': q, 'axis': -1, 'thr': thr})
+        dims = list(ac_pctls.dims)
+        st_data = ac_pctls.to_dataset().assign_coords({'pctls': q}).transpose(
+            'pctls', 'month', dims[0], dims[1])
     else:
         st_data = eval("data.groupby('time.month').{}('time')".format(
             tstat))
     st_data.attrs['Description'] =\
         "Annual cycle | Month stat: {} | Threshold: {}".format(
                 tstat, thr)
+    st_data = st_data.chunk({'month': -1})
+
     return st_data
 
 
@@ -317,13 +372,51 @@ def diurnal_cycle(data, var, stat, stat_config):
     if dcycle_stat == 'amount':
         tstat = stat_config[stat]['stat method']
         if 'percentile' in tstat:
-            q = float(tstat.split(' ')[1])
-            dcycle = data[var].groupby('time.hour').reduce(
-                _dask_percentile, dim='time', q=q, allow_lazy=True)
-            dcycle = dcycle.to_dataset()
+            q = tstat.partition(' ')[2]
+            errmsg = ("Make sure percentile(s) in stat method is given "
+                      "correctly; i.e. with a white space e.g. "
+                      "'percentile 95'")
+            if not q:
+                raise ValueError(errmsg)
+            else:
+                q = [float(q)] if q.isdigit() else eval(q)
+            dc_pctls = xa.apply_ufunc(
+                _percentile_func, data[var].groupby('time.hour'),
+                input_core_dims=[['time']], output_core_dims=[['pctls']],
+                dask='parallelized',
+                dask_gufunc_kwargs={'output_sizes': {'pctls': len(q)}},
+                output_dtypes=[float],
+                kwargs={'q': q, 'axis': -1, 'thr': thr})
+            dims = list(dc_pctls.dims)
+            st_data = dc_pctls.to_dataset().assign_coords(
+                {'pctls': q}).transpose('pctls', 'hour', dims[0], dims[1])
+        # if 'percentile' in tstat:
+        #     q = float(tstat.split(' ')[1])
+        #     dcycle = data[var].groupby('time.hour').reduce(
+        #         _dask_percentile, dim='time', q=q, allow_lazy=True)
+        #     dcycle = dcycle.to_dataset()
+        elif 'pdf' in tstat:
+            # Bins
+            assert 'bins' in stat_config[stat]['method kwargs'],\
+                    "\n\tBins are missing in 'method kwargs'!\n"
+            bin_r = stat_config[stat]['method kwargs']['bins']
+            bins = np.arange(bin_r[0], bin_r[1], bin_r[2])
+            lbins = bins.size - 1
+            dc_pdf = xa.apply_ufunc(
+                _pdf_calc, data[var].groupby('time.hour'),
+                input_core_dims=[['time']], output_core_dims=[['bins']],
+                dask='parallelized', output_dtypes=[float],
+                dask_gufunc_kwargs={'output_sizes': {'bins': lbins+1}},
+                kwargs={
+                    'keepdims': True, 'bins': bins, 'axis': -1, 'thr': thr})
+            dims = list(dc_pdf.dims)
+            dcycle = dc_pdf.to_dataset().assign_coords(
+                {'bins': bins}).transpose('bins', 'hour', dims[0], dims[1])
         else:
             dcycle = eval("data.groupby('time.hour').{}('time')".format(tstat))
+
         statnm = "Amount | stat: {} | thr: {}".format(tstat, thr)
+
     elif dcycle_stat == 'frequency':
         errmsg = "For frequency analysis, a threshold ('thr') must be set!"
         assert thr is not None, errmsg
@@ -519,6 +612,52 @@ def asop(data, var, stat, stat_config):
     return st_data
 
 
+def eda_calc(data, var, stat, stat_config):
+    """
+    Event duration analysis for precipitation
+    """
+    # Statistic used for events
+    event_stat = stat_config[stat]['event statistic']
+
+    # Bins
+    dur_bins = stat_config[stat]['duration bins']
+    dur_bins = np.array(dur_bins) if dur_bins is not None else dur_bins
+    st_bins = stat_config[stat]['statistic bins']
+    st_bins = np.array(st_bins) if st_bins is not None else st_bins
+
+    # Dry intervals
+    dry = stat_config[stat]['dry events']
+    dry_bins = stat_config[stat]['dry bins']
+    dry_bins = np.array(dry_bins) if dry_bins is not None else dry_bins
+
+    dur_dim = dur_bins.size+1 if dry else dur_bins.size
+    frq_dim = st_bins.size-1
+
+    # Event threshold
+    thr = stat_config[stat]['event thr']
+
+    eda_out = xa.apply_ufunc(
+        eda.eda, data[var], input_core_dims=[['time']],
+        output_core_dims=[['frequency', 'duration']],
+        dask='parallelized', output_dtypes=[float],
+        dask_gufunc_kwargs={'output_sizes': {
+            'frequency': frq_dim, 'duration': dur_dim}},
+        exclude_dims={'time'}, kwargs={
+            'thr': thr, 'axis': -1,  'duration_bins': dur_bins,
+            'event_statistic': event_stat, 'statistic_bins': st_bins,
+            'dry_events': dry, 'dry_bins': dry_bins, 'keepdims': True})
+
+    dims = list(eda_out.dims)
+    eda_ds = eda_out.to_dataset().transpose(dims[-2], dims[-1],
+                                            dims[0], dims[1])
+    st_data = eda_ds.assign(duration_bins=dur_bins, statistic_bins=st_bins,
+                            dry_bins=dry_bins)
+    st_data.attrs['Description'] =\
+        "EDA analysis | event statistic: {} | threshold: {}".format(
+                event_stat, thr)
+    return st_data
+
+
 def Rxx(data, var, stat, stat_config):
     """
     Count of any time units (days, hours, etc) when
@@ -542,6 +681,82 @@ def Rxx(data, var, stat, stat_config):
     st_data.attrs['Description'] =\
         "Rxx; frequency above threshold | threshold: {} | normalized: {}".\
         format(thr, norm)
+    return st_data
+
+
+def filtering(data, var, stat, stat_config):
+    """
+    Filter the input data
+    """
+    # The type of frequency cutoff
+    ftype = stat_config[stat]['cutoff type']
+
+    # The type of filter
+    filt = stat_config[stat]['filter']
+
+    # The length of filter window
+    window = stat_config[stat]['window']
+    assert window % 2 == 1, "Filter window must be odd"
+
+    # The filter mode
+    mode = stat_config[stat]['mode']
+
+    # First cutoff frequency
+    cutoff = stat_config[stat]['1st cutoff']
+    cutoff2 = stat_config[stat]['2nd cutoff']
+    if ftype == 'bandpass':
+        errmsg = "'2nd cutoff' must be set for bandpass filtering"
+        assert cutoff2 is not None, errmsg
+
+    # The filtering dimensions (1D or 2D filtering)
+    filt_dim = stat_config[stat]['filter dim']
+
+    # Thresholding data
+    in_thr = stat_config[stat]['thr']
+    if in_thr is not None:
+        if var in in_thr:
+            thr = in_thr[var]
+            data = data.where(data[var] >= thr)
+        else:
+            thr = None
+    else:
+        thr = in_thr
+
+    if filt == 'lanczos':
+        wgts = convolve.lanczos_filter(window, 1/cutoff, 1/cutoff2, ftype)
+    else:
+        # TO DO
+        print("No other filter implemented yet. To be done.")
+        sys.exit()
+
+    if mode == 'valid' or mode is None:
+        out_dim = data.time.size - window + 1
+    else:
+        out_dim = data.time.size
+
+    if filt_dim == 1:
+        filtered = xa.apply_ufunc(
+            convolve.filtering, data[var], input_core_dims=[['time']],
+            output_core_dims=[['filtered']], dask='parallelized',
+            dask_gufunc_kwargs={'output_sizes': {'filtered': out_dim}},
+            output_dtypes=[float],
+            kwargs={'wgts': wgts, 'dim': filt_dim, 'axis': -1, 'mode': mode})
+        dims = list(filtered.dims)
+        st_data = filtered.to_dataset().transpose('filtered', dims[0], dims[1])
+    elif filt_dim == 2:
+        print("\nSorry, 2D filtering not available yet.")
+        sys.exit()
+    else:
+        print("\nOnly 1D and 2D filtering (dim = 1 or 2) is possible ...")
+        sys.exit()
+
+    statnm = (
+        f"Filter Dimension: {filt_dim} | Filter: {filt} | Cutoff Type: {ftype}"
+        f" | 1st Cutoff (time steps): {cutoff} | 2nd Cutoff (time steps): "
+        f"{cutoff2} | Filter Window Size: {window}"
+    )
+    st_data.attrs['Description'] = "Convolved data | {}".format(statnm)
+
     return st_data
 
 
