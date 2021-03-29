@@ -122,12 +122,6 @@ def get_grid_coords(nc, grid_coords):
                        lats[-1-x, x:-x][::-1][1:], lats[x:-x, x][::-1][1:]]
         return list(zip(lons_p, lats_p))
 
-    # Domain center point
-    # grid_coords['lat_0'] = nc['Lambert_Conformal'].attrs[
-    #     'latitude_of_projection_origin']
-    # grid_coords['lon_0'] = nc['Lambert_Conformal'].attrs[
-    #     'longitude_of_central_meridian']
-
     # If lon/lat is 1D; create 2D meshgrid
     lons = nc.lon.values
     lats = nc.lat.values
@@ -359,7 +353,7 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
 
                 # Resampling of data
                 if stats_config[stat]['resample resolution'] is not None:
-                    print("\tResampling input data ...\n")
+                    print("\t\tResampling input data ...\n")
                     indata = resampling(
                         indata, v, stats_config[stat]['resample resolution'])
 
@@ -427,10 +421,14 @@ def get_month_string(mlist):
 def _get_freq(tf):
     from functools import reduce
 
-    tf = str(1) + tf if not tf[0].isdigit() else tf
     d = [j.isdigit() for j in tf]
-    freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
+    if np.any(d):
+        freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
+    else:
+        freq = 1
+
     unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
+
     if unit in ('M', 'Y'):
         freq = freq*30 if unit == 'M' else freq*365
         unit = 'D'
@@ -641,10 +639,10 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     file_path = os.path.join(mconf['fpath'], f'{tres}/{var}/{var}_*.nc')
     _flist = glob.glob(file_path)
 
-    emsg = ("Could not find any files at specified location:\n{file_path} "
-            "\n\nexiting ...")
+    errmsg = (f"Could not find any files at specified location:\n{file_path} "
+              "\n\nexiting ...")
     if not _flist:
-        print("\t\n{}".format(emsg))
+        print("\t\n{}".format(errmsg))
         sys.exit()
 
     _file_dates = [re.split('-|_', f.rsplit('.')[-2])[-2:] for f in _flist]
@@ -665,12 +663,12 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
 
     if deacc:
         _mdata = xa.open_mfdataset(
-            flist, combine='by_coords', parallel=True,
+            flist, combine='by_coords', parallel=True,  # engine='h5netcdf',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time')))
     else:
         _mdata = xa.open_mfdataset(
-            flist, combine='by_coords', parallel=True,
+            flist, combine='by_coords', parallel=True,  # engine='h5netcdf',
             chunks={**ch_t, **ch_x, **ch_y})
 
     # Time stamps
@@ -750,11 +748,12 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
         range(sy, ey+1), mns)]
     _file_dates = [re.split('-|_', f.rsplit('.')[-2])[-2:] for f in obs_flist]
     file_dates = [(d[0][:6], d[1][:6]) for d in _file_dates]
-    fidx = [np.where([d[0] <= date <= d[1] for d in file_dates])[0][0]
+    fidx = [np.where([d[0] <= date <= d[1] for d in file_dates])[0]
             for date in date_list]
-    flist = [obs_flist[i] for i in np.unique(fidx)]
+    flist = [obs_flist[i] for i in np.unique(np.hstack(fidx))]
     flist.sort()
     f_obs = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
+    # engine='h5netcdf')
 
     # Extract years
     obs_data = f_obs.where(((f_obs.time.dt.year >= sy) &

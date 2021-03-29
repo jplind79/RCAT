@@ -70,6 +70,7 @@ def default_stats_config(stats):
             'resample resolution': None,
             'pool data': False,
             'nr_bins': 80,
+            'bin_type': 'Klingaman',
             'thr': None,
             'cond analysis': None,
             'chunk dimension': 'space'},
@@ -215,7 +216,11 @@ def _get_freq(tf):
     from functools import reduce
 
     d = [j.isdigit() for j in tf]
-    freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
+    if np.any(d):
+        freq = int(reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if y]))
+    else:
+        freq = 1
+
     unit = reduce((lambda x, y: x+y), [x for x, y in zip(tf, d) if not y])
 
     if unit in ('M', 'Y'):
@@ -240,8 +245,7 @@ def moments(data, var, stat, stat_config):
     """
     _mstat = deepcopy(stat_config[stat]['moment stat'])
     mstat = _mstat[var] if isinstance(_mstat, dict) else _mstat
-    if not isinstance(mstat[0], np.int):
-        mstat[0] = str(1) + mstat[0]
+
     in_thr = stat_config[stat]['thr']
     if in_thr is not None:
         if var in in_thr:
@@ -532,7 +536,6 @@ def freq_int_dist(data, var, stat, stat_config):
     else:
         bin_r = stat_config[stat]['bins'][var]
         bins = np.arange(bin_r[0], bin_r[1], bin_r[2])
-    lbins = bins.size - 1
 
     # Data threshold
     in_thr = stat_config[stat]['thr']
@@ -547,6 +550,9 @@ def freq_int_dist(data, var, stat, stat_config):
         dry_thr = None if var not in in_dry_thr else in_dry_thr[var]
     else:
         dry_thr = in_dry_thr
+
+    # Output size
+    lbins_out = bins.size - 1 if dry_thr is None else bins.size
 
     # Normalization
     normalized = stat_config[stat]['normalized']
@@ -563,7 +569,7 @@ def freq_int_dist(data, var, stat, stat_config):
     pdf = xa.apply_ufunc(
         _pdf_calc, data[var], input_core_dims=[['time']],
         output_core_dims=[['bins']], dask='parallelized',
-        output_dtypes=[float], output_sizes={'bins': lbins+1},
+        output_dtypes=[float], output_sizes={'bins': lbins_out},
         kwargs={'keepdims': True, 'bins': bins, 'axis': -1, 'norm': norm,
                 'thr': thr, 'dry_event_thr': dry_thr})
     dims = list(pdf.dims)
@@ -579,12 +585,16 @@ def asop(data, var, stat, stat_config):
     Calculate ASoP components for precipitation
     """
     if stat_config[stat]['nr_bins'] is None:
-        nr_bins = np.arange(50)
+        nbins = np.arange(50)
     else:
-        nr_bins = np.arange(stat_config[stat]['nr_bins'])
-    bins = [ASoP.bins_calc(n) for n in nr_bins]
+        nbins = np.arange(stat_config[stat]['nr_bins'])
+    bintype = stat_config[stat]['bin_type']
+
+    # Define bins
+    bins = ASoP.bins_calc(nbins, bintype)
     bins = np.insert(bins, 0, 0.0)
     lbins = bins.size - 1
+
     in_thr = stat_config[stat]['thr']
     if in_thr is not None:
         thr = None if var not in in_thr else in_thr[var]
@@ -834,11 +844,6 @@ def _pdf_calc(data, bins=None, norm=False, keepdims=False, axis=0, thr=None,
             if any(np.isnan(data1d)):
                 data1d = data1d[~np.isnan(data1d)]
 
-            if dry_thr is not None:
-                dry_events = np.sum(data1d < dry_thr)
-            else:
-                dry_events = None
-
             if thr is not None:
                 indata = data1d[data1d >= thr]
             else:
@@ -860,11 +865,16 @@ def _pdf_calc(data, bins=None, norm=False, keepdims=False, axis=0, thr=None,
                 frequency = ocrns/np.nansum(ocrns)
                 C = frequency*means     # Relative contribution per bin
                 hdata = C/np.nansum(C)     # Normalized contribution per bin
-                hdata = np.hstack((dry_events, hdata))
+
             else:
                 hdata = np.histogram(indata, bins=bins,
                                      density=True)[0]
+
+            # Add dry events
+            if dry_thr is not None:
+                dry_events = np.sum(data1d < dry_thr)
                 hdata = np.hstack((dry_events, hdata))
+
         return hdata
 
     # Set number of bins to 10 (np.histogram default) if bins not provided.
