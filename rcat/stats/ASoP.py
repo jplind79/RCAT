@@ -135,7 +135,7 @@ def bins_calc(n, bintype='Klingaman'):
         1D array or list with bin numbers
     bintype: str
         The type of bins to be calculated; 'Klingaman' (see reference) or
-        'exp' for exponential bins.
+        'exponential' for exponential bins.
 
     Returns
     -------
@@ -145,7 +145,11 @@ def bins_calc(n, bintype='Klingaman'):
     if bintype == 'Klingaman':
         # bn = np.e**(np.log(0.005)+(n*(np.log(120)-np.log(0.005))**2/59)**(1/2))
         bn = 0.005*np.exp(np.sqrt(1.724*n))
-    elif bintype == 'exp':
+    elif bintype == 'exponential':
         bn = 0.02*np.exp(0.12*n)
+    else:
+        errmsg = (f"\n\nUnknown 'bintype' as input: {bintype}.\nMust be either"
+                  " 'Klingaman' or 'exponential'.\n")
+        raise ValueError(errmsg)
 
     return bn
