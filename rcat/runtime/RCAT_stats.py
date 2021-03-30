@@ -25,6 +25,7 @@ def default_stats_config(stats):
         'moments': {
             'vars': [],
             'moment stat': ['D', 'mean'],
+            'moment resample kwargs': None,
             'resample resolution': None,
             'pool data': False,
             'thr': None,
@@ -243,9 +244,8 @@ def moments(data, var, stat, stat_config):
     """
     Calculate standard moment statistics: avg, median, std, max/min
     """
-    _mstat = deepcopy(stat_config[stat]['moment stat'])
-    mstat = _mstat[var] if isinstance(_mstat, dict) else _mstat
 
+    # Data thresholding
     in_thr = stat_config[stat]['thr']
     if in_thr is not None:
         if var in in_thr:
@@ -256,27 +256,42 @@ def moments(data, var, stat, stat_config):
     else:
         thr = in_thr
 
-    diff = data.time.values[1] - data.time.values[0]
-    nsec = to_timedelta(diff).total_seconds()
-    tr, fr = _get_freq(mstat[0])
-    sec_resample = to_timedelta(tr, fr).total_seconds()
-    expr = "data[var].resample(time='{}').{}('time').dropna('time', 'all')"\
-        .format(mstat[0], mstat[1])
+    # Moment stats configuration
+    _mstat = deepcopy(stat_config[stat]['moment stat'])
+    mstat = _mstat[var] if isinstance(_mstat, dict) else _mstat
 
-    if mstat[0] == 'all':
-        st_data = eval("data.{}(dim='time', skipna=True)".format(mstat))
+    if mstat is None:
+        st_data = data.copy()
+        st_data.attrs['Description'] =\
+            f"Moment statistic: No statistics applied | Threshold: {thr}"
     else:
-        if nsec >= sec_resample:
-            print("* Data already at the same or coarser time resolution "
-                  "as statistic!\n* Keeping data as is ...\n")
-            st_data = data.copy()
+        diff = data.time.values[1] - data.time.values[0]
+        nsec = to_timedelta(diff).total_seconds()
+        tr, fr = _get_freq(mstat[0])
+        sec_resample = to_timedelta(tr, fr).total_seconds()
+        # Resample expression
+        res_kw = stat_config[stat]['moment resample kwargs']
+        if res_kw is None:
+            expr = (f"data[var].resample(time='{mstat[0]}')"
+                    f".{mstat[1]}('time').dropna('time', 'all')")
         else:
-            _st_data = eval(expr)
-            st_data = _st_data.to_dataset()
+            expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                    f".{mstat[1]}('time').dropna('time', 'all')")
+        if mstat[0] == 'all':
+            st_data = eval(f"data.{mstat[1]}(dim='time', skipna=True)")
+        else:
+            if nsec >= sec_resample or mstat is None:
+                print("\t\t* Moment statistics:\n\t\tData already at the same "
+                      "or coarser time resolution as selected resample "
+                      "frequency!\n\t\tKeeping data as is ...\n")
+                st_data = data.copy()
+            else:
+                _st_data = eval(expr)
+                st_data = _st_data.to_dataset()
 
-    st_data.attrs['Description'] =\
-        "Moment statistic: {} | Threshold: {}".format(
-            ' '.join(s.upper() for s in mstat), thr)
+        st_data.attrs['Description'] =\
+            "Moment statistic: {} | Threshold: {}".format(
+                ' '.join(s.upper() for s in mstat), thr)
     return st_data
 
 

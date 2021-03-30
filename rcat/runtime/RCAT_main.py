@@ -257,77 +257,98 @@ def resampling(data, v, tresample):
     """
     Resample data to chosen time frequency and resample method.
     """
-    from pandas import to_timedelta
-    diff = data.time.values[1] - data.time.values[0]
-    nsec = to_timedelta(diff).total_seconds()
-    tr, fr = _get_freq(tresample[0])
-    sec_resample = to_timedelta(tr, fr).total_seconds()
-    if nsec != sec_resample:
-        data = eval("data.resample(time='{}').{}('time').\
-                      dropna('time', 'all')".format(
-                          tresample[0], tresample[1]))
+    if isinstance(tresample, dict):
+        for tr, val in tresample.items():
+            lval = val if isinstance(val, list) else [val]
+            if tr == 'select hours':
+                data = data.sel(time=np.isin(data['time.hour'], lval))
+            elif tr == 'select dates':
+                data = data.sel(time=lval)
+            else:
+                errmsg = (f"\t\t\nUnknown type of selection: {tr}!\n Only "
+                          f"'select hours' and 'select dates' are available.")
+                raise ValueError(errmsg)
     else:
-        print("\t\tData is already at target resolution, skipping "
-              "resampling ...\n")
+        from pandas import to_timedelta
+        diff = data.time.values[1] - data.time.values[0]
+        nsec = to_timedelta(diff).total_seconds()
+        tr, fr = _get_freq(tresample[0])
+        sec_resample = to_timedelta(tr, fr).total_seconds()
+        if nsec != sec_resample:
+            data = eval("data.resample(time='{}').{}('time').\
+                          dropna('time', 'all')".format(
+                              tresample[0], tresample[1]))
+        else:
+            print("\t\tData is already at target resolution, skipping "
+                  "resampling ...\n")
     return data
 
 
-def conditional_data(condition, cvar, cdata, indata):
+def conditional_data(dd_condition, cond_var, cond_data, indata):
     """
     Sub-select data conditional on other data
     """
     import operator
 
-    def _get_cond_mask(darr, thr_type, relate, q=95, thr=0,
-                       expand=None, axis=0):
-        ops = {'>': operator.gt,
-               '<': operator.lt,
-               '>=': operator.ge,
-               '<=': operator.le,
-               '=': operator.eq}
+    ops = {'>': operator.gt,
+           '<': operator.lt,
+           '>=': operator.ge,
+           '<=': operator.le,
+           '=': operator.eq}
+
+    def _get_cond_mask(darr, thr_type, relate, q, expand=None, axis=0):
         if thr_type == 'percentile':
             mask = np.apply_along_axis(
-                # (lambda x: ops[relate](x, np.percentile(x, q=q))),
-                (lambda x: x >= np.percentile(x, q=q)),
+                lambda x: ops[relate](x, np.percentile(x, q=q)),
                 axis=axis, arr=darr)
         elif thr_type == 'static':
-            mask = np.apply_along_axis((lambda x: ops[relate](x, thr)),
+            mask = np.apply_along_axis(lambda x: ops[relate](x, q),
                                        axis=axis, arr=darr)
         if expand is not None:
             mask = np.repeat(mask, expand, axis=axis)
 
         return mask
 
-    if 'percentile' in condition['condition'][1]:
-        inthr = 'percentile'
-        q = float(condition['condition'][1].split(' ')[1])
-    else:
-        inthr = 'static'
-        q = condition['condition'][1]
-    relate = condition['condition'][0]
-
-    if 'resample resolution' in condition:
+    # Resample data
+    if 'resample resolution' in dd_condition:
         print("\t\tResampling conditional data ...\n")
-        tres = condition['resample resolution']
-        cdata = resampling(cdata, tres)
+        tres = dd_condition['resample resolution']
+        cond_data = resampling(cond_data, cond_var, tres)
 
-    cdata = manage_chunks(cdata, 'space')
+    # Re-chunk in space dim if needed
+    if len(cond_data.chunks['time']) > 1:
+        cond_data = manage_chunks(cond_data, 'space')
 
-    if cdata.time.size != indata.time.size:
-        expand = indata.time.size/cdata.time.size
+    # Type of conditional
+    cond_type = dd_condition['type']
+
+    # Logical operator for conditional selection
+    relate = dd_condition['operator']
+
+    if cond_type == 'file':
+        errmsg = ("\t\t\nConditional data from file must be 2D!\n")
+        with xa.open_dataset(dd_condition['file in']) as fopen:
+            q = fopen[dd_condition['file var']].squeeze()
+            assert q.ndim == 2, errmsg
+        sub_data = indata.where(ops[relate](indata, q))
     else:
-        expand = None
+        q = float(dd_condition['value'])
 
-    _mask = xa.apply_ufunc(
-        _get_cond_mask, cdata[cvar], input_core_dims=[['time']],
-        output_core_dims=[['time']], dask='parallelized',
-        output_dtypes=[float], exclude_dims={'time'},
-        dask_gufunc_kwargs={'output_sizes': {'time': indata.time.size}},
-        kwargs={'thr_type': inthr, 'relate': relate, 'q': q,
-                'expand': expand, 'axis': -1})
-    dims = list(_mask.dims)
-    mask = _mask.transpose(dims[-1], dims[0], dims[1])
-    sub_data = indata.where(mask)
+        if cond_data.time.size != indata.time.size:
+            expand = indata.time.size/cond_data.time.size
+        else:
+            expand = None
+
+        _mask = xa.apply_ufunc(
+            _get_cond_mask, cond_data[cond_var], input_core_dims=[['time']],
+            output_core_dims=[['time']], dask='parallelized',
+            output_dtypes=[float], exclude_dims={'time'},
+            dask_gufunc_kwargs={'output_sizes': {'time': indata.time.size}},
+            kwargs={'thr_type': cond_type, 'relate': relate, 'q': q,
+                    'expand': expand, 'axis': -1})
+        dims = list(_mask.dims)
+        mask = _mask.transpose(dims[-1], dims[0], dims[1])
+        sub_data = indata.where(mask)
 
     return sub_data
 
@@ -361,20 +382,25 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
                 data = manage_chunks(indata, chunk_dim)
 
                 # Conditional analysis; sample data according to condition
-                # (static threshold or percentile).
+                # (static threshold,  percentile or from file).
                 if stats_config[stat]['cond analysis'] is not None:
-                    cond = stats_config[stat]['cond analysis']
-                    vcond, ccond = zip(*cond.items())
-                    vcond = vcond[0]
-                    ccond = ccond[0]
-                    # assert vcond in st_data, msg.format(vcond, v)
-                    print("\t\tPerforming conditional sub-selection\n")
-                    frq = [v for v, k in ddict.items()
-                           if vcond in list(k.keys())][0]
-                    sub_data = conditional_data(
-                        ccond, vcond, ddict[frq][vcond][m]['data'], indata)
+                    cond_dict = stats_config[stat]['cond analysis']
+                    if v in cond_dict:
+                        print("\t\tPerforming conditional sub-selection\n")
+                        cond_calc = cond_dict[v]
+                        cond_var = cond_calc['cvar']
 
-                    data = manage_chunks(sub_data, chunk_dim)
+                        if cond_var == v:
+                            cond_data = indata
+                        else:
+                            # assert vcond in st_data, msg.format(vcond, v)
+                            cond_data = ddict[cond_var][m]['data']
+
+                        # Extract sub selection of data
+                        sub_data = conditional_data(cond_calc, cond_var,
+                                                    cond_data, indata)
+
+                        data = manage_chunks(sub_data, chunk_dim)
 
                 # Calculate stats
                 st_data[v][m]['domain'] = st.calc_statistics(data, v, stat,
@@ -903,6 +929,8 @@ args = get_args()
 
 # Read config file
 config_file = args.config
+if not os.path.isfile(config_file):
+    raise ValueError(f"\nConfig file, '{config_file}', does not exist!")
 cdict = get_settings(config_file)
 
 ###############################################
@@ -1071,6 +1099,7 @@ print("\n=== SAVE OUTPUT ===")
 tres_str = {}
 for stat in cdict['stats_conf']:
     tres_str[stat] = {}
+    res_tres = cdict['stats_conf'][stat]['resample resolution']
     for v in stats_dict[stat]:
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
                  (cdict['stats_conf'][stat]['thr'] is not None) and
@@ -1081,8 +1110,11 @@ for stat in cdict['stats_conf']:
         else:
             thrstr = ''
         if cdict['stats_conf'][stat]['resample resolution'] is not None:
-            res_tres = cdict['stats_conf'][stat]['resample resolution']
-            tres_str[stat][v] = "_".join(res_tres)
+            if isinstance(res_tres, dict):
+                t = list(res_tres.keys())[0]
+                tres_str[stat][v] = t.replace(' ', '_')
+            else:
+                tres_str[stat][v] = "_".join(t)
         else:
             tres_str[stat][v] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
