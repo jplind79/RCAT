@@ -582,7 +582,7 @@ def manage_chunks(data, chunk_dim):
     else:
         chunksize = xsize * ysize * np.mean(data.chunks['time'])
         if chunksize < min_chunksize or chunksize > max_chunksize:
-            sub_size = min_chunksize/(xsize*ysize)
+            sub_size = max_chunksize/(xsize*ysize)
             csize_t = int(data.time.size/sub_size)
             data = data.chunk({'time': csize_t, xd: xsize, yd: ysize})
         else:
@@ -689,12 +689,16 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
 
     if deacc:
         _mdata = xa.open_mfdataset(
-            flist, combine='by_coords', parallel=True,  # engine='h5netcdf',
+            flist, parallel=True,  # engine='h5netcdf',
+            data_vars='minimal', coords='minimal',
+            concat_dim='time', combine='by_coords', compat='override',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time')))
     else:
         _mdata = xa.open_mfdataset(
-            flist, combine='by_coords', parallel=True,  # engine='h5netcdf',
+            flist, parallel=True,  # engine='h5netcdf',
+            data_vars='minimal', coords='minimal',
+            concat_dim='time', combine='by_coords', compat='override',
             chunks={**ch_t, **ch_x, **ch_y})
 
     # Time stamps
@@ -778,8 +782,11 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
             for date in date_list]
     flist = [obs_flist[i] for i in np.unique(np.hstack(fidx))]
     flist.sort()
-    f_obs = xa.open_mfdataset(flist, combine='by_coords', parallel=True)
-    # engine='h5netcdf')
+    f_obs = xa.open_mfdataset(
+        flist, parallel=True,   # engine='h5netcdf',
+        data_vars='minimal', coords='minimal',
+        concat_dim='time', combine='by_coords',
+        compat='override').unify_chunks()
 
     # Extract years
     obs_data = f_obs.where(((f_obs.time.dt.year >= sy) &
