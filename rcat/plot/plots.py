@@ -590,8 +590,11 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
 
     Returns
     -------
-        axs: Axes objects
-            The axes objects created for each plot
+        axs: list
+            Axes objects for each plot
+        bps: list
+            Each item in list is a dictionary mapping each component of the
+            boxplot to a list of the `.Line2D` instances created.
     """
 
     if grid.size == 1:
@@ -601,6 +604,7 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
         idata = data
 
     axs = []
+    bps = []
     for g, ax in enumerate(grid):
         if labels is not None:
             msg = "*** ERROR *** \n 'labels' must be given in a list!"
@@ -623,8 +627,9 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
                 "\n{}\n".format("**Error**\nIf plotting grouped boxplot "
                                 "(grouped=True), then input data must "
                                 "be a dictionary.")
-            _grouped_boxplot(ax, bdata, group_names=lbls, leg_labels=lg_lbls,
-                             box_colors=box_colors, **box_kwargs)
+            bp = _grouped_boxplot(
+                ax, bdata, group_names=lbls, leg_labels=lg_lbls,
+                box_colors=box_colors, **box_kwargs)
         else:
             bp = ax.boxplot(bdata, labels=lbls, patch_artist=True,
                             **box_kwargs)
@@ -634,14 +639,10 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
                 h = custom_legend(cols, lg_lbls)
                 ax.legend(handles=h, fontsize='large')
 
-        ax.spines["left"].set_visible(True)
-        ax.spines["bottom"].set_visible(True)
-        # ax.set_facecolor('#d6d6d6')
-        # ax.grid(True, lw=.6, color='white')
-
         axs.append(ax)
+        bps.append(bp)
 
-    return axs
+    return axs, bps
 
 
 def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,

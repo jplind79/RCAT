@@ -568,14 +568,15 @@ def manage_chunks(data, chunk_dim):
     # Max chunksize just an arbitrary value to assert 'reasonable' chunking
     min_chunksize = 1e6
     max_chunksize = 1e8
-
     if chunk_dim == 'space':
         chunksize = np.mean(data.chunks[xd]) * np.mean(data.chunks[yd])\
                 * data.time.size
         if chunksize < min_chunksize or chunksize > max_chunksize:
             sub_size = np.sqrt(min_chunksize/data.time.size)
-            csize_x = int((xsize/sub_size))
-            csize_y = int((ysize/sub_size))
+            _csize_x = int((xsize/sub_size))
+            csize_x = 5 if _csize_x < 5 else _csize_x
+            _csize_y = int((ysize/sub_size))
+            csize_y = 5 if _csize_y < 5 else _csize_y
             data = data.chunk({'time': -1, xd: csize_x, yd: csize_y})
         else:
             data = data.chunk({'time': -1})
@@ -583,7 +584,8 @@ def manage_chunks(data, chunk_dim):
         chunksize = xsize * ysize * np.mean(data.chunks['time'])
         if chunksize < min_chunksize or chunksize > max_chunksize:
             sub_size = max_chunksize/(xsize*ysize)
-            csize_t = int(data.time.size/sub_size)
+            _csize_t = int(data.time.size/sub_size)
+            csize_t = 5 if _csize_t < 5 else _csize_t
             data = data.chunk({'time': csize_t, xd: xsize, yd: ysize})
         else:
             data = data.chunk({xd: xsize, yd: ysize})
@@ -1121,7 +1123,7 @@ for stat in cdict['stats_conf']:
                 t = list(res_tres.keys())[0]
                 tres_str[stat][v] = t.replace(' ', '_')
             else:
-                tres_str[stat][v] = "_".join(t)
+                tres_str[stat][v] = "_".join(res_tres)
         else:
             tres_str[stat][v] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
