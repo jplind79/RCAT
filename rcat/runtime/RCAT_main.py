@@ -187,7 +187,7 @@ def regrid_func(dd, v, vconf, mnames, onames, gdict):
     else:
         if isinstance(vconf['regrid'], dict):
             target_grid = xa.open_dataset(vconf['regrid']['file'])
-            gridname = vconf['regrid']['name']
+            gridname = "grid_{}".format(vconf['regrid']['name'])
             gdict.update({'lon': {gridname: target_grid['lon'].values},
                           'lat': {gridname: target_grid['lat'].values}})
             for mod in mnames:
