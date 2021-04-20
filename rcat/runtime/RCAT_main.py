@@ -164,14 +164,8 @@ def get_grids(nc, target_grid, method='bilinear'):
     else:
         s_grid = {'lon': nc.lon.values, 'lat': nc.lat.values}
         t_grid = target_grid
-    if t_grid['lon'].ndim == 1:
-        outdims = (t_grid['lat'].size, t_grid['lon'].size)
-        outdims_shape = {'lon': ('x',), 'lat': ('y',)}
-    else:
-        outdims = (t_grid['lon'].shape[0], t_grid['lon'].shape[1])
-        outdims_shape = {'lon': ('y', 'x'), 'lat': ('y', 'x')}
 
-    return s_grid, t_grid, outdims, outdims_shape
+    return s_grid, t_grid
 
 
 def regrid_func(dd, v, vconf, mnames, onames, gdict):
@@ -242,7 +236,7 @@ def regrid_calc(data, data_name, var, target_grid, method):
     indata = data[data_name]['data']
 
     # Get grid info
-    sgrid, tgrid, dim_val, dim_shape = get_grids(indata, target_grid, method)
+    sgrid, tgrid = get_grids(indata, target_grid, method)
 
     # Regridding
     regridder = gr.add_matrix_NaNs(xe.Regridder(sgrid, tgrid, method))
@@ -380,6 +374,7 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
 
                 # Check chunking of data
                 data = manage_chunks(indata, chunk_dim)
+                # print(f"Chunks of {m}: {data.chunks}")
 
                 # Conditional analysis; sample data according to condition
                 # (static threshold,  percentile or from file).
