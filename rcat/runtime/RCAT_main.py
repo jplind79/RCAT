@@ -984,7 +984,6 @@ else:
 #                                             #
 ###############################################
 
-
 # Loop over time resolution of input data
 grid_coords = {}
 grid_coords['meta data'] = {}
@@ -1067,6 +1066,8 @@ if cdict['var modification'] is not None:
         year_dd[new_var] = year_dd[nv_dict['input'][arglist[0]]]
         grid_coords['target grid'][new_var] =\
             grid_coords['target grid'][nv_dict['input'][arglist[0]]]
+        grid_coords['meta data'][new_var] =\
+            grid_coords['meta data'][nv_dict['input'][arglist[0]]]
 
         # Remove input variables if 'replace' in config_main.ini is set to True
         if nv_dict['replace']:
