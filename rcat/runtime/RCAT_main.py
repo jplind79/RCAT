@@ -368,9 +368,16 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
 
                 # Resampling of data
                 if stats_config[stat]['resample resolution'] is not None:
-                    print("\t\tResampling input data ...\n")
-                    indata = resampling(
-                        indata, v, stats_config[stat]['resample resolution'])
+                    resample_args = stats_config[stat]['resample resolution']
+                    if isinstance(resample_args, dict):
+                        if v in resample_args:
+                            print("\t\tResampling input data ...\n")
+                            indata = resampling(indata, v, resample_args[v])
+                        else:
+                            pass
+                    else:
+                        print("\t\tResampling input data ...\n")
+                        indata = resampling(indata, v, resample_args)
 
                 # Check chunking of data
                 data = manage_chunks(indata, chunk_dim)
@@ -797,6 +804,10 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     lons = obs_data.lon.values
     lats = obs_data.lat.values
 
+    # Drop bnds dims
+    if 'bnds' in obs_data.dims:
+        obs_data = obs_data.drop_dims('bnds')
+
     # Labels for space dimensions
     xd, yd = _space_dim(obs_data)
 
@@ -1101,10 +1112,10 @@ for stat in cdict['stats_conf']:
 ###############################################
 
 print("\n=== SAVE OUTPUT ===")
-tres_str = {}
+tresstr = {}
 for stat in cdict['stats_conf']:
-    tres_str[stat] = {}
-    res_tres = cdict['stats_conf'][stat]['resample resolution']
+    tresstr[stat] = {}
+    resample_res = cdict['stats_conf'][stat]['resample resolution']
     for v in stats_dict[stat]:
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
                  (cdict['stats_conf'][stat]['thr'] is not None) and
@@ -1114,22 +1125,32 @@ for stat in cdict['stats_conf']:
             thrstr = "thr{}_".format(thrval)
         else:
             thrstr = ''
-        if cdict['stats_conf'][stat]['resample resolution'] is not None:
-            if isinstance(res_tres, dict):
-                t = list(res_tres.keys())[0]
-                tres_str[stat][v] = t.replace(' ', '_')
+        if resample_res is not None:
+            if isinstance(resample_res, dict):
+                if v in resample_res:
+                    if resample_res[v][0] in ('select dates', 'select hours'):
+                        tresstr[stat][v] = resample_res[v][0].replace(' ', '_')
+                    else:
+                        tresstr[stat][v] = "_".join(resample_res[v])
+                else:
+                    tresstr[stat][v] = cdict['variables'][v]['freq']
             else:
-                tres_str[stat][v] = "_".join(res_tres)
+                if resample_res[0] in ('select dates', 'select hours'):
+                    tresstr[stat][v] = resample_res[0].replace(' ', '_')
+                else:
+                    tresstr[stat][v] = "_".join(resample_res)
         else:
-            tres_str[stat][v] = cdict['variables'][v]['freq']
+            tresstr[stat][v] = cdict['variables'][v]['freq']
         gridname = grid_coords['target grid'][v]['gridname']
+
         for m in stats_dict[stat][v]:
             print(f"\n\twriting {m.upper()} - {v} - {stat} to disk ...")
             time_suffix = get_month_string(month_dd[v][m])
             st_data = stats_dict[stat][v][m]
+
             save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
                          year_dd[v][m][0], year_dd[v][m][1], time_suffix,
-                         cdict['stats_conf'][stat], tres_str[stat][v], thrstr,
+                         cdict['stats_conf'][stat], tresstr[stat][v], thrstr,
                          cdict['regions'])
 
 
@@ -1147,7 +1168,7 @@ if cdict['validation plot']:
         for v in stats_dict[sn]:
             plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
                                       cdict['variables'][v]['obs'], year_dd[v],
-                                      month_dd[v], tres_str[sn][v], img_outdir,
+                                      month_dd[v], tresstr[sn][v], img_outdir,
                                       stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
             rplot.plot_main(plot_dict, sn)

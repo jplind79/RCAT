@@ -330,14 +330,18 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     if var == 'psl':
         lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
                                filled=False, colors='#4f5254', linewidths=2.3)
-        [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
+        # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
+        cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
+                          inline_spacing=24) for mplot, cl in zip(lp, clevs)]
+        [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
+          for txt in cl] for cl in cls]
 
     # Map settings
     rpl.map_axes_settings(fig, grid, fontsize='large', headtitle=headtitle,
                           time_mean='season')
 
     # Annotate
-    [ax.text(-0.05, 0.5, ft.upper(), size='x-large', va='center', ha='center',
+    [ax.text(-0.05, 0.5, ft.upper(), size='large', va='center', ha='center',
              rotation=90, transform=ax.transAxes)
      for ft, ax in zip(ftitles, [grid[i]
                                  for i in [p*4 for p in range(ndata+1)]])]
@@ -548,7 +552,7 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
         figshape = (1, 2)
 
         ylabel = ['Monthly mean ({})'.format(units),
-                  'Bias ({})'.format(units)]
+                  'Difference ({})'.format(units)]
         xlabel = [None]*2
         xlim = [[-.5, 11.5]]*2
         xticks = range(12)
@@ -567,16 +571,16 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
         # Legend
         legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                            for c, l in zip(abs_colors, lg_lbls[0])]
-        axs[0].legend(handles=legend_elements, fontsize=16)
+        axs[0].legend(handles=legend_elements, fontsize='large')
         legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                            for c, l in zip(rel_colors, lg_lbls[1])]
-        axs[1].legend(handles=legend_elements, fontsize=16)
+        axs[1].legend(handles=legend_elements, fontsize='large')
 
         [rpl.axes_settings(ax, xlabel=xlabel[a], xticks=xticks,
                            ylabel=ylabel[a], xtlabels=xtlbls, xlim=xlim[a])
          for a, ax in enumerate(axs)]
 
-        ttl = fig.suptitle(headtitle, fontsize=22)
+        ttl = fig.suptitle(headtitle, fontsize='xx-large')
         ttl.set_position((.5, 1.08))
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
@@ -943,7 +947,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
         figsize = (14, 12)
         figshape = (2, 1)
 
-        ylabel = ['({})'.format(units), 'Bias ({})'.format(units)]
+        ylabel = ['({})'.format(units), 'Difference ({})'.format(units)]
         xlabel = [None, 'Hour (UTC)']
         xlim = [[-.5, hours[-1]+.5]]*2
         xticks = hours[:]
@@ -964,11 +968,11 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
         legend_elements = [Line2D([0], [0], marker='o', mec='k', ms=10, lw=0,
                                   color=c, label=l)
                            for c, l, in zip(abs_colors, lg_lbls[0])]
-        axs[0].legend(handles=legend_elements, ncol=1, fontsize=17)
+        axs[0].legend(handles=legend_elements, ncol=1, fontsize='large')
         legend_elements = [Line2D([0], [0], marker='o', mec='k', ms=10, lw=0,
                                   color=c, label=l)
                            for c, l, in zip(rel_colors, lg_lbls[1])]
-        axs[1].legend(handles=legend_elements, ncol=1, fontsize=17)
+        axs[1].legend(handles=legend_elements, ncol=1, fontsize='large')
 
         [rpl.axes_settings(ax, xlabel=xlabel[a], xticks=xticks,
                            ylabel=ylabel[a], xtlabels=xtlbls, xlim=xlim[a])
@@ -976,7 +980,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
 
         [ax.ticklabel_format(useOffset=False, axis='y') for ax in axs]
 
-        ttl = fig.suptitle(headtitle, fontsize=22)
+        ttl = fig.suptitle(headtitle, fontsize='xx-large')
         ttl.set_position((.5, 1.06))
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
@@ -1054,16 +1058,16 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                     var, tres, regnm, ytitle.replace(' ', '_'), seas)
 
         # figure settings
-        figsize = (19, 7)
+        figsize = (23, 7)
         figshape = (1, 2)
 
         ylabel = ['Frequency (%)',
-                  'Frequency (%)']
+                  'Difference']
         ylim = [None]*2
         xlabel = ['({})'.format(units)]*2
         xlim = [[-.5, nbins-.5]]*2
-        xticks = range(nbins-1)[::4]
-        xtlbls = bins[:-1][::4]
+        xticks = range(nbins-1)[::6]
+        xtlbls = bins[:-1][::6]
 
         rpl.figure_init(plottype='line')
         fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
@@ -1079,17 +1083,17 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         # Legend
         legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                            for c, l in zip(abs_colors, lg_lbls[0])]
-        axs[0].legend(handles=legend_elements, fontsize=17)
+        axs[0].legend(handles=legend_elements, fontsize='large')
         legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                            for c, l in zip(rel_colors, lg_lbls[1])]
-        axs[1].legend(handles=legend_elements, fontsize=17)
+        axs[1].legend(handles=legend_elements, fontsize='large')
 
         [rpl.axes_settings(ax, xlabel=xlabel[a], xticks=xticks,
                            ylabel=ylabel[a], xtlabels=xtlbls,
                            xlim=xlim[a], ylim=ylim[a])
          for a, ax in enumerate(axs)]
 
-        ttl = fig.suptitle(headtitle, fontsize=22)
+        ttl = fig.suptitle(headtitle, fontsize='xx-large')
         ttl.set_position((.5, 1.06))
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
@@ -1317,17 +1321,17 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
             # Legend
             legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                                for c, l in zip(abs_colors, lg_lbls[0])]
-            axs[0].legend(handles=legend_elements, fontsize=17)
+            axs[0].legend(handles=legend_elements, fontsize='large')
             legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
                                for c, l in zip(rel_colors, lg_lbls[1])]
-            axs[1].legend(handles=legend_elements, fontsize=17)
+            axs[1].legend(handles=legend_elements, fontsize='large')
 
             [rpl.axes_settings(ax, xlabel=xlabel[a],  # xticks=xticks,
                                ylabel=ylabel[a],  # xtlabels=xtlbls,
                                xlim=xlim[a], ylim=ylim[a])
              for a, ax in enumerate(axs)]
 
-            ttl = fig.suptitle(headtitle, fontsize=22)
+            ttl = fig.suptitle(headtitle, fontsize='xx-large')
             ttl.set_position((.5, 1.06))
 
             plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')

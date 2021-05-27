@@ -576,11 +576,6 @@ def freq_int_dist(data, var, stat, stat_config):
     else:
         norm = False if var not in normalized else normalized[var]
 
-    if var == 'pr':
-        mask = ((np.isnan(data[var])) | (data[var] >= 0.0))
-        data_tmp = xa.where(~mask, 0.0, data[var])
-        data = data_tmp.to_dataset()
-
     pdf = xa.apply_ufunc(
         _pdf_calc, data[var], input_core_dims=[['time']],
         output_core_dims=[['bins']], dask='parallelized',
@@ -854,7 +849,9 @@ def _pdf_calc(data, bins=None, norm=False, keepdims=False, axis=0, thr=None,
     def _compute(data1d, bins, lbins, norm, thr, dry_thr):
         if all(np.isnan(data1d)):
             print("All data missing/masked!")
-            hdata = np.repeat(np.nan, lbins+1)
+
+            hdata = np.repeat(np.nan, lbins+1) if dry_thr is not None\
+                else np.repeat(np.nan, lbins)
         else:
             if any(np.isnan(data1d)):
                 data1d = data1d[~np.isnan(data1d)]
