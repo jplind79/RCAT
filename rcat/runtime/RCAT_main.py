@@ -505,6 +505,12 @@ def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
     else:
         stat_fn = stat_name
 
+    fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
+        label, stat_fn, var, thr, tres, tstat, grid, sy, ey, tsuffix)
+    data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(sy, ey,
+                                                                tsuffix)
+    data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
+
     if regs is not None:
         for r in regs:
             rn = r.replace(' ', '_')
@@ -514,11 +520,6 @@ def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
                 label, stat_fn, var, thr, tres, tstat, rn, grid, sy, ey,
                 tsuffix)
             data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname))
-    fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-        label, stat_fn, var, thr, tres, tstat, grid, sy, ey, tsuffix)
-    data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(sy, ey,
-                                                                tsuffix)
-    data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
 
 
 def get_masked_data(data, var, mask):
@@ -834,6 +835,68 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     return outdata
 
 
+def timeres_def(resample, cdict, v, mod, obs):
+    """
+    Generate a dictionary with time resolution string for models and obs
+    """
+    tres_out_obs = None
+    plot_tres = ''
+    if resample is not None:
+        if isinstance(resample, dict):
+            if v in resample:
+                if resample[v][0] in ('select dates', 'select hours'):
+                    tres_out = resample[v][0].replace(' ', '_')
+                else:
+                    tres_out = "_".join(resample[v])
+                tres_out_obs = tres_out
+                # The tres used in plot file names (if plotting)
+                plot_tres = f"_{tres_out}"
+            else:
+                tres_out = cdict['variables'][v]['freq']
+        else:
+            if resample[0] in ('select dates', 'select hours'):
+                tres_out = resample[0].replace(' ', '_')
+            else:
+                tres_out = "_".join(resample)
+            tres_out_obs = tres_out
+            plot_tres = f"_{tres_out}"
+    else:
+        tres_out = cdict['variables'][v]['freq']
+
+    if isinstance(tres_out, list):
+        msg = "The number of input frequencies must match number of models!"
+        assert len(tres_out) == len(mod), msg
+        tres_dd = {m: tr for m, tr in zip(mod, tres_out)}
+    elif isinstance(tres_out, str):
+        tres_dd = {m: tres_out for m in mod}
+    else:
+        msg = (f"Unknown format on time frequency: {tres_out}. "
+               f"Should be either string or list.")
+        raise ValueError(msg)
+
+    tres_dd.update({'plot tres': plot_tres})
+
+    # Obs
+    if obs[0] is not None:
+        if tres_out_obs is None:
+            tres_out_o = cdict['variables'][v]['obs freq']
+            if isinstance(tres_out_o, list):
+                msg = ("The number of input frequencies must match "
+                       "number of observations!")
+                assert len(tres_out_o) == len(obslist), msg
+                tres_dd.update({o: tr for o, tr in zip(obslist, tres_out_o)})
+            elif isinstance(tres_out_o, str):
+                tres_dd.update({o: tres_out_o for o in obslist})
+            else:
+                msg = (f"Unknown format on obs time frequency: {tres_out_o}. "
+                       f"Should be either string or list.")
+                raise ValueError(msg)
+        else:
+            tres_dd.update({o: tres_out_obs for o in obslist})
+
+    return tres_dd
+
+
 def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
                   img_outdir, stat_outdir, stat):
     """
@@ -863,7 +926,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     # Create dictionaries with list of files for models and obs
     _fm_list = {stat: [glob.glob(os.path.join(
         stat_outdir, '{}'.format(st), '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-            m, stnm, var, thrstr, tres, tstat, grdnme, yrs_d[m][0],
+            m, stnm, var, thrstr, tres[m], tstat, grdnme, yrs_d[m][0],
             yrs_d[m][1], get_month_string(mon_d[m])))) for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
 
@@ -872,7 +935,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         _fo_list = {stat: [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-                o, stnm, var, thrstr, tres, tstat, grdnme,
+                o, stnm, var, thrstr, tres[o], tstat, grdnme,
                 yrs_d[o][0], yrs_d[o][1], get_month_string(mon_d[o]))))
             for o in obs_list]}
         fo_list = {s: [y for x in ll for y in x] for s, ll in _fo_list.items()}
@@ -893,7 +956,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         'models': models,
         'observation': obs,
         'variable': var,
-        'time res': tres,
+        'time res': tres['plot tres'],
         'stat method': tstat,
         'units': vconf['units'],
         'grid coords': grid_coords,
@@ -913,8 +976,8 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         _fm_listr = {stat: {r:  [glob.glob(os.path.join(
             stat_outdir, '{}'.format(st),
             '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                m, stnm, var, thrstr, tres, tstat, r.replace(' ', '_'), grdnme,
-                yrs_d[m][0], yrs_d[m][1], get_month_string(mon_d[m]))))
+                m, stnm, var, thrstr, tres[m], tstat, r.replace(' ', '_'),
+                grdnme, yrs_d[m][0], yrs_d[m][1], get_month_string(mon_d[m]))))
             for m in models] for r in cdict['regions']}}
         fm_listr = {s: {r: [y for x in _fm_listr[s][r] for y in x]
                         for r in _fm_listr[s]} for s in _fm_listr}
@@ -922,7 +985,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
             _fo_listr = {stat: {r: [glob.glob(os.path.join(
                 stat_outdir, '{}'.format(st),
                 '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                    o, stnm, var, thrstr, tres, tstat, r.replace(' ', '_'),
+                    o, stnm, var, thrstr, tres[o], tstat, r.replace(' ', '_'),
                     grdnme, yrs_d[o][0], yrs_d[o][1],
                     get_month_string(mon_d[o])))) for o in obs_list]
                 for r in cdict['regions']}}
@@ -1008,7 +1071,9 @@ for var in cdict['variables']:
     data_dict[var] = {}
     var_conf = get_variable_config(cdict['variables'][var], var)
 
-    tres = cdict['variables'][var]['freq']
+    _tres = cdict['variables'][var]['freq']
+    tres = ([_tres]*len(cdict['models'].keys())
+            if not isinstance(_tres, list) else _tres)
     print("\n\tvariable: {}  |  input resolution: {}".format(var, tres))
 
     grid_coords['meta data'][var] = {}
@@ -1029,14 +1094,18 @@ for var in cdict['variables']:
             data_dict[var][oname] = obs_data
 
     mod_names = []
-    mod_scf = var_conf['scale factor']
-    mod_scf = ([mod_scf]*len(cdict['models'].keys())
-               if not isinstance(mod_scf, list) else mod_scf)
-    for (mod_name, settings), scf in zip(cdict['models'].items(), mod_scf):
+    _mod_scf = var_conf['scale factor']
+    mod_scf = ([_mod_scf]*len(cdict['models'].keys())
+               if not isinstance(_mod_scf, list) else _mod_scf)
+    _deacc = var_conf['deacc']
+    deacc = ([_deacc]*len(cdict['models'].keys())
+             if not isinstance(_deacc, list) else _deacc)
+    for (mod_name, settings), tr, scf, dc\
+            in zip(cdict['models'].items(), tres, mod_scf, deacc):
         mod_names.append(mod_name)
         mod_data = get_mod_data(
-            mod_name, settings, tres, var, var_conf['var names'],
-            scf, var_conf['deacc'])
+            mod_name, settings, tr, var, var_conf['var names'],
+            scf, dc)
         data_dict[var][mod_name] = mod_data
 
         # Update grid information for plotting purposes
@@ -1117,6 +1186,12 @@ for stat in cdict['stats_conf']:
     tresstr[stat] = {}
     resample_res = cdict['stats_conf'][stat]['resample resolution']
     for v in stats_dict[stat]:
+        # Time resolution
+        obs = cdict['variables'][v]['obs']
+        obslist = [obs] if not isinstance(obs, list) else obs
+        tresstr[stat][v] = timeres_def(resample_res, cdict, v,
+                                       mod_names, obslist)
+        # Threshold
         thrlg = (('thr' in cdict['stats_conf'][stat]) and
                  (cdict['stats_conf'][stat]['thr'] is not None) and
                  (v in cdict['stats_conf'][stat]['thr']))
@@ -1125,33 +1200,17 @@ for stat in cdict['stats_conf']:
             thrstr = "thr{}_".format(thrval)
         else:
             thrstr = ''
-        if resample_res is not None:
-            if isinstance(resample_res, dict):
-                if v in resample_res:
-                    if resample_res[v][0] in ('select dates', 'select hours'):
-                        tresstr[stat][v] = resample_res[v][0].replace(' ', '_')
-                    else:
-                        tresstr[stat][v] = "_".join(resample_res[v])
-                else:
-                    tresstr[stat][v] = cdict['variables'][v]['freq']
-            else:
-                if resample_res[0] in ('select dates', 'select hours'):
-                    tresstr[stat][v] = resample_res[0].replace(' ', '_')
-                else:
-                    tresstr[stat][v] = "_".join(resample_res)
-        else:
-            tresstr[stat][v] = cdict['variables'][v]['freq']
+
+        # Grid name
         gridname = grid_coords['target grid'][v]['gridname']
 
         for m in stats_dict[stat][v]:
             print(f"\n\twriting {m.upper()} - {v} - {stat} to disk ...")
             time_suffix = get_month_string(month_dd[v][m])
-            st_data = stats_dict[stat][v][m]
-
-            save_to_disk(st_data, m, stat, stat_outdir, v, gridname,
-                         year_dd[v][m][0], year_dd[v][m][1], time_suffix,
-                         cdict['stats_conf'][stat], tresstr[stat][v], thrstr,
-                         cdict['regions'])
+            save_to_disk(stats_dict[stat][v][m], m, stat, stat_outdir, v,
+                         gridname, year_dd[v][m][0], year_dd[v][m][1],
+                         time_suffix, cdict['stats_conf'][stat],
+                         tresstr[stat][v][m], thrstr, cdict['regions'])
 
 
 ###############################################
