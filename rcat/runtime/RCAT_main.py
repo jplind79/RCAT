@@ -251,17 +251,28 @@ def resampling(data, v, tresample):
     """
     Resample data to chosen time frequency and resample method.
     """
-    if isinstance(tresample, dict):
-        for tr, val in tresample.items():
-            lval = val if isinstance(val, list) else [val]
-            if tr == 'select hours':
-                data = data.sel(time=np.isin(data['time.hour'], lval))
-            elif tr == 'select dates':
-                data = data.sel(time=lval)
-            else:
-                errmsg = (f"\t\t\nUnknown type of selection: {tr}!\n Only "
-                          f"'select hours' and 'select dates' are available.")
-                raise ValueError(errmsg)
+    # if isinstance(tresample, dict):
+    #     for tr, val in tresample.items():
+    #         lval = val if isinstance(val, list) else [val]
+    #         if tr == 'select hours':
+    #             data = data.sel(time=np.isin(data['time.hour'], lval))
+    #         elif tr == 'select dates':
+    #             data = data.sel(time=lval)
+    #         else:
+    #             errmsg = (f"\t\t\nUnknown type of selection: {tr}!\n Only "
+    #                      f"'select hours' and 'select dates' are available.")
+    #             raise ValueError(errmsg)
+    errmsg = (f"\t\t\nResample resolution argument must be a list of two "
+              f"items. Please re-check the configuration.")
+    assert len(tresample) == 2, errmsg
+
+    if tresample[0] in ('select hours', 'select dates'):
+        val = tresample[1]
+        lval = val if isinstance(val, list) else [val]
+        if tresample[0] == 'select hours':
+            data = data.sel(time=np.isin(data['time.hour'], lval))
+        else:
+            data = data.sel(time=lval)
     else:
         from pandas import to_timedelta
         diff = data.time.values[1] - data.time.values[0]
@@ -666,7 +677,17 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
         range(fyear, lyear+1), months)]
 
-    file_path = os.path.join(mconf['fpath'], f'{tres}/{var}/{var}_*.nc')
+    if vnames is not None:
+        if 'all' in vnames:
+            readvar = vnames['all']['prfx']
+        elif model in vnames:
+            readvar = vnames[model]['prfx']
+        else:
+            readvar = var
+    else:
+        readvar = var
+    file_path = os.path.join(mconf['fpath'],
+                             f'{tres}/{readvar}/{readvar}_*.nc')
     _flist = glob.glob(file_path)
 
     errmsg = (f"Could not find any files at specified location:\n{file_path} "
@@ -726,9 +747,11 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     if 'height' in mdata.dims:
         mdata = mdata.squeeze()
 
-    # Rename variable if not consistent with name in config_main.ini
+    # Rename variable if not consistent with name in configuration file
     if vnames is not None:
-        if model in vnames:
+        if 'all' in vnames:
+            mdata = mdata.rename({vnames['all']['vname']: var})
+        elif model in vnames:
             mdata = mdata.rename({vnames[model]['vname']: var})
 
     if cfactor is not None:
