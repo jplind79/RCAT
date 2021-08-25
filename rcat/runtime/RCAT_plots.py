@@ -248,7 +248,6 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         ref_obs = obslist[0]
         fobs = {o: xa.open_dataset(f) for o, f in zip(obslist, fo_list)}
         fobs_msk = {o: _mask_data(ds, var, mask) for o, ds in fobs.items()}
-
         dlist = [fobs_msk[ref_obs][var].values[i, :] for i in range(4)] +\
                 [fmod_msk[m][var].values[i, :] -
                  fobs_msk[ref_obs][var].values[i, :]

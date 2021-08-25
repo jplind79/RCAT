@@ -505,9 +505,10 @@ def save_to_disk(data, label, stat, odir, var, grid, sy, ey, tsuffix,
     #             var: {'dtype': 'float32', '_FillValue': 1.e20}
     #             }
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
-        _tstat = stat_dict['stat method'].partition(' ')[0]
-        tstat = '_' + re.sub(r'[^a-zA-Z0-9 \.\n]', '', _tstat).\
-                replace(' ', '_')
+        # _tstat = stat_dict['stat method'].partition(' ')[0]
+        # tstat = '_' + re.sub(r'[^a-zA-Z0-9 \.\n]', '', _tstat).\
+        #         replace(' ', '_')
+        tstat = '_' + stat_dict['stat method'].replace(' ', '')
     else:
         tstat = ''
     stat_name = stat.replace(' ', '_')
@@ -871,8 +872,10 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     else:
         stnm = st
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
+        # if 'percentile' in cdict['stats_conf'][stat]['stat method']:
+        #     tstat = '_percentile'
         tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(
-            ' ', '_')
+            ' ', '')
     else:
         tstat = ''
     thrlg = (('thr' in cdict['stats_conf'][stat]) and

@@ -309,11 +309,6 @@ def seasonal_cycle(data, var, stat, stat_config):
             thr = None
     else:
         thr = in_thr
-    # if 'percentile' in tstat:
-    #     q = float(tstat.split(' ')[1])
-    #     st_data = data[var].groupby('time.season').reduce(
-    #         _dask_percentile, dim='time', q=q, allow_lazy=True)
-    #     st_data = st_data.to_dataset()
     if 'percentile' in tstat:
         q = tstat.partition(' ')[2]
         errmsg = ("Make sure percentile(s) in stat method is given correctly; "
@@ -321,17 +316,14 @@ def seasonal_cycle(data, var, stat, stat_config):
         if not q:
             raise ValueError(errmsg)
         else:
-            q = [float(q)] if q.isdigit() else eval(q)
+            # q = [float(q)] if q.isdigit() else eval(q)
+            q = float(q)
         sc_pctls = xa.apply_ufunc(
             _percentile_func, data[var].groupby('time.season'),
-            input_core_dims=[['time']], output_core_dims=[['pctls']],
-            dask='parallelized',
-            dask_gufunc_kwargs={'output_sizes': {'pctls': len(q)}},
-            output_dtypes=[float],
+            input_core_dims=[['time']],
+            dask='parallelized', output_dtypes=[float],
             kwargs={'q': q, 'axis': -1, 'thr': thr})
-        dims = list(sc_pctls.dims)
-        st_data = sc_pctls.to_dataset().assign_coords({'pctls': q}).transpose(
-            'pctls', dims[0], dims[1], dims[2])
+        st_data = sc_pctls.to_dataset()
     else:
         st_data = eval("data.groupby('time.season').{}('time')".format(
             tstat))
@@ -363,17 +355,13 @@ def annual_cycle(data, var, stat, stat_config):
         if not q:
             raise ValueError(errmsg)
         else:
-            q = [float(q)] if q.isdigit() else eval(q)
+            q = float(q)
         ac_pctls = xa.apply_ufunc(
             _percentile_func, data[var].groupby('time.month'),
-            input_core_dims=[['time']], output_core_dims=[['pctls']],
-            dask='parallelized',
-            dask_gufunc_kwargs={'output_sizes': {'pctls': len(q)}},
-            output_dtypes=[float],
+            input_core_dims=[['time']],
+            dask='parallelized', output_dtypes=[float],
             kwargs={'q': q, 'axis': -1, 'thr': thr})
-        dims = list(ac_pctls.dims)
-        st_data = ac_pctls.to_dataset().assign_coords({'pctls': q}).transpose(
-            'pctls', 'month', dims[0], dims[1])
+        st_data = ac_pctls.to_dataset()
     else:
         st_data = eval("data.groupby('time.month').{}('time')".format(
             tstat))
@@ -416,22 +404,13 @@ def diurnal_cycle(data, var, stat, stat_config):
             if not q:
                 raise ValueError(errmsg)
             else:
-                q = [float(q)] if q.isdigit() else eval(q)
+                q = float(q)
             dc_pctls = xa.apply_ufunc(
                 _percentile_func, data[var].groupby('time.hour'),
-                input_core_dims=[['time']], output_core_dims=[['pctls']],
-                dask='parallelized',
-                dask_gufunc_kwargs={'output_sizes': {'pctls': len(q)}},
-                output_dtypes=[float],
+                input_core_dims=[['time']],
+                dask='parallelized', output_dtypes=[float],
                 kwargs={'q': q, 'axis': -1, 'thr': thr})
-            dims = list(dc_pctls.dims)
-            st_data = dc_pctls.to_dataset().assign_coords(
-                {'pctls': q}).transpose('pctls', 'hour', dims[0], dims[1])
-        # if 'percentile' in tstat:
-        #     q = float(tstat.split(' ')[1])
-        #     dcycle = data[var].groupby('time.hour').reduce(
-        #         _dask_percentile, dim='time', q=q, allow_lazy=True)
-        #     dcycle = dcycle.to_dataset()
+            dcycle = dc_pctls.to_dataset()
         elif 'pdf' in tstat:
             # Bins
             assert 'bins' in stat_config[stat]['method kwargs'],\
