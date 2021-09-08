@@ -189,27 +189,38 @@ def calc_statistics(data, var, stat, stat_config):
 
 
 def _check_hours(ds):
-    def _rounding(arr):
-        if np.any(arr.dt.minute > 0):
-            mod_time = [x.dt.ceil('H').values if x.dt.minute >= 30 else
-                        x.dt.floor('H').values for x in arr]
-            arr.values = mod_time
-        else:
-            pass
+    """
+    Checking time stamps for subdaily data
+    Hours in time stamps should be the right edge of interval if accumulated
+    or resampled data.
+    """
+    def _rounding(arr, offset=0):
+        mtime = [
+            x.dt.ceil('H').values + Hour(offset) if x.dt.minute >= 30 else
+            x.dt.floor('H').values + Hour(offset) for x in arr]
+        arr.values = mtime
         return arr
-    if np.any(ds.time.dt.minute > 0):
+
+    # Hour offsets
+    offset_dict = {12: 6, 6: 3, 3: 1, 1: 0}
+    _delta = ds['time.hour'].diff('time')
+    delta = _delta[_delta > 0].values[0]
+    hr_check = np.all(np.isin(ds['time.hour'], np.arange(0, 24, delta)))
+    if hr_check and not np.any(ds.time.dt.minute > 0):
+        pass
+    else:
+        from pandas.tseries.offsets import Hour
+        offset = offset_dict[delta]
         print("\t\t\tShifting time stamps to whole hours!\n")
+        # if np.any(ds.time.dt.minute > 0):
         if ds.time.size > 500:
             ds_time = xa.DataArray(
                 ds.time.values, dims="time").chunk(int(ds.time.size/100))
-            mod_time = ds_time.map_blocks(_rounding)
-            ds = ds.assign_coords({'time': mod_time.values})
+            mtime = ds_time.map_blocks(_rounding, kwargs={'offset': offset})
+            ds = ds.assign_coords({'time': mtime.values})
         else:
-            mod_time = [x.dt.ceil('H').values if x.dt.minute >= 30 else
-                        x.dt.floor('H').values for x in ds.time]
-            ds = ds.assign_coords({'time': mod_time})
-    else:
-        pass
+            mtime = _rounding(ds.time, offset=offset)
+            ds = ds.assign_coords({'time': mtime})
     return ds
 
 
@@ -265,21 +276,21 @@ def moments(data, var, stat, stat_config):
         st_data.attrs['Description'] =\
             f"Moment statistic: No statistics applied | Threshold: {thr}"
     else:
-        diff = data.time.values[1] - data.time.values[0]
-        nsec = to_timedelta(diff).total_seconds()
-        tr, fr = _get_freq(mstat[0])
-        sec_resample = to_timedelta(tr, fr).total_seconds()
-        # Resample expression
-        res_kw = stat_config[stat]['moment resample kwargs']
-        if res_kw is None:
-            expr = (f"data[var].resample(time='{mstat[0]}')"
-                    f".{mstat[1]}('time').dropna('time', 'all')")
-        else:
-            expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
-                    f".{mstat[1]}('time').dropna('time', 'all')")
         if mstat[0] == 'all':
             st_data = eval(f"data.{mstat[1]}(dim='time', skipna=True)")
         else:
+            # Resample expression
+            res_kw = stat_config[stat]['moment resample kwargs']
+            if res_kw is None:
+                expr = (f"data[var].resample(time='{mstat[0]}')"
+                        f".{mstat[1]}('time').dropna('time', 'all')")
+            else:
+                expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                        f".{mstat[1]}('time').dropna('time', 'all')")
+            diff = data.time.values[1] - data.time.values[0]
+            nsec = to_timedelta(diff).total_seconds()
+            tr, fr = _get_freq(mstat[0])
+            sec_resample = to_timedelta(tr, fr).total_seconds()
             if nsec >= sec_resample or mstat is None:
                 print("\t\t* Moment statistics:\n\t\tData already at the same "
                       "or coarser time resolution as selected resample "
