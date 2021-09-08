@@ -9,8 +9,9 @@ import glob
 import xarray as xa
 import xesmf as xe
 import pandas as pd
+from pandas import to_timedelta
+import datetime as dt
 from itertools import product
-# import dask.array as da
 import numpy as np
 import re
 from dask.distributed import Client
@@ -251,57 +252,70 @@ def resampling(data, v, tresample):
     """
     Resample data to chosen time frequency and resample method.
     """
-    if isinstance(tresample, dict):
-        for tr, val in tresample.items():
-            lval = val if isinstance(val, list) else [val]
-            if tr == 'select hours':
-                data = data.sel(time=np.isin(data['time.hour'], lval))
-            elif tr == 'select dates':
-                data = data.sel(time=lval)
-            else:
-                errmsg = (f"\t\t\nUnknown type of selection: {tr}!\n Only "
-                          f"'select hours' and 'select dates' are available.")
-                raise ValueError(errmsg)
+    errmsg = (f"\t\t\nResample resolution argument must be a list of two "
+              f"items. Please re-check the configuration.")
+    assert len(tresample) == 2, errmsg
+
+    if tresample[0] in ('select hours', 'select dates'):
+        val = tresample[1]
+        lval = val if isinstance(val, list) else [val]
+        if tresample[0] == 'select hours':
+            data = data.sel(time=np.isin(data['time.hour'], lval))
+        else:
+            data = data.sel(time=lval)
     else:
-        from pandas import to_timedelta
         diff = data.time.values[1] - data.time.values[0]
         nsec = to_timedelta(diff).total_seconds()
         tr, fr = _get_freq(tresample[0])
         sec_resample = to_timedelta(tr, fr).total_seconds()
         if nsec != sec_resample:
-            data = eval("data.resample(time='{}').{}('time').\
-                          dropna('time', 'all')".format(
-                              tresample[0], tresample[1]))
+            if sec_resample < 24*3600:
+                data = eval(
+                    f"data.resample(time='{tresample[0]}', "
+                    f"label='right', closed='right').{tresample[1]}('time')."
+                    f"dropna('time', 'all')")
+                # EDIT Petter 210608: Should the time stamp be set to midpoint?
+                data['time'] = data.time - np.timedelta64(
+                    dt.timedelta(seconds=np.round(sec_resample/2)))
+            else:
+                data = eval(f"data.resample(time='{tresample[0]}')."
+                            f"{tresample[1]}('time').dropna('time', 'all')")
         else:
             print("\t\tData is already at target resolution, skipping "
                   "resampling ...\n")
     return data
 
 
-def conditional_data(dd_condition, cond_var, cond_data, indata):
+def conditional_data(dd_condition, cond_var, cond_data, indata, in_var):
     """
     Sub-select data conditional on other data
     """
     import operator
 
+    def _percentile_func(arr, axis=0, q=95, thr=None):
+        if thr is not None:
+            arr[arr < thr] = np.nan
+        pctl = np.nanpercentile(arr, axis=axis, q=q)
+        if axis == -1 and pctl.ndim > 2:
+            pctl = np.moveaxis(pctl, 0, -1)
+        return pctl
+
+    def _get_cond_mask(darr, relate, q, expand=None, axis=0):
+        mask = ops[relate](darr, q)
+        if expand is not None:
+            mask = np.repeat(mask, expand, axis=axis)
+
+        return mask
+
+    # Relational operators
     ops = {'>': operator.gt,
            '<': operator.lt,
            '>=': operator.ge,
            '<=': operator.le,
            '=': operator.eq}
 
-    def _get_cond_mask(darr, thr_type, relate, q, expand=None, axis=0):
-        if thr_type == 'percentile':
-            mask = np.apply_along_axis(
-                lambda x: ops[relate](x, np.percentile(x, q=q)),
-                axis=axis, arr=darr)
-        elif thr_type == 'static':
-            mask = np.apply_along_axis(lambda x: ops[relate](x, q),
-                                       axis=axis, arr=darr)
-        if expand is not None:
-            mask = np.repeat(mask, expand, axis=axis)
-
-        return mask
+    # Number of time steps in input data
+    ts = indata.time.size
 
     # Resample data
     if 'resample resolution' in dd_condition:
@@ -313,10 +327,10 @@ def conditional_data(dd_condition, cond_var, cond_data, indata):
     if len(cond_data.chunks['time']) > 1:
         cond_data = manage_chunks(cond_data, 'space')
 
-    # Type of conditional
+    # Type of conditional: from file, static value or percentile
     cond_type = dd_condition['type']
 
-    # Logical operator for conditional selection
+    # Get relational operator for conditional selection
     relate = dd_condition['operator']
 
     if cond_type == 'file':
@@ -328,21 +342,26 @@ def conditional_data(dd_condition, cond_var, cond_data, indata):
     else:
         q = float(dd_condition['value'])
 
-        if cond_data.time.size != indata.time.size:
-            expand = indata.time.size/cond_data.time.size
+        if cond_data.time.size != ts:
+            expand = ts/cond_data.time.size
         else:
             expand = None
-
-        _mask = xa.apply_ufunc(
-            _get_cond_mask, cond_data[cond_var], input_core_dims=[['time']],
-            output_core_dims=[['time']], dask='parallelized',
-            output_dtypes=[float], exclude_dims={'time'},
-            dask_gufunc_kwargs={'output_sizes': {'time': indata.time.size}},
-            kwargs={'thr_type': cond_type, 'relate': relate, 'q': q,
-                    'expand': expand, 'axis': -1})
-        dims = list(_mask.dims)
-        mask = _mask.transpose(dims[-1], dims[0], dims[1])
-        sub_data = indata.where(mask)
+        if cond_type == 'static':
+            mask = xa.apply_ufunc(
+                _get_cond_mask, cond_data[cond_var], input_core_dims=[[]],
+                output_core_dims=[[]], dask='parallelized',
+                output_dtypes=[float], kwargs={
+                    'relate': relate, 'q': q, 'expand': expand, 'axis': -1})
+            sub_data = indata[in_var].where(mask.data).to_dataset()
+        elif cond_type == 'percentile':
+            pctl = xa.apply_ufunc(
+                _percentile_func, cond_data[cond_var],
+                input_core_dims=[['time']], output_core_dims=[[]],
+                dask='parallelized', output_dtypes=[float],
+                kwargs={'q': q, 'axis': -1})
+            sub_data = indata.where(ops[relate](indata, pctl))
+        else:
+            raise ValueError(f"Unknown conditional selec type:\t{cond_type}")
 
     return sub_data
 
@@ -379,10 +398,6 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
                         print("\t\tResampling input data ...\n")
                         indata = resampling(indata, v, resample_args)
 
-                # Check chunking of data
-                data = manage_chunks(indata, chunk_dim)
-                # print(f"Chunks of {m}: {data.chunks}")
-
                 # Conditional analysis; sample data according to condition
                 # (static threshold,  percentile or from file).
                 if stats_config[stat]['cond analysis'] is not None:
@@ -400,9 +415,13 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
 
                         # Extract sub selection of data
                         sub_data = conditional_data(cond_calc, cond_var,
-                                                    cond_data, indata)
-
+                                                    cond_data, indata, v)
+                        # Check chunking of data
                         data = manage_chunks(sub_data, chunk_dim)
+                    else:
+                        data = manage_chunks(indata, chunk_dim)
+                else:
+                    data = manage_chunks(indata, chunk_dim)
 
                 # Calculate stats
                 st_data[v][m]['domain'] = st.calc_statistics(data, v, stat,
@@ -555,7 +574,7 @@ def get_masked_data(data, var, mask):
     #     {var: (['time', 'y', 'x'],  mask_data)},
     #     coords={'lon': (lon_d, mask[1]), 'lat': (lat_d, mask[2]),
     #             'time': data.time.values})
-    # return out
+    # return out_mdata
 
 
 def manage_chunks(data, chunk_dim):
@@ -565,6 +584,8 @@ def manage_chunks(data, chunk_dim):
     xd, yd = _space_dim(data)
     xsize = data[xd].size
     ysize = data[yd].size
+
+    data = data.unify_chunks()
 
     # Rule of thumb: chunk size should at least be 1e6 elements
     # http://xarray.pydata.org/en/stable/dask.html#chunking-and-performance
@@ -667,7 +688,17 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
         range(fyear, lyear+1), months)]
 
-    file_path = os.path.join(mconf['fpath'], f'{tres}/{var}/{var}_*.nc')
+    if vnames is not None:
+        if 'all' in vnames:
+            readvar = vnames['all']['prfx']
+        elif model in vnames:
+            readvar = vnames[model]['prfx']
+        else:
+            readvar = var
+    else:
+        readvar = var
+    file_path = os.path.join(mconf['fpath'],
+                             f'{tres}/{readvar}/{readvar}_*.nc')
     _flist = glob.glob(file_path)
 
     errmsg = (f"Could not find any files at specified location:\n{file_path} "
@@ -699,12 +730,22 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
             concat_dim='time', combine='by_coords', compat='override',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time')))
+        # if ch_t['time'] == -1:
+        #     _mdata = _mdata.chunk({'time': -1}).unify_chunks()
+
+        # Modify time stamps to mid-point
+        diff = _mdata.time.values[1] - _mdata.time.values[0]
+        nsec = to_timedelta(diff).total_seconds()
+        _mdata['time'] = _mdata.time -\
+            np.timedelta64(dt.timedelta(seconds=np.round(nsec/2)))
     else:
         _mdata = xa.open_mfdataset(
             flist, parallel=True,  # engine='h5netcdf',
             data_vars='minimal', coords='minimal',
             concat_dim='time', combine='by_coords', compat='override',
             chunks={**ch_t, **ch_x, **ch_y})
+        # if ch_t['time'] == -1:
+        #     _mdata = _mdata.chunk({'time': -1}).unify_chunks()
 
     # Time stamps
     if 'units' in _mdata.time.attrs:
@@ -727,9 +768,11 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     if 'height' in mdata.dims:
         mdata = mdata.squeeze()
 
-    # Rename variable if not consistent with name in config_main.ini
+    # Rename variable if not consistent with name in configuration file
     if vnames is not None:
-        if model in vnames:
+        if 'all' in vnames:
+            mdata = mdata.rename({vnames['all']['vname']: var})
+        elif model in vnames:
             mdata = mdata.rename({vnames[model]['vname']: var})
 
     if cfactor is not None:
@@ -1074,7 +1117,8 @@ for var in cdict['variables']:
     _tres = cdict['variables'][var]['freq']
     tres = ([_tres]*len(cdict['models'].keys())
             if not isinstance(_tres, list) else _tres)
-    print("\n\tvariable: {}  |  input resolution: {}".format(var, tres))
+    ptres = ', '.join(np.unique(tres))
+    print(f"\n\tvariable: {var}  |  input resolution: {ptres}")
 
     grid_coords['meta data'][var] = {}
     grid_coords['target grid'][var] = {}

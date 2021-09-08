@@ -305,6 +305,10 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     clevs_rel = get_clevs(np.array(dlist[4:8]), centered=True)
     clevs = [clevs_abs]*4 + [clevs_rel]*ndata*4
 
+    # TBD: Try to find appropriate formatting for color bar
+    # cb_fmt_abs = [str(f)[::-1].find('.') for f in clevs_abs]
+    # cb_fmt_rel = [str(f)[::-1].find('.') for f in clevs_rel]
+
     rpl.figure_init(plottype='map')
 
     if var == 'psl':
