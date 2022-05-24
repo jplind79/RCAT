@@ -206,6 +206,28 @@ def obs_data():
     },
 
     # ------------------------------------------------------------------------
+    # Surface wind speed
+    'sfcWind': {
+        'ERA5': {
+            'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
+            'file pattern': 'sfcWind_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+        'EOBS25': {
+            'path': '/nobackup/rossby20/sm_petli/data/EOBS/EOBS25/day',
+            'file pattern': 'sfcWind_EOBS25_ens_mean_0.1deg_reg_v25.0e_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Daily maximum Surface wind speed
+    'sfcWindmax': {
+        'ERA5': {
+            'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
+            'file pattern': 'sfcWindmax_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+    },
+
+    # ------------------------------------------------------------------------
     # Long-wave down-welling radiation
     'rlds': {
         'ERA5': {
