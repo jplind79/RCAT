@@ -376,7 +376,8 @@ def create_polygon():
     return poly
 
 
-def plot_polygon(polygon, map_resolution='l', savefig=False, figpath=None):
+def plot_polygon(polygon, map_resolution='l', map_proj='stere',
+                 savefig=False, figpath=None):
     """
     Plot polygon on map.
 
@@ -433,7 +434,7 @@ def plot_polygon(polygon, map_resolution='l', savefig=False, figpath=None):
     fig = plt.figure(figsize=[12, 13])
     ax = fig.add_subplot(111)
 
-    mm = Basemap(resolution=map_resolution, projection='stere', ellps='WGS84',
+    mm = Basemap(resolution=map_resolution, projection=map_proj, ellps='WGS84',
                  lon_0=lon_0, lat_0=lat_0,
                  llcrnrlon=min(lons)-lon_incr, llcrnrlat=min(lats)-lat_incr,
                  urcrnrlon=max(lons)+lon_incr, urcrnrlat=max(lats)+lat_incr,
@@ -555,6 +556,9 @@ if __name__ == "__main__":
     parser.add_argument('--area', '-a', metavar='POLYGON', type=str,
                         help=('If purpose is to plot, this is the name of '
                               'polygon to be plotted'))
+    parser.add_argument('--proj', metavar='MAP PROJECTION',
+                        type=str, default='stere',
+                        help=('The map projection to use if plotting polygon'))
     parser.add_argument('--resolution', '-r', metavar='MAP_RESOLUTION',
                         default='l', type=str,
                         help=(
@@ -584,7 +588,8 @@ if __name__ == "__main__":
         errmsg = ("\n\tWhen plotting polygon, polygon name must be provided")
         assert area is not None, errmsg
 
-        plot_polygon(area, args.resolution, args.save, args.figpath)
+        mproj = args.proj
+        plot_polygon(area, args.resolution, mproj, args.save, args.figpath)
     elif args.purpose == 'printareas':
         polygons(poly_print=True)
     else:
