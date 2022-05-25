@@ -204,12 +204,8 @@ def _check_hours(ds):
     Hours in time stamps should be the right edge of interval if accumulated
     or resampled data.
     """
-    def _rounding(arr, offset=0):
-        mtime = [
-            x.dt.ceil('H').values + Hour(offset) if x.dt.minute >= 30 else
-            x.dt.floor('H').values + Hour(offset) for x in arr]
-        arr.values = mtime
-        return arr
+    # Round to nearest minute
+    ds['time'] = ds.indexes['time'].round('min')
 
     # Hour offsets
     offset_dict = {12: 6, 6: 3, 3: 1, 1: 0}
@@ -219,18 +215,11 @@ def _check_hours(ds):
     if hr_check and not np.any(ds.time.dt.minute > 0):
         pass
     else:
-        from pandas.tseries.offsets import Hour
         offset = offset_dict[delta]
         print("\t\t\tShifting time stamps to whole hours!\n")
-        # if np.any(ds.time.dt.minute > 0):
-        if ds.time.size > 500:
-            ds_time = xa.DataArray(
-                ds.time.values, dims="time").chunk(int(ds.time.size/100))
-            mtime = ds_time.map_blocks(_rounding, kwargs={'offset': offset})
-            ds = ds.assign_coords({'time': mtime.values})
-        else:
-            mtime = _rounding(ds.time, offset=offset)
-            ds = ds.assign_coords({'time': mtime})
+        hbool = np.all(ds.indexes['time'].minute >= 30)
+        ds['time'] = ds.indexes['time'].ceil('H').shift(offset, 'H') if hbool\
+            else ds.indexes['time'].floor('H').shift(offset, 'H')
     return ds
 
 
