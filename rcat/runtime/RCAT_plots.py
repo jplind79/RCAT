@@ -311,14 +311,14 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
     rpl.figure_init(plottype='map')
 
-    if var == 'psl':
-        map_kw = map_grid.copy()
-        map_kw.update({'cbar_mode': None})
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_kw)
-    else:
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_grid)
+    # if var == 'psl':
+    #     map_kw = map_grid.copy()
+    #     map_kw.update({'cbar_mode': None})
+    #     fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
+    #                                      **map_kw)
+    # else:
+    fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
+                                     **map_grid)
 
     lts = grid_coords['target grid'][var]['lat'][tgname]
     lns = grid_coords['target grid'][var]['lon'][tgname]
@@ -331,21 +331,21 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
 
     # Add contour plot if mslp
-    if var == 'psl':
-        lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
-                               filled=False, colors='#4f5254', linewidths=2.3)
-        # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
-        cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
-                          inline_spacing=24) for mplot, cl in zip(lp, clevs)]
-        [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
-          for txt in cl] for cl in cls]
+    # if var == 'psl':
+    #     lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
+    #                            filled=False, colors='#4f5254', linewidths=2.3)
+    #     # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
+    #     cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
+    #                       inline_spacing=24) for mplot, cl in zip(lp, clevs)]
+    #     [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
+    #       for txt in cl] for cl in cls]
 
     # Map settings
-    rpl.map_axes_settings(fig, grid, fontsize='large', headtitle=headtitle,
+    rpl.map_axes_settings(fig, grid, headtitle=headtitle,
                           time_mean='season')
 
     # Annotate
-    [ax.text(-0.05, 0.5, ft.upper(), size='large', va='center', ha='center',
+    [ax.text(-0.05, 0.5, ft.upper(), va='center', ha='center',
              rotation=90, transform=ax.transAxes)
      for ft, ax in zip(ftitles, [grid[i]
                                  for i in [p*4 for p in range(ndata+1)]])]
@@ -1005,7 +1005,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     for reg in regions:
 
         fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_listr[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values*100, axis=(1, 2))[1:]
+        mod_ann = {m: np.nanmean(fmod[m][var].values*100, axis=(1, 2))
                    for m in models}
         bins = fmod[ref_model].bin_edges.values[1:]
         nbins = bins.size
@@ -1016,7 +1016,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             obslbl = "_".join(s for s in obslist)
             fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                           fo_listr[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values*100, axis=(1, 2))[1:]
+            obs_ann = {o: np.nanmean(fobs[o][var].values*100, axis=(1, 2))
                        for o in obslist}
             dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
                      [mod_ann[m] - obs_ann[ref_obs] for m in models]]
@@ -1070,8 +1070,8 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         ylim = [None]*2
         xlabel = ['({})'.format(units)]*2
         xlim = [[-.5, nbins-.5]]*2
-        xticks = range(nbins-1)[::6]
-        xtlbls = bins[:-1][::6]
+        xticks = range(nbins)[::6]
+        xtlbls = bins[::6]
 
         rpl.figure_init(plottype='line')
         fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
