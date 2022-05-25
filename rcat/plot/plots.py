@@ -251,9 +251,9 @@ def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
         map_label(laxs, ["{:02d} Z".format(h) for h in time_units])
 
 
-def make_scatter_plot(grid, xdata, ydata, sdata=None, colors=None,
-                      lbl_fontsize='large', axis_type='linear',
-                      labels=None, **sc_kwargs):
+def make_scatter_plot(grid, xdata, ydata, sdata=None, fcolors=None,
+                      ecolors=None, lbl_fontsize='large',
+                      axis_type='linear', labels=None, **sc_kwargs):
     """
     Create a scatter plot
 
@@ -263,11 +263,18 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, colors=None,
             returned from the 'fig_grid_setup' function
         xdata/ydata: Array/list
             1D array or list of 1D arrays with data for x/y axis
-        colors: array/list
-            List of colors ot be used for each data set in input data. This is
+        fcolors: array/list
+            List of colors to be used for each data set in input data. This is
             separate from 'color'/'c' option available from matplotlib.scatter
             call (and set in sc_kwargs) where all individual input data sets
-            will have that color/s.
+            will have that specific color/s. If set, then
+            ecolors need also be supplied.
+        ecolors: array/list
+            List of edge colors to be used for each data set in input data.
+            This is separate from 'edgecolors'/'ec' option available from
+            matplotlib.scatter call (and set in sc_kwargs) where all individual
+            input data sets will have that specific color/s. If set, then
+            fcolors need also be supplied.
         lbl_fontsize: string/float
             Fontsize for legend labels
         axis_type: str
@@ -285,6 +292,14 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, colors=None,
             The axes objects created for each plot
     """
 
+    # Check that necessary color settings are supplied
+    if ecolors is not None:
+        errmsg = "If edgecolors (ecolors) is set, so must also fcolors!"
+        assert fcolors is not None, errmsg
+    if fcolors is not None:
+        errmsg = "If facecolors (fcolors) is set, so must also ecolors!"
+        assert ecolors is not None, errmsg
+
     if labels is not None:
         dlabels = [[labels]] if not isinstance(labels,
                                                (list, tuple)) else [labels]
@@ -296,20 +311,23 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, colors=None,
         if sdata is not None:
             sd = [sdata] if isinstance(
                 sdata[0], (list, tuple, np.ndarray)) else [[sdata]]
-        if colors is not None:
-            lcls = [colors] if isinstance(
-                colors, (list, tuple, np.ndarray)) else [[colors]]
+        if fcolors is not None:
+            fcls = [fcolors] if isinstance(
+                fcolors, (list, tuple, np.ndarray)) else [[fcolors]]
+            ecls = [ecolors] if isinstance(
+                ecolors, (list, tuple, np.ndarray)) else [[ecolors]]
 
         axs = []
         for i, ax in enumerate(grid):
-            if colors is not None:
+            if fcolors is not None:
                 if sdata is not None:
-                    pts = [ax.scatter(xx, yy, c=cc, s=ss, **sc_kwargs)
-                           for xx, yy, cc, ss in zip(xd[i], yd[i],
-                                                     lcls, sd[i])]
+                    pts = [ax.scatter(xx, yy, c=cc, ec=ec, s=ss, **sc_kwargs)
+                           for xx, yy, cc, ec, ss in zip(
+                               xd[i], yd[i], fcls[i], ecls[i], sd[i])]
                 else:
-                    pts = [ax.scatter(xx, yy, c=cc, **sc_kwargs)
-                           for xx, yy, cc in zip(xd[i], yd[i], lcls[i])]
+                    pts = [ax.scatter(xx, yy, c=cc, ec=ec, **sc_kwargs)
+                           for xx, yy, cc, ec in zip(
+                               xd[i], yd[i], fcls[i], ecls[i])]
             else:
                 if sdata is not None:
                     pts = [ax.scatter(xx, yy, s=ss, **sc_kwargs)
@@ -341,23 +359,27 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, colors=None,
             msg = """*** ERROR *** \n Labels must be in a list when """
             """multiple figures"""
             assert isinstance(labels, list), msg
-        if colors is not None:
-            lcls = colors if isinstance(
-                colors, (list, tuple, np.ndarray)) else [colors]
+        if fcolors is not None:
+            fcls = fcolors if isinstance(
+                fcolors, (list, tuple, np.ndarray)) else [fcolors]
+            ecls = ecolors if isinstance(
+                ecolors, (list, tuple, np.ndarray)) else [ecolors]
 
         axs = []
         for i, ax in enumerate(grid):
             xd = xdata[i]
             yd = ydata[i]
             if isinstance(yd[0], (list, tuple, np.ndarray)):
-                if colors is not None:
+                if fcolors is not None:
                     if sdata is not None:
-                        pts = [ax.scatter(xx, yy, s=ss, c=cc, **sc_kwargs)
-                               for xx, yy, ss, cc in zip(xd, yd,
-                                                         sdata[i], lcls[i])]
+                        pts = [ax.scatter(xx, yy, s=ss, c=cc, ec=ec,
+                                          **sc_kwargs)
+                               for xx, yy, ss, cc, ec in zip(
+                                   xd, yd, sdata[i], fcls[i], ecls[i])]
                     else:
-                        pts = [ax.scatter(xx, yy, c=cc, **sc_kwargs)
-                               for xx, yy, cc in zip(xd, yd, lcls[i])]
+                        pts = [ax.scatter(xx, yy, c=cc, ec=ec, **sc_kwargs)
+                               for xx, yy, cc, ec in zip(
+                                   xd, yd, fcls[i], ecls[i])]
                 else:
                     if sdata is not None:
                         pts = [ax.scatter(xx, yy, s=ss, **sc_kwargs)
@@ -376,12 +398,13 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, colors=None,
                     ax.axhline(color='k', lw=1, ls='--', alpha=.5)
 
             else:
-                if colors is not None:
+                if fcolors is not None:
                     if sdata is not None:
-                        pts = ax.scatter(xd, yd, s=sdata[i], c=lcls[i],
-                                         **sc_kwargs)
+                        pts = ax.scatter(xd, yd, s=sdata[i], c=fcls[i],
+                                         ec=ecls[i], **sc_kwargs)
                     else:
-                        pts = ax.scatter(xd, yd, c=lcls[i], **sc_kwargs)
+                        pts = ax.scatter(xd, yd, c=fcls[i], ec=ecls[i],
+                                         **sc_kwargs)
                 else:
                     if sdata is not None:
                         pts = ax.scatter(xd, yd, s=sdata[i], **sc_kwargs)
