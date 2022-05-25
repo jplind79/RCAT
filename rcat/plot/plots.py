@@ -738,22 +738,22 @@ def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
     """
 
     nsubgroups = np.array([len(v) for v in data.values()], dtype=object)
-    assert len(np.unique(nsubgroups)) == 1,\
-        "\n{}\n".format("Number of subgroups for each property "
-                        "differ!")
-    nsubgroups = nsubgroups[0]
+    # assert len(np.unique(nsubgroups)) == 1,\
+    #     "\n{}\n".format("Number of subgroups for each property "
+    #                     "differ!")
+    # nsubgroups = nsubgroups[0]
 
     bps = []
     cpos = 1
     label_pos = []
-    for k in data:
+    for k, ngrp in zip(data, nsubgroups):
         d = data[k]
-        pos = np.arange(nsubgroups) + cpos
+        pos = np.arange(ngrp) + cpos
         label_pos.append(pos.mean())
         bp = ax.boxplot(d, positions=pos, widths=box_width, patch_artist=True,
                         **box_kwargs)
         _decorate_box(ax, bp, colors=box_colors)
-        cpos += nsubgroups + box_spacing
+        cpos += ngrp + box_spacing
         bps.append(bp)
     if 'vert' in box_kwargs:
         if box_kwargs['vert'] is False:
@@ -934,7 +934,7 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
 
     from mpl_toolkits.basemap import Basemap
 
-    def _get_mapobj(ax, lats, lons):
+    def _get_mapobj(ax, lats, lons, _lon0, _lat0, lat1):
         # Make sure lons are +/- 180 deg.
         if lons.max() > 180:
             lons[lons > 180] -= 360.
@@ -945,8 +945,8 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
 
         # Calculate domain mid point if not given
         idx = tuple([np.int(i/2) for i in lat.shape])
-        lat0 = lat[idx] if lat_0 is None else lat_0
-        lon0 = lon[idx] if lon_0 is None else lon_0
+        lat0 = lat[idx] if _lat0 is None else _lat0
+        lon0 = lon[idx] if _lon0 is None else _lon0
 
         if zoom == 'crnrs':
             if crnr_vals is None:
@@ -959,7 +959,7 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
             correctly.\nSet to [width/height] in meters, and try again.'''
 
         m = Basemap(projection=proj, ax=ax,
-                    lat_0=lat0, lon_0=lon0, lat_1=lat_1,
+                    lat_0=lat0, lon_0=lon0, lat_1=lat1,
                     width=zoom_geom[0], height=zoom_geom[1],
                     llcrnrlat=(corners[0]), urcrnrlat=(corners[2]),
                     llcrnrlon=(corners[1]), urcrnrlon=(corners[3]),
@@ -967,9 +967,12 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
                     **mkwargs)
         return m, m(lon, lat)
 
+    ngrid = grid.ngrids
+
     if isinstance(lats, list):
-        if len(lats) != grid.ngrids:
+        if len(lats) != ngrid:
             grid = grid[:len(lats)]
+            ngrid = len(grid)
             print("\n{}\n{}\n\n".format(
                 "***** WARNING *****",
                 "Number of lat/lon arrays provided does not "
@@ -979,11 +982,21 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
         llats = lats
         llons = lons
     else:
-        llats = [lats]*grid.ngrids
-        llons = [lons]*grid.ngrids
+        llats = [lats]*ngrid
+        llons = [lons]*ngrid
 
-    ms, crds = zip(*[_get_mapobj(ax, llats[i], llons[i]) for i, ax in
-                     enumerate(grid)])
+    # Lat 0/1, Lon 0
+    llon0 = lon_0 if isinstance(lon_0, list) else [lon_0]*ngrid
+    llat0 = lat_0 if isinstance(lat_0, list) else [lat_0]*ngrid
+    if proj == 'lcc':
+        _llat1 = lat_1 if isinstance(lat_1, list) else [lat_1]*ngrid
+        llat1 = np.copy(llat0) if np.isin(None, _llat1) else _llat1
+    else:
+        llat1 = [None]*ngrid
+
+    ms, crds = zip(*[
+        _get_mapobj(ax, llats[i], llons[i], llon0[i], llat0[i], llat1[i])
+                     for i, ax in enumerate(grid)])
     m_arr, coords = (ms[0], crds[0]) if len(grid) == 1 else (ms, crds)
 
     return m_arr, coords
@@ -1167,6 +1180,15 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
         cs: Contour plot object
     """
 
+    try:
+        m.drawcountries(linewidth=1.0, color="#272727")
+    except ValueError:
+        pass
+    try:
+        m.drawcoastlines(linewidth=1.2, color='#1c1c1c')
+    except ValueError:
+        pass
+
     if mesh:
         cs = m.pcolormesh(x, y, data,
                           cmap=cmap,
@@ -1192,15 +1214,6 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
                                norm=norm,
                                levels=clevs,
                                **map_kwargs)
-
-    try:
-        m.drawcountries(linewidth=.7, color="#424242")
-    except ValueError:
-        pass
-    try:
-        m.drawcoastlines(linewidth=1.0, color='#383838')
-    except ValueError:
-        pass
 
     return cs
 
