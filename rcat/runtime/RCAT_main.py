@@ -104,13 +104,13 @@ def get_args():
     return parser.parse_args()
 
 
-def get_grid_coords(nc, grid_coords):
+def get_grid_coords(ds, grid_coords):
     """
     Read model grid coordinates
 
     Parameters
     ----------
-    nc: xarray dataset
+    ds: xarray dataset
     Returns
     -------
     grid_coords: dict
@@ -124,8 +124,9 @@ def get_grid_coords(nc, grid_coords):
         return list(zip(lons_p, lats_p))
 
     # If lon/lat is 1D; create 2D meshgrid
-    lons = nc.lon.values
-    lats = nc.lat.values
+    xd, yd = _space_coords(ds)
+    lons = ds[xd].values
+    lats = ds[yd].values
     lon, lat = np.meshgrid(lons, lats)\
         if lats.ndim == 1 else (lons, lats)
 
@@ -412,7 +413,6 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
                         else:
                             # assert vcond in st_data, msg.format(vcond, v)
                             cond_data = ddict[cond_var][m]['data']
-
                         # Extract sub selection of data
                         sub_data = conditional_data(cond_calc, cond_var,
                                                     cond_data, indata, v)
@@ -426,11 +426,11 @@ def calc_stats(ddict, vlist, stat, pool, chunk_dim, stats_config, regions):
                 # Calculate stats
                 st_data[v][m]['domain'] = st.calc_statistics(data, v, stat,
                                                              stats_config)
-
                 if regions:
+                    xd, yd = _space_coords(data)
                     masks = {
                         r: mask_region(
-                            data.lon.values, data.lat.values, r,
+                            data[xd].values, data[yd].values, r,
                             cut_data=False) for r in regions}
                     if pool:
                         mdata = {r: get_masked_data(data, v, masks[r])
@@ -491,14 +491,30 @@ def _space_dim(ds):
     """
     Return labels for space dimensions in data set.
 
-    Space dimensions in different observations have different names. This
+    Space dimensions in different data sets may have different names. This
     dictionary is created to account for that (to some extent), but in the
     future this might be change/removed. For now, it's hard coded.
     """
-    spcdim = {'x': ['x', 'X', 'lon', 'rlon'],
-              'y': ['y', 'Y', 'lat', 'rlat']}
+    spcdim = {'x': ['lon', 'rlon', 'longitude', 'x', 'X'],
+              'y': ['lat', 'rlat', 'latitude', 'y', 'Y']}
     xd = [x for x in ds.dims if x in spcdim['x']][0]
     yd = [y for y in ds.dims if y in spcdim['y']][0]
+
+    return xd, yd
+
+
+def _space_coords(ds):
+    """
+    Return names for space coordinates in data set.
+
+    Space coordinates in different data sets may have different names. This
+    dictionary is created to account for that (to some extent), but in the
+    future this might be change/removed. For now, it's hard coded.
+    """
+    spcdim = {'x': ['lon', 'longitude', 'x', 'X', 'rlon'],
+              'y': ['lat', 'latitude', 'y', 'Y', 'rlat']}
+    xd = [x for x in spcdim['x'] if x in ds.coords][0]
+    yd = [y for y in spcdim['y'] if y in ds.coords][0]
 
     return xd, yd
 
@@ -614,6 +630,7 @@ def manage_chunks(data, chunk_dim):
         else:
             data = data.chunk({xd: xsize, yd: ysize})
 
+    # return data.persist()
     return data
 
 
@@ -747,6 +764,8 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
         # if ch_t['time'] == -1:
         #     _mdata = _mdata.chunk({'time': -1}).unify_chunks()
 
+    # -- Dimensions ---
+
     # Time stamps
     if 'units' in _mdata.time.attrs:
         if _mdata.time.attrs['units'] == 'day as %Y%m%d.%f':
@@ -764,10 +783,6 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
                           (_mdata.time.dt.year <= lyear) &
                           (np.isin(_mdata.time.dt.month, months))), drop=True)
 
-    # Remove height dim
-    if 'height' in mdata.dims:
-        mdata = mdata.squeeze()
-
     # Rename variable if not consistent with name in configuration file
     if vnames is not None:
         if 'all' in vnames:
@@ -778,8 +793,22 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     if cfactor is not None:
         mdata[var] *= cfactor
 
+    # Dimension names
+    if 'rlon' in mdata[var].dims:
+        try:
+            mdata = mdata.swap_dims({'rlon': 'x', 'rlat': 'y'})
+        except ValueError:
+            mdata = mdata.swap_dims({'rlon': 'lon', 'rlat': 'lat'})
+
+    # Remove height dim
+    if 'height' in mdata.dims:
+        mdata = mdata.squeeze()
+
     # Model grid
     gridname = 'grid_{}'.format(mconf['grid name'])
+
+    # Spatial coordinates
+    xd, yd = _space_coords(mdata)
 
     # - Unrotate grid if needed
     if mconf['grid type'] == 'rot':
@@ -792,7 +821,7 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
             swap_dims({'rlon': 'x', 'rlat': 'y'})
         grid = {'lon': lon_reg, 'lat': lat_reg}
     else:
-        grid = {'lon': mdata.lon.values, 'lat': mdata.lat.values}
+        grid = {'lon': mdata[xd].values, 'lat': mdata[yd].values}
 
     outdata = {'data': mdata.unify_chunks(),
                'grid': grid, 'gridname': gridname}
@@ -845,31 +874,30 @@ def get_obs_data(metadata_file, obs, var, cfactor, sy, ey, mns):
     if cfactor is not None:
         obs_data[var] *= cfactor
 
-    lons = obs_data.lon.values
-    lats = obs_data.lat.values
-
     # Drop bnds dims
     if 'bnds' in obs_data.dims:
         obs_data = obs_data.drop_dims('bnds')
 
-    # Labels for space dimensions
+    # Labels for spatial coordinates
+    xc, yc = _space_coords(obs_data)
+
+    # Labels for spatial dimensions
     xd, yd = _space_dim(obs_data)
 
     # Make sure lon/lat elements are in ascending order
-    if lons.ndim == 1:
-        if np.diff(lons)[0] < 0:
-            lons = lons[::-1]
-            obs_data = obs_data.reindex({xd: obs_data[xd][::-1]})
-        if np.diff(lats)[0] < 0:
-            lats = lats[::-1]
-            obs_data = obs_data.reindex({yd: obs_data[yd][::-1]})
-    elif lons.ndim == 2:
-        if np.diff(lons[0, :])[0] < 0:
-            lons = np.flipud(lons)
+    if obs_data[xc].ndim == 1:
+        if np.diff(obs_data[xc])[0] < 0:
             obs_data = obs_data.reindex({xd: np.flipud(obs_data[xd])})
-        if np.diff(lats[:, 0])[0] < 0:
-            lats = np.flipud(lats)
+        if np.diff(obs_data[yc])[0] < 0:
             obs_data = obs_data.reindex({yd: np.flipud(obs_data[yd])})
+    elif obs_data[xc].ndim == 2:
+        if np.diff(obs_data[xc][0, :])[0] < 0:
+            obs_data = obs_data.reindex({xd: np.flipud(obs_data[xd])})
+        if np.diff(obs_data[yc][:, 0])[0] < 0:
+            obs_data = obs_data.reindex({yd: np.flipud(obs_data[yd])})
+
+    lons = obs_data[xc].values
+    lats = obs_data[yc].values
 
     grid = {'lon': lons, 'lat': lats}
     gridname = 'grid_{}'.format(obs.upper())
