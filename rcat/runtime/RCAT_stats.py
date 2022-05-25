@@ -113,6 +113,15 @@ def default_stats_config(stats):
             'thr': 1.0,
             'cond analysis': None,
             'chunk dimension': 'space'},
+        'cdd': {
+            'vars': ['pr'],
+            'resample resolution': None,
+            'pool data': False,
+            'thr': 1.0,
+            'periods': np.arange(1, 61),
+            'maxper': False,
+            'cond analysis': None,
+            'chunk dimension': 'space'},
         'signal filtering': {
             'vars': [],
             'resample resolution': None,
@@ -173,6 +182,7 @@ def _stats(stat):
         'asop': asop,
         'eda': eda_calc,
         'Rxx': Rxx,
+        'cdd': cdd,
         'signal filtering': filtering,
     }
     return p[stat]
@@ -627,7 +637,6 @@ def asop(data, var, stat, stat_config):
         output_dtypes=[float], output_sizes={'factors': 2, 'bins': lbins},
         kwargs={'keepdims': True, 'axis': -1, 'bins': bins})
     dims = list(asop_out.dims)
-
     # N.B. This does not work in rcat yet! Variable name need still to be 'pr'
     # C = asop.isel(factors=0)
     # FC = asop.isel(factors=1)
@@ -639,7 +648,7 @@ def asop(data, var, stat, stat_config):
                                               dims[0], dims[1])
     st_data = asop_ds.assign(bin_edges=bins, factors=['C', 'FC'])
     st_data.attrs['Description'] =\
-        "ASoP analysis | threshold: {}".format(thr)
+        f"ASoP analysis | bin type: {bintype} | threshold: {thr}"
     return st_data
 
 
@@ -700,6 +709,9 @@ def Rxx(data, var, stat, stat_config):
     else:
         thr = in_thr
 
+    errmsg = "\nA threshold must be set for Rxx calculation"
+    assert thr is not None, errmsg
+
     # Normalized values or not
     norm = stat_config[stat]['normalize']
 
@@ -712,6 +724,47 @@ def Rxx(data, var, stat, stat_config):
     st_data.attrs['Description'] =\
         "Rxx; frequency above threshold | threshold: {} | normalized: {}".\
         format(thr, norm)
+    return st_data
+
+
+def cdd(data, var, stat, stat_config):
+    """
+    Calculate frequencies of consecutive dry days (CDD) periods.
+    See cdd function in rcat/stats/climateindex.py for more details and
+    options.
+    """
+    in_thr = stat_config[stat]['thr']
+    if in_thr is not None:
+        thr = None if var not in in_thr else in_thr[var]
+    else:
+        thr = in_thr
+
+    errmsg = "\nA threshold must be set for CDD calculation"
+    assert thr is not None, errmsg
+
+    # Array of CDD interval lengths to consider
+    periods = stat_config[stat]['periods']
+
+    # Calculate longest dry period?
+    # N.B. If so, value will be positioned last in returned array.
+    maxper = stat_config[stat]['maxper']
+
+    # Output size
+    dim_out = len(periods) if maxper else len(periods) - 1
+
+    frq_cdd = xa.apply_ufunc(
+        ci.cdd, data[var], input_core_dims=[['time']],
+        output_core_dims=[['frequencies']], dask='parallelized',
+        output_dtypes=[float], output_sizes={'frequencies': dim_out},
+        kwargs={'keepdims': True, 'axis': -1, 'thr': thr, 'periods': periods,
+                'maxper': maxper})
+
+    dims = list(frq_cdd.dims)
+    frq_cdd_ds = frq_cdd.to_dataset().transpose(dims[-1], dims[0], dims[1])
+    st_data = frq_cdd_ds.assign(cdd_intervals=periods)
+    st_data.attrs['Description'] =\
+        f"CDD frequencies | threshold: {thr} | Longest CDD period: {maxper}"
+
     return st_data
 
 
