@@ -7,7 +7,6 @@ Authors: Petter Lind & David Lindstedt
 
 import numpy as np
 
-
 def run_mean(x, N, mode='valid'):
     """
     Calculate running mean

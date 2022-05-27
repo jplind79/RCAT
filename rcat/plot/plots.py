@@ -251,7 +251,8 @@ def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
         map_label(laxs, ["{:02d} Z".format(h) for h in time_units])
 
 
-def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
+def make_scatter_plot(grid, xdata, ydata, sdata=None, fcolors=None,
+                      ecolors=None, lbl_fontsize='large',
                       axis_type='linear', labels=None, **sc_kwargs):
     """
     Create a scatter plot
@@ -262,6 +263,18 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
             returned from the 'fig_grid_setup' function
         xdata/ydata: Array/list
             1D array or list of 1D arrays with data for x/y axis
+        fcolors: array/list
+            List of colors to be used for each data set in input data. This is
+            separate from 'color'/'c' option available from matplotlib.scatter
+            call (and set in sc_kwargs) where all individual input data sets
+            will have that specific color/s. If set, then
+            ecolors need also be supplied.
+        ecolors: array/list
+            List of edge colors to be used for each data set in input data.
+            This is separate from 'edgecolors'/'ec' option available from
+            matplotlib.scatter call (and set in sc_kwargs) where all individual
+            input data sets will have that specific color/s. If set, then
+            fcolors need also be supplied.
         lbl_fontsize: string/float
             Fontsize for legend labels
         axis_type: str
@@ -279,18 +292,46 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
             The axes objects created for each plot
     """
 
+    # Check that necessary color settings are supplied
+    if ecolors is not None:
+        errmsg = "If edgecolors (ecolors) is set, so must also fcolors!"
+        assert fcolors is not None, errmsg
+    if fcolors is not None:
+        errmsg = "If facecolors (fcolors) is set, so must also ecolors!"
+        assert ecolors is not None, errmsg
+
+    if labels is not None:
+        dlabels = [[labels]] if not isinstance(labels,
+                                               (list, tuple)) else [labels]
     if grid.size == 1:
         xd = [xdata] if isinstance(xdata[0],
                                    (list, tuple, np.ndarray)) else [[xdata]]
         yd = [ydata] if isinstance(ydata[0],
                                    (list, tuple, np.ndarray)) else [[ydata]]
-        if labels is not None:
-            dlabels = [[labels]] if not isinstance(labels,
-                                                   (list, tuple)) else [labels]
+        if sdata is not None:
+            sd = [sdata] if isinstance(
+                sdata[0], (list, tuple, np.ndarray)) else [[sdata]]
+        if fcolors is not None:
+            fcls = [fcolors] if isinstance(
+                fcolors, (list, tuple, np.ndarray)) else [[fcolors]]
+            ecls = [ecolors] if isinstance(
+                ecolors, (list, tuple, np.ndarray)) else [[ecolors]]
+
         axs = []
         for i, ax in enumerate(grid):
-            pts = [ax.scatter(xx, yy, **sc_kwargs)
-                   for xx, yy in zip(xd[i], yd[i])]
+            if fcolors is not None:
+                if sdata is not None:
+                    pts = [ax.scatter(xx, yy, c=cc, ec=ec, s=ss, **sc_kwargs)
+                           for xx, yy, cc, ec, ss in zip(
+                               xd[i], yd[i], fcls[i], ecls[i], sd[i])]
+                else:
+                    pts = [ax.scatter(xx, yy, c=cc, ec=ec, **sc_kwargs)
+                           for xx, yy, cc, ec in zip(
+                               xd[i], yd[i], fcls[i], ecls[i])]
+            else:
+                if sdata is not None:
+                    pts = [ax.scatter(xx, yy, s=ss, **sc_kwargs)
+                           for xx, yy, ss in zip(xd[i], yd[i], sd[i])]
             if labels is not None:
                 [pt.set_label(lbl) for pt, lbl in zip(pts, labels[i])]
                 ax.legend(fontsize=lbl_fontsize)
@@ -318,14 +359,34 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
             msg = """*** ERROR *** \n Labels must be in a list when """
             """multiple figures"""
             assert isinstance(labels, list), msg
+        if fcolors is not None:
+            fcls = fcolors if isinstance(
+                fcolors, (list, tuple, np.ndarray)) else [fcolors]
+            ecls = ecolors if isinstance(
+                ecolors, (list, tuple, np.ndarray)) else [ecolors]
 
         axs = []
         for i, ax in enumerate(grid):
             xd = xdata[i]
             yd = ydata[i]
             if isinstance(yd[0], (list, tuple, np.ndarray)):
-                pts = [ax.scatter(xx, yy, **sc_kwargs)
-                       for xx, yy in zip(xd, yd)]
+                if fcolors is not None:
+                    if sdata is not None:
+                        pts = [ax.scatter(xx, yy, s=ss, c=cc, ec=ec,
+                                          **sc_kwargs)
+                               for xx, yy, ss, cc, ec in zip(
+                                   xd, yd, sdata[i], fcls[i], ecls[i])]
+                    else:
+                        pts = [ax.scatter(xx, yy, c=cc, ec=ec, **sc_kwargs)
+                               for xx, yy, cc, ec in zip(
+                                   xd, yd, fcls[i], ecls[i])]
+                else:
+                    if sdata is not None:
+                        pts = [ax.scatter(xx, yy, s=ss, **sc_kwargs)
+                               for xx, yy, ss in zip(xd, yd, sdata[i])]
+                    else:
+                        pts = [ax.scatter(xx, yy, **sc_kwargs)
+                               for xx, yy in zip(xd, yd)]
                 if labels is not None:
                     [pt.set_label(lbl) for pt, lbl in zip(pts, dlabels[i])]
 
@@ -337,7 +398,19 @@ def make_scatter_plot(grid, xdata, ydata, lbl_fontsize='large',
                     ax.axhline(color='k', lw=1, ls='--', alpha=.5)
 
             else:
-                pts = ax.scatter(xd, yd, **sc_kwargs)
+                if fcolors is not None:
+                    if sdata is not None:
+                        pts = ax.scatter(xd, yd, s=sdata[i], c=fcls[i],
+                                         ec=ecls[i], **sc_kwargs)
+                    else:
+                        pts = ax.scatter(xd, yd, c=fcls[i], ec=ecls[i],
+                                         **sc_kwargs)
+                else:
+                    if sdata is not None:
+                        pts = ax.scatter(xd, yd, s=sdata[i], **sc_kwargs)
+                    else:
+                        pts = ax.scatter(xd, yd, **sc_kwargs)
+
                 if labels is not None:
                     pts.set_label(dlabels[i])
 
@@ -665,22 +738,22 @@ def _grouped_boxplot(ax, data, group_names=None, leg_labels=None,
     """
 
     nsubgroups = np.array([len(v) for v in data.values()], dtype=object)
-    assert len(np.unique(nsubgroups)) == 1,\
-        "\n{}\n".format("Number of subgroups for each property "
-                        "differ!")
-    nsubgroups = nsubgroups[0]
+    # assert len(np.unique(nsubgroups)) == 1,\
+    #     "\n{}\n".format("Number of subgroups for each property "
+    #                     "differ!")
+    # nsubgroups = nsubgroups[0]
 
     bps = []
     cpos = 1
     label_pos = []
-    for k in data:
+    for k, ngrp in zip(data, nsubgroups):
         d = data[k]
-        pos = np.arange(nsubgroups) + cpos
+        pos = np.arange(ngrp) + cpos
         label_pos.append(pos.mean())
         bp = ax.boxplot(d, positions=pos, widths=box_width, patch_artist=True,
                         **box_kwargs)
         _decorate_box(ax, bp, colors=box_colors)
-        cpos += nsubgroups + box_spacing
+        cpos += ngrp + box_spacing
         bps.append(bp)
     if 'vert' in box_kwargs:
         if box_kwargs['vert'] is False:
@@ -861,7 +934,7 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
 
     from mpl_toolkits.basemap import Basemap
 
-    def _get_mapobj(ax, lats, lons):
+    def _get_mapobj(ax, lats, lons, _lon0, _lat0, lat1):
         # Make sure lons are +/- 180 deg.
         if lons.max() > 180:
             lons[lons > 180] -= 360.
@@ -872,8 +945,8 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
 
         # Calculate domain mid point if not given
         idx = tuple([np.int(i/2) for i in lat.shape])
-        lat0 = lat[idx] if lat_0 is None else lat_0
-        lon0 = lon[idx] if lon_0 is None else lon_0
+        lat0 = lat[idx] if _lat0 is None else _lat0
+        lon0 = lon[idx] if _lon0 is None else _lon0
 
         if zoom == 'crnrs':
             if crnr_vals is None:
@@ -886,7 +959,7 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
             correctly.\nSet to [width/height] in meters, and try again.'''
 
         m = Basemap(projection=proj, ax=ax,
-                    lat_0=lat0, lon_0=lon0, lat_1=lat_1,
+                    lat_0=lat0, lon_0=lon0, lat_1=lat1,
                     width=zoom_geom[0], height=zoom_geom[1],
                     llcrnrlat=(corners[0]), urcrnrlat=(corners[2]),
                     llcrnrlon=(corners[1]), urcrnrlon=(corners[3]),
@@ -894,9 +967,12 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
                     **mkwargs)
         return m, m(lon, lat)
 
+    ngrid = grid.ngrids
+
     if isinstance(lats, list):
-        if len(lats) != grid.ngrids:
+        if len(lats) != ngrid:
             grid = grid[:len(lats)]
+            ngrid = len(grid)
             print("\n{}\n{}\n\n".format(
                 "***** WARNING *****",
                 "Number of lat/lon arrays provided does not "
@@ -906,11 +982,21 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
         llats = lats
         llons = lons
     else:
-        llats = [lats]*grid.ngrids
-        llons = [lons]*grid.ngrids
+        llats = [lats]*ngrid
+        llons = [lons]*ngrid
 
-    ms, crds = zip(*[_get_mapobj(ax, llats[i], llons[i]) for i, ax in
-                     enumerate(grid)])
+    # Lat 0/1, Lon 0
+    llon0 = lon_0 if isinstance(lon_0, list) else [lon_0]*ngrid
+    llat0 = lat_0 if isinstance(lat_0, list) else [lat_0]*ngrid
+    if proj == 'lcc':
+        _llat1 = lat_1 if isinstance(lat_1, list) else [lat_1]*ngrid
+        llat1 = np.copy(llat0) if np.isin(None, _llat1) else _llat1
+    else:
+        llat1 = [None]*ngrid
+
+    ms, crds = zip(*[
+        _get_mapobj(ax, llats[i], llons[i], llon0[i], llat0[i], llat1[i])
+                     for i, ax in enumerate(grid)])
     m_arr, coords = (ms[0], crds[0]) if len(grid) == 1 else (ms, crds)
 
     return m_arr, coords
@@ -1094,6 +1180,15 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
         cs: Contour plot object
     """
 
+    try:
+        m.drawcountries(linewidth=1.0, color="#272727")
+    except ValueError:
+        pass
+    try:
+        m.drawcoastlines(linewidth=1.2, color='#1c1c1c')
+    except ValueError:
+        pass
+
     if mesh:
         cs = m.pcolormesh(x, y, data,
                           cmap=cmap,
@@ -1119,15 +1214,6 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
                                norm=norm,
                                levels=clevs,
                                **map_kwargs)
-
-    try:
-        m.drawcountries(linewidth=.7, color="#424242")
-    except ValueError:
-        pass
-    try:
-        m.drawcoastlines(linewidth=1.0, color='#383838')
-    except ValueError:
-        pass
 
     return cs
 

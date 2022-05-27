@@ -281,18 +281,18 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         headtitle = '{} [{}] | Threshold: {}\n{}'.format(
             var, units, thr, ytitle)
         if obs is not None:
-            fn = '{}_thr{}_{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
+            fn = '{}_thr{}{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
                 var, thr, tres, tstat, obslbl, ytitle.replace(' ', '_'))
         else:
-            fn = '{}_thr{}_{}{}_map_seasonal_cycle_model_{}.png'.format(
+            fn = '{}_thr{}{}{}_map_seasonal_cycle_model_{}.png'.format(
                 var, thr, tres, tstat, ytitle.replace(' ', '_'))
     else:
         headtitle = '{} [{}] | {}'.format(var, units, ytitle)
         if obs is not None:
-            fn = '{}_{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
+            fn = '{}{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
                 var, tres, tstat, obslbl, ytitle.replace(' ', '_'))
         else:
-            fn = '{}_{}{}_map_seasonal_cycle_model_{}.png'.format(
+            fn = '{}{}{}_map_seasonal_cycle_model_{}.png'.format(
                 var, tres, tstat, ytitle.replace(' ', '_'))
 
     if var == 'pr':
@@ -304,16 +304,20 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     clevs_rel = get_clevs(np.array(dlist[4:8]), centered=True)
     clevs = [clevs_abs]*4 + [clevs_rel]*ndata*4
 
+    # TBD: Try to find appropriate formatting for color bar
+    # cb_fmt_abs = [str(f)[::-1].find('.') for f in clevs_abs]
+    # cb_fmt_rel = [str(f)[::-1].find('.') for f in clevs_rel]
+
     rpl.figure_init(plottype='map')
 
-    if var == 'psl':
-        map_kw = map_grid.copy()
-        map_kw.update({'cbar_mode': None})
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_kw)
-    else:
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_grid)
+    # if var == 'psl':
+    #     map_kw = map_grid.copy()
+    #     map_kw.update({'cbar_mode': None})
+    #     fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
+    #                                      **map_kw)
+    # else:
+    fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
+                                     **map_grid)
 
     lts = grid_coords['target grid'][var]['lat'][tgname]
     lns = grid_coords['target grid'][var]['lon'][tgname]
@@ -326,21 +330,21 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
 
     # Add contour plot if mslp
-    if var == 'psl':
-        lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
-                               filled=False, colors='#4f5254', linewidths=2.3)
-        # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
-        cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
-                          inline_spacing=24) for mplot, cl in zip(lp, clevs)]
-        [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
-          for txt in cl] for cl in cls]
+    # if var == 'psl':
+    #     lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
+    #                            filled=False, colors='#4f5254', linewidths=2.3)
+    #     # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
+    #     cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
+    #                       inline_spacing=24) for mplot, cl in zip(lp, clevs)]
+    #     [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
+    #       for txt in cl] for cl in cls]
 
     # Map settings
-    rpl.map_axes_settings(fig, grid, fontsize='large', headtitle=headtitle,
+    rpl.map_axes_settings(fig, grid, headtitle=headtitle,
                           time_mean='season')
 
     # Annotate
-    [ax.text(-0.05, 0.5, ft.upper(), size='large', va='center', ha='center',
+    [ax.text(-0.05, 0.5, ft.upper(), va='center', ha='center',
              rotation=90, transform=ax.transAxes)
      for ft, ax in zip(ftitles, [grid[i]
                                  for i in [p*4 for p in range(ndata+1)]])]
@@ -429,12 +433,12 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         if thr != 'None':
             headtitle = '{} | {} [{}] | Threshold: {}\n{}'.format(
                 ftitles[p], var, units, thr, ytitle)
-            fn = '{}_thr{}_{}{}_map_ann_cycle_{}_{}.png'.format(
+            fn = '{}_thr{}{}{}_map_ann_cycle_{}_{}.png'.format(
                 var, thr, tres, tstat, data_name, ytitle.replace(' ', '_'))
         else:
             headtitle = '{} | {} [{}] | {}'.format(
                 ftitles[p], var, units, ytitle)
-            fn = '{}_{}{}_map_ann_cycle_{}_{}.png'.format(
+            fn = '{}{}{}_map_ann_cycle_{}_{}.png'.format(
                 var, tres, tstat, data_name, ytitle.replace(' ', '_'))
 
         rpl.figure_init(plottype='map')
@@ -529,21 +533,21 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
             headtitle = '{} | Threshold: {}\n{} {}'.format(
                 var, thr, reg, ytitle)
             if obs is not None:
-                fn = '{}_thr{}_{}{}_lnplot_ann_cycle_{}_model_{}_{}.png'.\
+                fn = '{}_thr{}{}{}_lnplot_ann_cycle_{}_model_{}_{}.png'.\
                     format(var, thr, tres, tstat, regnm, obslbl,
                            ytitle.replace(' ', '_'))
             else:
-                fn = '{}_thr{}_{}{}_lnplot_ann_cycle_{}_model_{}.png'.\
+                fn = '{}_thr{}{}{}_lnplot_ann_cycle_{}_model_{}.png'.\
                     format(var, thr, tres, tstat, regnm,
                            ytitle.replace(' ', '_'))
         else:
             headtitle = '{} | {} {}'.format(var, reg, ytitle)
             if obs is not None:
-                fn = '{}_{}{}_lnplot_ann_cycle_{}_model_{}_{}.png'.\
+                fn = '{}{}{}_lnplot_ann_cycle_{}_model_{}_{}.png'.\
                     format(var, tres, tstat, regnm, obslbl,
                            ytitle.replace(' ', '_'))
             else:
-                fn = '{}_{}{}_lnplot_ann_cycle_{}_model_{}.png'.\
+                fn = '{}{}{}_lnplot_ann_cycle_{}_model_{}.png'.\
                     format(var, tres, tstat, regnm, ytitle.replace(' ', '_'))
 
         # figure settings
@@ -669,22 +673,22 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                     '{} [{}] | p{} | Threshold: {} | {} {}'.\
                     format(var, units, pctls[p], thr, seas, ytitle)
             if obs is not None:
-                fn = '{}_thr{}_{}_map_percentile_p{}_model_{}_{}_{}.png'.\
+                fn = '{}_thr{}{}_map_percentile_p{}_model_{}_{}_{}.png'.\
                     format(var, thr, tres, pctls[p], obslbl,
                            ytitle.replace(' ', '_'), seas)
             else:
-                fn = '{}_thr{}_{}_map_percentile_p{}_model_{}_{}.png'.\
+                fn = '{}_thr{}{}_map_percentile_p{}_model_{}_{}.png'.\
                     format(var, thr, tres, pctls[p],
                            ytitle.replace(' ', '_'), seas)
         else:
             headtitle = '{} [{}] | p{} | {} {}'.format(
                 var, units, pctls[p], seas, ytitle)
             if obs is not None:
-                fn = '{}_{}_map_percentile_p{}_model_{}_{}_{}.png'.format(
+                fn = '{}{}_map_percentile_p{}_model_{}_{}_{}.png'.format(
                     var, tres, pctls[p], obslbl, ytitle.replace(' ', '_'),
                     seas)
             else:
-                fn = '{}_{}_map_percentile_p{}_model_{}_{}.png'.format(
+                fn = '{}{}_map_percentile_p{}_model_{}_{}.png'.format(
                     var, tres, pctls[p], ytitle.replace(' ', '_'), seas)
 
         rpl.figure_init(plottype='map')
@@ -816,13 +820,13 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         if thr != 'None':
             headtitle = '{} | {} [{}] | Threshold: {}\n{} | {}'.format(
                 ftitles[p], var, dc_units, thr, ytitle, seas)
-            fn = '{}_thr{}_{}{}_map_diurnal_cycle_{}_{}_{}_{}.png'.format(
+            fn = '{}_thr{}{}{}_map_diurnal_cycle_{}_{}_{}_{}.png'.format(
                 var, thr, tres, tstat, fn_prfx, data_name,
                 ytitle.replace(' ', '_'), seas)
         else:
             headtitle = '{} | {} [{}] | {} | {}'.format(
                 ftitles[p], var, dc_units, ytitle, seas)
-            fn = '{}_{}{}_map_diurnal_cycle_{}_{}_{}_{}.png'.format(
+            fn = '{}{}{}_map_diurnal_cycle_{}_{}_{}_{}.png'.format(
                 var, tres, tstat, fn_prfx, data_name,
                 ytitle.replace(' ', '_'), seas)
 
@@ -921,12 +925,12 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             headtitle = '{} ({}) |  Threshold: {}\n{} | {} | {}'.format(
                 var, dcycle_stat, thr, reg, ytitle, seas)
             if obs is not None:
-                fn = ("{}_thr{}_{}{}_lnplot_diurnal_cycle_{}_{}_model_"
+                fn = ("{}_thr{}{}{}_lnplot_diurnal_cycle_{}_{}_model_"
                       "{}_{}_{}.png").format(
                           var, thr, tres, tstat, fn_prfx, regnm, obslbl,
                           ytitle.replace(' ', '_'), seas)
             else:
-                fn = ("{}_thr{}_{}{}_lnplot_diurnal_cycle_{}_{}_model_"
+                fn = ("{}_thr{}{}{}_lnplot_diurnal_cycle_{}_{}_model_"
                       "{}_{}.png").format(
                           var, thr, tres, tstat, fn_prfx, regnm,
                           ytitle.replace(' ', '_'), seas)
@@ -934,11 +938,11 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             headtitle = '{} ({}) |  {} | {} | {}'.format(var, dcycle_stat,
                                                          reg, ytitle, seas)
             if obs is not None:
-                fn = '{}_{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}_{}.png'.\
+                fn = '{}{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}_{}.png'.\
                     format(var, tres, tstat, fn_prfx, regnm, obslbl,
                            ytitle.replace(' ', '_'), seas)
             else:
-                fn = '{}_{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}.png'.\
+                fn = '{}{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}.png'.\
                     format(var, tres, tstat, fn_prfx, regnm,
                            ytitle.replace(' ', '_'), seas)
 
@@ -1000,7 +1004,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     for reg in regions:
 
         fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_listr[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values*100, axis=(1, 2))[1:]
+        mod_ann = {m: np.nanmean(fmod[m][var].values*100, axis=(1, 2))
                    for m in models}
         bins = fmod[ref_model].bin_edges.values[1:]
         nbins = bins.size
@@ -1011,7 +1015,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             obslbl = "_".join(s for s in obslist)
             fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                           fo_listr[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values*100, axis=(1, 2))[1:]
+            obs_ann = {o: np.nanmean(fobs[o][var].values*100, axis=(1, 2))
                        for o in obslist}
             dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
                      [mod_ann[m] - obs_ann[ref_obs] for m in models]]
@@ -1041,19 +1045,19 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             headtitle = '{} |  Threshold: {}\n{} | {} | {}'.format(
                 var, thr, reg, ytitle, seas)
             if obs is not None:
-                fn = '{}_thr{}_{}_pdf_{}_model_{}_{}_{}.png'.format(
+                fn = '{}_thr{}{}_pdf_{}_model_{}_{}_{}.png'.format(
                     var, thr, tres, regnm, obslbl,
                     ytitle.replace(' ', '_'), seas)
             else:
-                fn = '{}_thr{}_{}_pdf_{}_model_{}_{}.png'.format(
+                fn = '{}_thr{}{}_pdf_{}_model_{}_{}.png'.format(
                     var, thr, tres, regnm, ytitle.replace(' ', '_'), seas)
         else:
             headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle, seas)
             if obs is not None:
-                fn = '{}_{}_pdf_{}_model_{}_{}_{}.png'.format(
+                fn = '{}{}_pdf_{}_model_{}_{}_{}.png'.format(
                     var, tres, regnm, obslbl, ytitle.replace(' ', '_'), seas)
             else:
-                fn = '{}_{}_pdf_{}_model_{}_{}.png'.format(
+                fn = '{}{}_pdf_{}_model_{}_{}.png'.format(
                     var, tres, regnm, ytitle.replace(' ', '_'), seas)
 
         # figure settings
@@ -1065,8 +1069,8 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         ylim = [None]*2
         xlabel = ['({})'.format(units)]*2
         xlim = [[-.5, nbins-.5]]*2
-        xticks = range(nbins-1)[::6]
-        xtlbls = bins[:-1][::6]
+        xticks = range(nbins)[::6]
+        xtlbls = bins[::6]
 
         rpl.figure_init(plottype='line')
         fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
@@ -1164,18 +1168,18 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         headtitle = 'ASoP FC Index | Thr: {}\n{} | {}'.format(
             thr, ytitle, seas)
         if obs is not None:
-            fn = 'asop_FC_thr{}_{}_map_model_{}_{}_{}.png'.\
+            fn = 'asop_FC_thr{}{}_map_model_{}_{}_{}.png'.\
                 format(thr, tres, obslbl, ytitle.replace(' ', '_'), seas)
         else:
-            fn = 'asop_FC_thr{}_{}_map_model_{}_{}.png'.\
+            fn = 'asop_FC_thr{}{}_map_model_{}_{}.png'.\
                 format(thr, tres, ytitle.replace(' ', '_'), seas)
     else:
         headtitle = 'ASoP FC Index | {} | {}'.format(ytitle, seas)
         if obs is not None:
-            fn = 'asop_FC_{}_map_model_{}_{}_{}.png'.\
+            fn = 'asop_FC{}_map_model_{}_{}_{}.png'.\
                 format(tres, obslbl, ytitle.replace(' ', '_'), seas)
         else:
-            fn = 'asop_FC_{}_map_model_{}_{}.png'.\
+            fn = 'asop_FC{}_map_model_{}_{}.png'.\
                 format(tres, ytitle.replace(' ', '_'), seas)
 
     rpl.figure_init(plottype='map')
@@ -1274,22 +1278,22 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
                 headtitle = 'ASoP ({}) |  Thr: {}\n{} | {} | {}'.format(
                     fctr, thr, reg, ytitle, seas)
                 if obs is not None:
-                    fn = '{}_thr{}_{}_asop_{}_{}_model_{}_{}_{}.png'.format(
+                    fn = '{}_thr{}{}_asop_{}_{}_model_{}_{}_{}.png'.format(
                         var, thr, tres, fctr, regnm, obslbl,
                         ytitle.replace(' ', '_'), seas)
                 else:
-                    fn = '{}_thr{}_{}_asop_{}_{}_model_{}_{}.png'.format(
+                    fn = '{}_thr{}{}_asop_{}_{}_model_{}_{}.png'.format(
                         var, thr, tres, fctr, regnm,
                         ytitle.replace(' ', '_'), seas)
             else:
                 headtitle = 'ASoP ({}) |  {} | {} | {}'.format(
                     fctr, reg, ytitle, seas)
                 if obs is not None:
-                    fn = '{}_{}_asop_{}_{}_model_{}_{}_{}.png'.format(
+                    fn = '{}{}_asop_{}_{}_model_{}_{}_{}.png'.format(
                         var, tres, fctr, regnm, obslbl,
                         ytitle.replace(' ', '_'), seas)
                 else:
-                    fn = '{}_{}_asop_{}_{}_model_{}_{}.png'.format(
+                    fn = '{}{}_asop_{}_{}_model_{}_{}.png'.format(
                         var, tres, fctr, regnm, ytitle.replace(' ', '_'), seas)
 
             # figure settings

@@ -113,6 +113,15 @@ def default_stats_config(stats):
             'thr': 1.0,
             'cond analysis': None,
             'chunk dimension': 'space'},
+        'cdd': {
+            'vars': ['pr'],
+            'resample resolution': None,
+            'pool data': False,
+            'thr': 1.0,
+            'periods': np.arange(1, 61),
+            'maxper': False,
+            'cond analysis': None,
+            'chunk dimension': 'space'},
         'signal filtering': {
             'vars': [],
             'resample resolution': None,
@@ -173,6 +182,7 @@ def _stats(stat):
         'asop': asop,
         'eda': eda_calc,
         'Rxx': Rxx,
+        'cdd': cdd,
         'signal filtering': filtering,
     }
     return p[stat]
@@ -189,27 +199,27 @@ def calc_statistics(data, var, stat, stat_config):
 
 
 def _check_hours(ds):
-    def _rounding(arr):
-        if np.any(arr.dt.minute > 0):
-            mod_time = [x.dt.ceil('H').values if x.dt.minute >= 30 else
-                        x.dt.floor('H').values for x in arr]
-            arr.values = mod_time
-        else:
-            pass
-        return arr
-    if np.any(ds.time.dt.minute > 0):
-        print("\t\t\tShifting time stamps to whole hours!\n")
-        if ds.time.size > 500:
-            ds_time = xa.DataArray(
-                ds.time.values, dims="time").chunk(int(ds.time.size/100))
-            mod_time = ds_time.map_blocks(_rounding)
-            ds = ds.assign_coords({'time': mod_time.values})
-        else:
-            mod_time = [x.dt.ceil('H').values if x.dt.minute >= 30 else
-                        x.dt.floor('H').values for x in ds.time]
-            ds = ds.assign_coords({'time': mod_time})
-    else:
+    """
+    Checking time stamps for subdaily data
+    Hours in time stamps should be the right edge of interval if accumulated
+    or resampled data.
+    """
+    # Round to nearest minute
+    ds['time'] = ds.indexes['time'].round('min')
+
+    # Hour offsets
+    offset_dict = {12: 6, 6: 3, 3: 1, 1: 0}
+    _delta = ds['time.hour'].diff('time')
+    delta = _delta[_delta > 0].values[0]
+    hr_check = np.all(np.isin(ds['time.hour'], np.arange(0, 24, delta)))
+    if hr_check and not np.any(ds.time.dt.minute > 0):
         pass
+    else:
+        offset = offset_dict[delta]
+        print("\t\t\tShifting time stamps to whole hours!\n")
+        hbool = np.all(ds.indexes['time'].minute >= 30)
+        ds['time'] = ds.indexes['time'].ceil('H').shift(offset, 'H') if hbool\
+            else ds.indexes['time'].floor('H').shift(offset, 'H')
     return ds
 
 
@@ -265,21 +275,21 @@ def moments(data, var, stat, stat_config):
         st_data.attrs['Description'] =\
             f"Moment statistic: No statistics applied | Threshold: {thr}"
     else:
-        diff = data.time.values[1] - data.time.values[0]
-        nsec = to_timedelta(diff).total_seconds()
-        tr, fr = _get_freq(mstat[0])
-        sec_resample = to_timedelta(tr, fr).total_seconds()
-        # Resample expression
-        res_kw = stat_config[stat]['moment resample kwargs']
-        if res_kw is None:
-            expr = (f"data[var].resample(time='{mstat[0]}')"
-                    f".{mstat[1]}('time').dropna('time', 'all')")
-        else:
-            expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
-                    f".{mstat[1]}('time').dropna('time', 'all')")
         if mstat[0] == 'all':
             st_data = eval(f"data.{mstat[1]}(dim='time', skipna=True)")
         else:
+            # Resample expression
+            res_kw = stat_config[stat]['moment resample kwargs']
+            if res_kw is None:
+                expr = (f"data[var].resample(time='{mstat[0]}')"
+                        f".{mstat[1]}('time').dropna('time', 'all')")
+            else:
+                expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                        f".{mstat[1]}('time').dropna('time', 'all')")
+            diff = data.time.values[1] - data.time.values[0]
+            nsec = to_timedelta(diff).total_seconds()
+            tr, fr = _get_freq(mstat[0])
+            sec_resample = to_timedelta(tr, fr).total_seconds()
             if nsec >= sec_resample or mstat is None:
                 print("\t\t* Moment statistics:\n\t\tData already at the same "
                       "or coarser time resolution as selected resample "
@@ -316,7 +326,6 @@ def seasonal_cycle(data, var, stat, stat_config):
         if not q:
             raise ValueError(errmsg)
         else:
-            # q = [float(q)] if q.isdigit() else eval(q)
             q = float(q)
         sc_pctls = xa.apply_ufunc(
             _percentile_func, data[var].groupby('time.season'),
@@ -613,7 +622,6 @@ def asop(data, var, stat, stat_config):
         output_dtypes=[float], output_sizes={'factors': 2, 'bins': lbins},
         kwargs={'keepdims': True, 'axis': -1, 'bins': bins})
     dims = list(asop_out.dims)
-
     # N.B. This does not work in rcat yet! Variable name need still to be 'pr'
     # C = asop.isel(factors=0)
     # FC = asop.isel(factors=1)
@@ -625,7 +633,7 @@ def asop(data, var, stat, stat_config):
                                               dims[0], dims[1])
     st_data = asop_ds.assign(bin_edges=bins, factors=['C', 'FC'])
     st_data.attrs['Description'] =\
-        "ASoP analysis | threshold: {}".format(thr)
+        f"ASoP analysis | bin type: {bintype} | threshold: {thr}"
     return st_data
 
 
@@ -686,6 +694,9 @@ def Rxx(data, var, stat, stat_config):
     else:
         thr = in_thr
 
+    errmsg = "\nA threshold must be set for Rxx calculation"
+    assert thr is not None, errmsg
+
     # Normalized values or not
     norm = stat_config[stat]['normalize']
 
@@ -698,6 +709,47 @@ def Rxx(data, var, stat, stat_config):
     st_data.attrs['Description'] =\
         "Rxx; frequency above threshold | threshold: {} | normalized: {}".\
         format(thr, norm)
+    return st_data
+
+
+def cdd(data, var, stat, stat_config):
+    """
+    Calculate frequencies of consecutive dry days (CDD) periods.
+    See cdd function in rcat/stats/climateindex.py for more details and
+    options.
+    """
+    in_thr = stat_config[stat]['thr']
+    if in_thr is not None:
+        thr = None if var not in in_thr else in_thr[var]
+    else:
+        thr = in_thr
+
+    errmsg = "\nA threshold must be set for CDD calculation"
+    assert thr is not None, errmsg
+
+    # Array of CDD interval lengths to consider
+    periods = stat_config[stat]['periods']
+
+    # Calculate longest dry period?
+    # N.B. If so, value will be positioned last in returned array.
+    maxper = stat_config[stat]['maxper']
+
+    # Output size
+    dim_out = len(periods) if maxper else len(periods) - 1
+
+    frq_cdd = xa.apply_ufunc(
+        ci.cdd, data[var], input_core_dims=[['time']],
+        output_core_dims=[['frequencies']], dask='parallelized',
+        output_dtypes=[float], output_sizes={'frequencies': dim_out},
+        kwargs={'keepdims': True, 'axis': -1, 'thr': thr, 'periods': periods,
+                'maxper': maxper})
+
+    dims = list(frq_cdd.dims)
+    frq_cdd_ds = frq_cdd.to_dataset().transpose(dims[-1], dims[0], dims[1])
+    st_data = frq_cdd_ds.assign(cdd_intervals=periods)
+    st_data.attrs['Description'] =\
+        f"CDD frequencies | threshold: {thr} | Longest CDD period: {maxper}"
+
     return st_data
 
 

@@ -55,7 +55,7 @@ myGrBuPu = ["#edfac2", "#cdffcd", "#99f0b2", "#53bd9f", "#32a696", "#3296b4",
             "#0570b0", "#05508c", "#0a1f96", "#2c0246", "#6a2c5a", "#ff99ac",
             "#ff4d6e", "#ffcccc", "#ffffcc"]
 myGrBuPu = colors.ListedColormap(myGrBuPu)
-myGrBuPu.set_over("#ff00ff")
+myGrBuPu.set_over("#f7f056")
 myGrBuPu.set_under("White")
 
 topography = ["#79B2DE", "#ACD0A5", "#94BF8B", "#A8C68F", "#BDCC96",
