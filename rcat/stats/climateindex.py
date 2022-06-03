@@ -229,9 +229,9 @@ def Rxx(data, thr=1.0, axis=0, normalize=False, keepdims=False):
 
 def RRpX(data, percentile, thr=None, axis=0, keepdims=False):
     """
-    RRpX mm, total amount of precipitation above the percentile threshold pXX;
-    RR ≥ pXX mm: Let RRij be the daily precipitation amount on day i in period
-    j. Sum the precipitation for all days where RRij ≥ pXX mm.
+    RRpX mm, total amount of precipitation above the percentile threshold pX;
+    RR ≥ pX mm: Let RRij be the daily precipitation amount on day i in period
+    j. Sum the precipitation for all days where RRij ≥ pX mm.
 
     Parameters
     ----------
