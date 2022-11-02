@@ -766,8 +766,7 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     if deacc:
         _mdata = xa.open_mfdataset(
             flist, parallel=True,  # engine='h5netcdf',
-            data_vars='minimal', coords='minimal',
-            concat_dim='time', combine='by_coords', compat='override',
+            data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time')))
         # if ch_t['time'] == -1:
@@ -781,8 +780,7 @@ def get_mod_data(model, mconf, tres, var, vnames, cfactor, deacc):
     else:
         _mdata = xa.open_mfdataset(
             flist, parallel=True,  # engine='h5netcdf',
-            data_vars='minimal', coords='minimal',
-            concat_dim='time', combine='by_coords', compat='override',
+            data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y})
         # if ch_t['time'] == -1:
         #     _mdata = _mdata.chunk({'time': -1}).unify_chunks()
