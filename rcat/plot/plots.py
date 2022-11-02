@@ -1185,7 +1185,7 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
     except ValueError:
         pass
     try:
-        m.drawcoastlines(linewidth=1.2, color='#1c1c1c')
+        m.drawcoastlines(linewidth=0.8, color='#272727')
     except ValueError:
         pass
 
