@@ -323,6 +323,8 @@ def conditional_data(dd_condition, cond_var, cond_data, indata, in_var):
         print("\t\tResampling conditional data ...\n")
         tres = dd_condition['resample resolution']
         cond_data = resampling(cond_data, cond_var, tres)
+    else:
+        tres = None
 
     # Re-chunk in space dim if needed
     if len(cond_data.chunks['time']) > 1:
@@ -335,11 +337,20 @@ def conditional_data(dd_condition, cond_var, cond_data, indata, in_var):
     relate = dd_condition['operator']
 
     if cond_type == 'file':
+        wrnmsg = ("\t\t\n*** WARNING:\n Variable of conditional file data is"
+                  " not the same as input data variable! ***\n")
         errmsg = ("\t\t\nConditional data from file must be 2D!\n")
-        with xa.open_dataset(dd_condition['file in']) as fopen:
-            q = fopen[dd_condition['file var']].squeeze()
+        file_in = dd_condition['file in']
+        file_var = dd_condition['file var']
+        if file_var != in_var:
+            warnings.warn(wrnmsg)
+        with xa.open_dataset(file_in) as fopen:
+            q = fopen[file_var].squeeze()
             assert q.ndim == 2, errmsg
         sub_data = indata.where(ops[relate](indata, q))
+        sub_data.attrs['Conditional_subselection:'] =\
+            (f"Type: file ({file_in}) | File var: {file_var} | "
+             f"Operator: {relate} | Resampled cond data: {tres}")
     else:
         q = float(dd_condition['value'])
 
@@ -353,14 +364,25 @@ def conditional_data(dd_condition, cond_var, cond_data, indata, in_var):
                 output_core_dims=[[]], dask='parallelized',
                 output_dtypes=[float], kwargs={
                     'relate': relate, 'q': q, 'expand': expand, 'axis': -1})
-            sub_data = indata[in_var].where(mask.data).to_dataset()
+            sub_data = indata.where(mask)
+            sub_data.attrs['Conditional_subselection:'] =\
+                (f"Type: Static | Value: {q} | Operator: {relate} | "
+                 f"Cond variable: {cond_var} | Resampled cond data: {tres}")
         elif cond_type == 'percentile':
             pctl = xa.apply_ufunc(
                 _percentile_func, cond_data[cond_var],
                 input_core_dims=[['time']], output_core_dims=[[]],
                 dask='parallelized', output_dtypes=[float],
                 kwargs={'q': q, 'axis': -1})
-            sub_data = indata.where(ops[relate](indata, pctl))
+            if cond_var != in_var:
+                mask = xa.where(ops[relate](cond_data[cond_var], pctl),
+                                True, False)
+                sub_data = indata.where(mask)
+            else:
+                sub_data = indata.where(ops[relate](indata, pctl))
+            sub_data.attrs['Conditional_subselection:'] =\
+                (f"Type: Percentile | Value: {q} | Operator: {relate} | "
+                 f"Cond variable: {cond_var} | Resampled cond data: {tres}")
         else:
             raise ValueError(f"Unknown conditional selec type:\t{cond_type}")
 
