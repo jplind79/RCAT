@@ -222,8 +222,7 @@ def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
         [ax.text(0.05, 0.92, label, horizontalalignment='left',
                  verticalalignment='center', fontsize='large',
                  bbox=dict(facecolor='white', edgecolor='black',
-                           boxstyle='round'), size='large',
-                 transform=ax.transAxes)
+                           boxstyle='round'), transform=ax.transAxes)
          for ax, label in zip(axs, cycle(labels))]
 
     laxs = axs if isinstance(axs, list) else list(axs)
