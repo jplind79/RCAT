@@ -644,7 +644,6 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
             returned from the 'fig_grid_setup' function
         data: List/Array
             1d array or list of 1d arrays with data for boxplot
-            one box.
         labels: str/list
             String or a list of strings with xtick labels (for each box/group
             of boxes)

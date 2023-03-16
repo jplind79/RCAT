@@ -22,6 +22,18 @@ def default_stats_config(stats):
     for a selection of statistics given by input stats.
     """
     stats_dict = {
+        'generic': {
+            'vars': [],
+            'statistic': {'description': 'Average', 'algorithm': 'mean'},
+            'function args': None,
+            'apply dim': 'time',
+            'new dims': None,
+            'group data': None,
+            'resample resolution': None,
+            'pool data': False,
+            'thr': None,
+            'cond analysis': None,
+            'chunk dimension': 'time'},
         'moments': {
             'vars': [],
             'moment stat': ['D', 'mean'],
@@ -172,6 +184,7 @@ def _stats(stat):
     do the calculation.
     """
     p = {
+        'generic': generic_function,
         'moments': moments,
         'seasonal cycle': seasonal_cycle,
         'annual cycle': annual_cycle,
@@ -249,6 +262,114 @@ def _get_freq(tf):
 #                   STATISTICS FUNCTIONS                   #
 #                                                          #
 ############################################################
+
+def generic_function(data, var, stat, stat_config):
+    """
+    Calculate statistics applying user defined function. Arguments and returned
+    data need to be specified in main RCAT configuration file. Statistical
+    calculations may be done on sub-grouped data (using xarray resample),
+    as defined by user in configuration file.
+    """
+
+    def _calc(da, modpath, module, funcnm, **kwargs):
+        sys.path.append(modpath)
+        import importlib
+        fmod = importlib.import_module(module)
+        func = getattr(fmod, funcnm)
+
+        out = func(da.values, **kwargs)
+        da_out = xa.DataArray(out, dims=da.dims, coords=da.coords)
+        return da_out
+
+    def _dd_grp(g):
+        if g in ('Y', 'y', 'year', 'ann', 'annual'):
+            lbl = 'Y'
+        elif g in ('D', 'd', 'day'):
+            lbl = 'D'
+        elif g in ('season', 'QS-DEC'):
+            lbl = 'QS-DEC'
+        elif g in ('hour', 'h', 'H'):
+            lbl = 'H'
+        else:
+            lbl = g
+
+        return lbl
+
+    # Data thresholding
+    in_thr = stat_config[stat]['thr']
+    if in_thr is not None:
+        if var in in_thr:
+            thr = in_thr[var]
+            data = data.where(data[var] >= thr)
+        else:
+            thr = None
+    else:
+        thr = in_thr
+
+    dim = stat_config[stat]['apply dim']
+    outdim = stat_config[stat]['new dims']
+
+    # Group/sub-select data?
+    grp = stat_config[stat]['group data']
+    if grp is not None:
+        data = data.chunk({'time': -1})
+        # NOTE: Use groupby or resample function?
+        # indata = data[var].groupby(f'time.{grp}').apply(lambda x: x)
+        gr = _dd_grp(grp)
+        indata = data[var].resample(time=f'{gr}').apply(lambda x: x)
+    else:
+        gr = None
+        indata = data[var]
+
+    # Stat function to apply
+    fstat = stat_config[stat]['statistic']
+    kwargs = stat_config[stat]['function args']
+    assert isinstance(fstat, dict), \
+        print("stat function in configuration file must be a dictionary"
+              " with keys 'description' and 'algorithm'")
+
+    if fstat['algorithm'] in ('sum', 'count', 'mean', 'max', 'min', 'std'):
+        st_data = eval(f"indata.{fstat['algorithm']}('time')")
+    else:
+        if 'lambda' in fstat['algorithm']:
+            func = fstat['algorithm']
+        elif isinstance(fstat['algorithm'], dict):
+            import pathlib
+            fpth = fstat['algorithm']['module file'].rsplit('/', 1)
+            f = pathlib.Path(fpth[1])
+            fmodule = f.with_suffix('').name
+            funcname = fstat['algorithm']['function name']
+
+        newdim = [[outdim['dim name']]] if outdim is not None else outdim
+        dimsize = outdim['dim size'] if outdim is not None else outdim
+        if gr is None:
+            if newdim is not None:
+                out = xa.apply_ufunc(
+                    func, indata, input_core_dims=[[dim]],
+                    output_core_dims=newdim, dask='parallelized',
+                    output_sizes={newdim: dimsize}, output_dtypes=[float],
+                    kwargs=kwargs)
+            else:
+                out = xa.apply_ufunc(func, indata, input_core_dims=[[dim]],
+                                     dask='parallelized',
+                                     output_dtypes=[float], kwargs=kwargs)
+            dims = list(out.dims)
+            st_data = out.to_dataset().transpose(dims[-1], dims[0], dims[1])
+        else:
+            out = xa.map_blocks(_calc, indata, (fpth[0], fmodule, funcname),
+                                kwargs, template=indata)
+            st_data = out.to_dataset(name=var)
+            # Add back time stamps
+            st_data = st_data.assign(
+                {'time': data['time'].resample(time=f'{gr}').apply(
+                    lambda x: x).values})
+
+    st_data.attrs['Description'] =\
+        (f"Statistic: {fstat['description']} | Threshold: {thr}  | "
+         f"Grouped data: {gr}")
+
+    return st_data
+
 
 def moments(data, var, stat, stat_config):
     """
@@ -371,6 +492,10 @@ def annual_cycle(data, var, stat, stat_config):
             dask='parallelized', output_dtypes=[float],
             kwargs={'q': q, 'axis': -1, 'thr': thr})
         st_data = ac_pctls.to_dataset()
+    elif isinstance(tstat, dict):
+        func = tstat['function']
+        st_data = eval("data.groupby('time.month').reduce({}, dim='time')".\
+                       format(func))
     else:
         st_data = eval("data.groupby('time.month').{}('time')".format(
             tstat))
@@ -794,7 +919,7 @@ def filtering(data, var, stat, stat_config):
     if filt == 'lanczos':
         wgts = convolve.lanczos_filter(window, 1/cutoff, 1/cutoff2, ftype)
     else:
-        # TO DO
+        # TODO
         print("No other filter implemented yet. To be done.")
         sys.exit()
 
