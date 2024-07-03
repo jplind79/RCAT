@@ -48,13 +48,13 @@ def obs_data():
             'file pattern': 'tas_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            # 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             # 'file pattern': 'tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/remap/EUR-11/day',
             'file pattern': 'tas_EUR-11_ECMWF-ERA5_rean_r1i1p1_ECMWF_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'NGCD': {
-            'path': '/nobackup/rossby20/sm_petli/data/NGCD',
+            'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
             'file pattern': 'tas_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
         },
         # 'GRIDCLIM': {  # 3hr (1968-1996)
@@ -81,11 +81,11 @@ def obs_data():
             'file pattern': 'tasmax_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'tasmax_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'NGCD': {
-            'path': '/nobackup/rossby20/sm_petli/data/NGCD',
+            'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
             'file pattern': 'tasmax_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
         },
     },
@@ -104,11 +104,11 @@ def obs_data():
             'file pattern': 'tasmin_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'tasmin_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'NGCD': {
-            'path': '/nobackup/rossby20/sm_petli/data/NGCD',
+            'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
             'file pattern': 'tasmin_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
         },
     },
@@ -129,50 +129,50 @@ def obs_data():
             'file pattern': 'pr_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            # 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             # 'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/remap/EUR-11/day',
             'file pattern': 'pr_EUR-11_ECMWF-ERA5_rean_r1i1p1_ECMWF_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERAI': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'pr_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'NGCD': {
-            'path': '/nobackup/rossby20/sm_petli/data/NGCD',
+            'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
             'file pattern': 'pr_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
         },
         'HIPRADv2.0': {
-            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code/masked', # noqa
-            # 'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h_old_code', # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/HIPRAD/1h_old_code/masked', # noqa
+            # 'path': '/nobackup/rossby26/users/sm_petli/data/HIPRAD/1h_old_code', # noqa
             'file pattern': 'pr_HIPRAD2_1H_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'HIPRADv2.1': {
-            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/1h/masked',
+            'path': '/nobackup/rossby26/users/sm_petli/data/HIPRAD/1h/masked',
             'file pattern': 'pr_HIPRAD2_1H_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'HIPRADv3': {
-            'path': '/nobackup/rossby20/sm_petli/data/HIPRAD/Nordic_v3/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/HIPRAD/Nordic_v3/1h',
             'file pattern': 'pr_HIPRAD3_Nordic_1H_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'SENORGE': {
-            'path': '/nobackup/rossby20/sm_petli/data/seNorge_pr/orig',
+            'path': '/nobackup/rossby26/users/sm_petli/data/seNorge_pr/orig',
             'file pattern': 'pr_seNorge2_PREC1h_grid_YYYYMM.nc', # noqa
         },
         'Klimagrid': {
-            'path': '/nobackup/rossby20/sm_petli/data/klimagrid/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/klimagrid/1h',
             'file pattern': 'pr_Klimagrid_Denmark_1h_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'Spain02': {
-            'path': '/nobackup/rossby20/sm_petli/data/Spain02/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/Spain02/day',
             'file pattern': 'pr_Spain02_v2_day_YYYYMM01_YYYYMM31.nc', # noqa
         },
         'SAFRAN': {
-            'path': '/nobackup/rossby20/sm_petli/data/SAFRAN/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/SAFRAN/day',
             'file pattern': 'pr_Meteo-France_SAFRAN_day_YYYYMM01_YYYYMM31.nc', # noqa
         },
         'EURO4M-APGD': {
-            'path': '/nobackup/rossby20/sm_petli/data/EURO4M/APGD/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/EURO4M/APGD/day',
             'file pattern': 'pr_EURO4M-APGD_day_YYYYMM01_YYYYMM31.nc', # noqa
         },
     },
@@ -181,7 +181,7 @@ def obs_data():
     # Convective Precipitation
     'cpr': {
         'ERAI': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'cpr_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -190,7 +190,7 @@ def obs_data():
     # CAPE
     'cape': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'cape_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -211,7 +211,7 @@ def obs_data():
             'file pattern': 'psl_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            # 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
             'file pattern': 'psl_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
@@ -225,7 +225,7 @@ def obs_data():
             'file pattern': 'sfcWind_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'EOBS25': {
-            'path': '/nobackup/rossby20/sm_petli/data/EOBS/EOBS25/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/EOBS/EOBS25/day',
             'file pattern': 'sfcWind_EOBS25_ens_mean_0.1deg_reg_v25.0e_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -256,7 +256,7 @@ def obs_data():
     # Long-wave down-welling radiation
     'rlds': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rlds_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -265,11 +265,11 @@ def obs_data():
     # Short-wave down-welling radiation
     'rsds': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'rsds_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/SW/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/SW/CLARA-A2/day',  # noqa
             'file pattern': 'rsds_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -278,7 +278,7 @@ def obs_data():
     # Long-wave surface net radiation
     'rlns': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rlns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -287,7 +287,7 @@ def obs_data():
     # Short-wave surface net radiation
     'rsns': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rsns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -296,7 +296,7 @@ def obs_data():
     # TOA longwave emissions
     'rlnt': {
         'METEOSAT': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/TOA/OLR/MSG/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/TOA/OLR/MSG/day',  # noqa
             'file pattern': 'rlnt_CMSAF_METEOSAT-MSG2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -305,7 +305,7 @@ def obs_data():
     # Surface upward latent heat fluxes
     'hfls': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'hfls_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -314,7 +314,7 @@ def obs_data():
     # Surface upward sensible heat fluxes
     'hfss': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'hfss_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -323,11 +323,11 @@ def obs_data():
     # Total Cloud Cover
     'clt': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'clt_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clt_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -336,11 +336,11 @@ def obs_data():
     # Low-level Cloud Cover
     'cll': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'cll_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'cll_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -349,11 +349,11 @@ def obs_data():
     # Middle-level Cloud Cover
     'clm': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'clm_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clm_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -362,11 +362,11 @@ def obs_data():
     # High-level Cloud Cover
     'clh': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'clh_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clh_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -375,11 +375,11 @@ def obs_data():
     # Integral of cloud water
     'clwvi': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'clwvi_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clwvi_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -388,11 +388,11 @@ def obs_data():
     # Integral of cloud ice
     'clivi': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/1h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'clivi_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
-            'path': '/nobackup/rossby20/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clivi_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -401,7 +401,7 @@ def obs_data():
     # Total column water vapor
     'prw': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'prw_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -410,7 +410,7 @@ def obs_data():
     # Snow cover
     'sc': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/3h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/3h',
             'file pattern': 'sc_3H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -419,11 +419,11 @@ def obs_data():
     # Snow depth water equivalent
     'snw_b': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/3h',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/3h',
             'file pattern': 'sd_3H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'seNorge': {
-            'path': '/nobackup/rossby20/sm_petli/data/seNorge_snow/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/seNorge_snow/day',
             'file pattern': 'snw_b_seNorge_snowsim_v201_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -432,11 +432,11 @@ def obs_data():
     # Snow depth
     'snd': {
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5_snow',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5_snow',
             'file pattern': 'snd_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'seNorge': {
-            'path': '/nobackup/rossby20/sm_petli/data/seNorge_snow/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/seNorge_snow/day',
             'file pattern': 'snd_seNorge_snowsim_v201_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -445,7 +445,7 @@ def obs_data():
     # Geopotential 500hPa
     'phi500': {
         'ERAI': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'phi500_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -454,7 +454,7 @@ def obs_data():
     # Temperature 850hPa
     'ta850': {
         'ERAI': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'ta850_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
@@ -463,7 +463,7 @@ def obs_data():
     # Specific humidity 850hPa
     'hus850': {
         'ERAI': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
             'file pattern': 'hus850_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
