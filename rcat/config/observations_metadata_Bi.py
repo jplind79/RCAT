@@ -48,12 +48,22 @@ def obs_data():
             'file pattern': 'tas_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            # 'file pattern': 'tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            'path': '/home/rossby/imports/obs/ECMWF/ERA5/remap/EUR-11/day',
+            'file pattern': 'tas_EUR-11_ECMWF-ERA5_rean_r1i1p1_ECMWF_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'NGCD': {
             'path': '/nobackup/rossby20/sm_petli/data/NGCD',
             'file pattern': 'tas_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
+        },
+        # 'GRIDCLIM': {  # 3hr (1968-1996)
+        #     'path': '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/subday/tas',
+        #     'file pattern': 'tas_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_3hr_YYYYMMDD00-YYYYMMDD21.nc', # noqa
+        # },
+        'GRIDCLIM': {  # 1hr (1997-2018)
+            'path': '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/subday/tas',
+            'file pattern': 'tas_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_1hr_YYYYMMDD00-YYYYMMDD23.nc', # noqa
         },
     },
 
@@ -119,8 +129,10 @@ def obs_data():
             'file pattern': 'pr_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
-            'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            # 'path': '/nobackup/rossby20/sm_petli/data/ERA5/VALIDATION/EUR/day',
+            # 'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            'path': '/home/rossby/imports/obs/ECMWF/ERA5/remap/EUR-11/day',
+            'file pattern': 'pr_EUR-11_ECMWF-ERA5_rean_r1i1p1_ECMWF_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERAI': {
             'path': '/nobackup/rossby20/sm_petli/data/ERAI/VALIDATION/EUR/day',
@@ -224,6 +236,19 @@ def obs_data():
         'ERA5': {
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
             'file pattern': 'sfcWindmax_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Near-surface relative humidity
+    'hurs': {
+        # 'GRIDCLIM': {  # 3hr (1968-1996)
+        #     'path': '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/subday/hurs',
+        #     'file pattern': 'hurs_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_3hr_YYYYMMDD00-YYYYMMDD21.nc', # noqa
+        # },
+        'GRIDCLIM': {  # 1hr (1997-2018)
+            'path': '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/subday/hurs',
+            'file pattern': 'hurs_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_1hr_YYYYMMDD00-YYYYMMDD23.nc', # noqa
         },
     },
 

@@ -16,6 +16,7 @@ Rv = 461.5      # gas constant vapor
 eps = R/Rv
 cp = 1005.
 cv = 718.
+poisson = 2/7
 
 
 def rh2sh(rh, T, P=1013.25):
@@ -48,7 +49,7 @@ def rh2sh(rh, T, P=1013.25):
     e = rh * es
     sh = (eps * e) / (P - e*(1 - eps))
 
-    return(sh)
+    return sh
 
 
 def sh2rh(sh, T, P=1013.25):
@@ -83,7 +84,7 @@ def sh2rh(sh, T, P=1013.25):
         rh[rh > 1] = 1
         rh[rh < 0] = 0
 
-    return(rh)
+    return rh
 
 
 def td2sh(Td, P):
@@ -108,7 +109,7 @@ def td2sh(Td, P):
     e = 6.112 * np.exp((17.67 * Td_C) / (Td_C + 243.5))
     q = (eps * e)/(P - (0.378 * e))
 
-    return(q)
+    return q
 
 
 def sh2td(sh, p):
@@ -159,6 +160,21 @@ def calc_es(T):
     return 6.112 * np.exp(17.67 * Tc / (Tc + 243.5))
 
 
+def calc_ws(T, P=1013.25):
+    """
+    Returns saturation mixing ratio in kg/kg at temperature T (Kelvin) and
+    pressure P (hPa).
+    Formula in https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf
+    """
+
+    # Saturation vapor pressure (in hPa)
+    es = calc_es(T)
+
+    # Saturation mixing ratio
+    ws = 0.622*(es/(P-es))
+    return ws
+
+
 def calc_e_from_w(w, P=1013.25):
     """
     Vapor pressure over liquid surface can be calculated from a variety of
@@ -174,12 +190,13 @@ def calc_e_from_w(w, P=1013.25):
     return w * P / (eps + w)
 
 
-def calc_e_from_sh(sh, P=1013.25):
+def calc_e_from_sh(sh, P=101325):
     """
     Vapor pressure over liquid surface can be calculated from a variety of
     different combinations of state variables.
-    Here, vapor pressure is calculated from specific humidity sh and pressure
-    P. Formula is given in standard literature; e.g. eq. 2.19 in Rogers & Yau
+    Here, vapor pressure is calculated from specific humidity sh (kg/kg) and
+    pressure P (Pa).
+    Formula is given in standard literature; e.g. eq. 2.19 in Rogers & Yau
     (Cloud physics) and eq. 4.1.4 in Emanuel (1994).
     Reference:
     * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:
@@ -258,7 +275,104 @@ def uv2wind(u, v):
     return ws, wd
 
 
-def calc_vaisala(ddict, model, lower_plevel, upper_plevel):
+def lifted_condensation_temperature(tair, tdew):
+    """
+    Returns the lifted condensation temperature in units of Kelvin.
+
+    Parameters
+    ----------
+    tair, float/array of floats
+        Air temperature (in units of Kelvin)
+    tdew, float/array of floats
+        Dew point temperature (in units of Kelvin)
+
+    Returns
+    -------
+    tc, floats/arrays of floats
+        Lifted condensation temperature (in units of Kelvin)
+    """
+
+    tc = 56 + 1. / (1. / (tdew - 56) + np.log(tair / tdew) / 800.)
+
+    return tc
+
+
+def theta_equivalent(tair, tdew, p, sh):
+    """
+    Returns the equivalent potential temperature in units of Kelvin.
+    Based on approximative formula from Bolton, D. 1980
+    See also:
+    https://glossary.ametsoc.org/wiki/Equivalent_potential_temperature
+
+    Parameters
+    ----------
+    tair, float/array of floats
+        Air temperature (in units of Kelvin)
+    tdew, float/array of floats
+        Dew point temperature (in units of Kelvin)
+    p, float/array of floats
+        Pressure in units of hPa
+    sh, float/array of floats
+        Specific humidity in units of kg/kg
+
+    Returns
+    -------
+    theta_e, floats/arrays of floats
+        Equivalent potential temperature (in units of Kelvin)
+    """
+    # Saturation mixing ratio
+    r = calc_ws(tair, p)
+
+    # Vapor pressure (pressure in Pa)
+    e = calc_e_from_sh(sh, p*100)
+
+    # LCL temperature
+    t_l = lifted_condensation_temperature(tair, tdew)
+
+    # Potential temperature at LCL
+    th_l = tair*(1000/p)**(0.2854*(1-0.28*sh)) * (tair/t_l)**(0.28 * r)
+
+    # Equivalent potential temperature
+    theta_e = th_l * np.exp(r * (1 + 0.448 * r) * (3036. / t_l - 1.78))
+
+    return theta_e
+
+
+def theta_pseudoequiv(tair, tdew, p, sh):
+    """
+    Returns the pseudo-equivalent potential temperature in units of Kelvin.
+    Based on approximative formula from Bolton, D. 1980
+    See also:
+    https://glossary.ametsoc.org/wiki/Pseudoequivalent_potential_temperature
+
+    Note that here the specific humidity is used instead of mixing ratio, which
+    are approximately the same (low water vapor mass in parcel compared to dry
+    mass).
+
+    Parameters
+    ----------
+    tair, float/array of floats
+        Air temperature (in units of Kelvin)
+    tdew, float/array of floats
+        Dew point temperature (in units of Kelvin)
+    p, float/array of floats
+        Pressure in units of hPa
+    sh, float/array of floats
+        Specific humidity in units of kg/kg
+
+    Returns
+    -------
+    theta_ep, floats/arrays of floats
+        Pseudo-equivalent potential temperature (in units of Kelvin)
+    """
+    tc = lifted_condensation_temperature(tair, tdew)
+    theta_ep = tair*(1000/p)**(0.2854*(1-0.28*sh)) * \
+        np.exp(sh*(1+0.81*sh)*((3376/tc)-2.54))
+
+    return theta_ep
+
+
+def brunt_vaisala_frequency(ddict, model, lower_plevel, upper_plevel):
     """
     Calculate Brunt-Vaisala frequency in layer bounded by two pressure levels.
     Pressure must be given in hPa, temperature (T) in Kelvin and specific

@@ -1,11 +1,11 @@
 import sys
 import numpy as np
-import dask.array as da
 import xarray as xa
 from rcat.stats import ASoP
 from rcat.stats import convolve
 from rcat.stats import event_duration as eda
 from rcat.stats import climateindex as ci
+from rcat.stats import precipitation_index as prix
 from pandas import to_timedelta
 from copy import deepcopy
 
@@ -134,6 +134,15 @@ def default_stats_config(stats):
             'maxper': False,
             'cond analysis': None,
             'chunk dimension': 'space'},
+        'pr survival fraction': {
+            'vars': ['pr'],
+            'resample resolution': None,
+            'pool data': False,
+            'percentiles': np.arange(1, 100),
+            'thr': None,
+            'cond analysis': None,
+            'vectorize': True,
+            'chunk dimension': 'space'},
         'signal filtering': {
             'vars': [],
             'resample resolution': None,
@@ -192,6 +201,7 @@ def _stats(stat):
         'diurnal cycle': diurnal_cycle,
         'dcycle harmonic': dcycle_harmonic_fit,
         'pdf': freq_int_dist,
+        'pr survival fraction': pr_amount_survival_fraction,
         'asop': asop,
         'eda': eda_calc,
         'Rxx': Rxx,
@@ -402,11 +412,25 @@ def moments(data, var, stat, stat_config):
             # Resample expression
             res_kw = stat_config[stat]['moment resample kwargs']
             if res_kw is None:
-                expr = (f"data[var].resample(time='{mstat[0]}')"
-                        f".{mstat[1]}('time').dropna('time', 'all')")
+                if mstat[1] == 'apply function':
+                    expr = (f"data[var].resample(time='{mstat[0]}')"
+                            f".apply({mstat[2]}).dropna('time', 'all')")
+                elif mstat[1] == 'interpolate':
+                    expr = (f"data[var].resample(time='{mstat[0]}')"
+                            f".interpolate({mstat[2]}).dropna('time', 'all')")
+                else:
+                    expr = (f"data[var].resample(time='{mstat[0]}')"
+                            f".{mstat[1]}('time').dropna('time', 'all')")
             else:
-                expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
-                        f".{mstat[1]}('time').dropna('time', 'all')")
+                if mstat[1] == 'apply function':
+                    expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                            f".apply({mstat[2]}).dropna('time', 'all')")
+                elif mstat[1] == 'interpolate':
+                    expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                            f".interpolate({mstat[2]}).dropna('time', 'all')")
+                else:
+                    expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                            f".{mstat[1]}('time').dropna('time', 'all')")
             diff = data.time.values[1] - data.time.values[0]
             nsec = to_timedelta(diff).total_seconds()
             tr, fr = _get_freq(mstat[0])
@@ -494,8 +518,8 @@ def annual_cycle(data, var, stat, stat_config):
         st_data = ac_pctls.to_dataset()
     elif isinstance(tstat, dict):
         func = tstat['function']
-        st_data = eval("data.groupby('time.month').reduce({}, dim='time')".\
-                       format(func))
+        st_data = eval("data.groupby('time.month').reduce("
+                       f"{func}, dim='time')")
     else:
         st_data = eval("data.groupby('time.month').{}('time')".format(
             tstat))
@@ -547,7 +571,7 @@ def diurnal_cycle(data, var, stat, stat_config):
             dcycle = dc_pctls.to_dataset()
         elif 'pdf' in tstat:
             # Bins
-            assert 'bins' in stat_config[stat]['method kwargs'],\
+            assert 'bins' in stat_config[stat]['method kwargs'], \
                     "\n\tBins are missing in 'method kwargs'!\n"
             bin_r = stat_config[stat]['method kwargs']['bins']
             bins = np.arange(bin_r[0], bin_r[1], bin_r[2])
@@ -878,6 +902,41 @@ def cdd(data, var, stat, stat_config):
     return st_data
 
 
+def pr_amount_survival_fraction(data, var, stat, stat_config):
+    """
+    Calculate the frequency distribution, normalize by total precipitation, and
+    sum the fractions. It answers the question 'what fraction of total
+    precipitation occurs beyond the top p percentile of days in a period?',
+    where p is any percentile of interest.
+    """
+    in_thr = stat_config[stat]['thr']
+    if in_thr is not None:
+        thr = None if var not in in_thr else in_thr[var]
+    else:
+        thr = in_thr
+
+    # Quantiles
+    pctls = stat_config[stat]['percentiles']
+    da_pctls = xa.DataArray(pctls, dims={'perc': len(pctls)})
+
+    # Vectorize the unvectorized function?
+    vectorize = stat_config[stat]['vectorize']
+
+    fracs = xa.apply_ufunc(
+        prix.precip_amount_survival_fraction, data[var], da_pctls,
+        input_core_dims=[['time'], ['perc']], output_core_dims=[['pctl']],
+        dask_gufunc_kwargs={'output_sizes': {'pctl': len(pctls)}},
+        dask='parallelized', output_dtypes=[data[var].dtype],
+        vectorize=vectorize, kwargs={'keepdims': True})
+
+    dims = list(fracs.dims)
+    st_data = fracs.to_dataset(name=var).transpose(
+        dims[-1], dims[0], dims[1]).assign(percentiles=pctls)
+    st_data.attrs['Description'] =\
+        f"Pr survival fractions | threshold: {thr}"
+    return st_data
+
+
 def filtering(data, var, stat, stat_config):
     """
     Filter the input data
@@ -961,15 +1020,6 @@ def _percentile_func(arr, axis=0, q=95, thr=None):
     if axis == -1 and pctl.ndim > 2:
         pctl = np.moveaxis(pctl, 0, -1)
     return pctl
-
-
-def _dask_percentile(arr, axis=0, q=95):
-    if len(arr.chunks[axis]) > 1:
-        msg = ('Input array cannot be chunked along the percentile '
-               'dimension.')
-        raise ValueError(msg)
-    return da.map_blocks(np.nanpercentile, arr, axis=axis, q=q,
-                         drop_axis=axis)
 
 
 def _harmonic_linefit(data, keepdims=False, axis=0, var=None):

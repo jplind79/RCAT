@@ -43,6 +43,7 @@ def plot_main(pltdict, statistic):
                                    var, ref_model)
     map_grid_def = pdict['map grid setup']
     map_grid = _map_grid_setup(map_grid_def)
+    map_domain = pdict['map domain']
     map_sets = pdict['map kwargs']
 
     line_grid = pdict['line grid setup']
@@ -65,8 +66,8 @@ def plot_main(pltdict, statistic):
 
     _plots(statistic)(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                       ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                      img_dir, grid_coords, map_conf, map_grid, map_sets,
-                      line_grid, line_sets)
+                      img_dir, grid_coords, map_domain, map_conf, map_grid,
+                      map_sets, line_grid, line_sets)
 
 
 def _map_grid_setup(map_grid_set):
@@ -161,7 +162,6 @@ def round_to_sign_digits(x, sig=2):
 
 def get_clevs(data, centered=False):
     from scipy.stats import skew
-
     if centered:
         abs_max = np.nanpercentile(data, 98)
         abs_min = np.nanpercentile(data, 2)
@@ -218,8 +218,8 @@ def get_clevs(data, centered=False):
 
 def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                obs, var, tres, tstat, units, ytitle, regions, img_dir,
-               grid_coords, map_conf, map_grid, map_sets, line_grid,
-               line_sets):
+               grid_coords, map_domain, map_conf, map_grid, map_sets,
+               line_grid, line_sets):
     """
     Plotting seasonal mean map plot
     """
@@ -234,7 +234,8 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Map settings
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
-    domain = grid_coords['meta data'][var][ref_model]['domain']
+    domain_model = map_domain if map_domain else ref_model
+    domain = grid_coords['meta data'][var][domain_model]['domain']
     mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
@@ -273,8 +274,12 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                                 for m in othr_mod]
 
     # figure settings
-    figsize = (22, 14)
     figshape = (ndata + 1, 4)
+    if np.prod(figshape) > 8:
+        figsize = (22, 14)
+    else:
+        figsize = (20, 9)
+
     thr = fmod_msk[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
     if thr != 'None':
@@ -330,9 +335,9 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
 
     # Add contour plot if mslp
-    # if var == 'psl':
-    #     lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
-    #                            filled=False, colors='#4f5254', linewidths=2.3)
+    if var == 'psl':
+        lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
+                               filled=False, colors='#4f5254', linewidths=1.3)
     #     # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
     #     cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
     #                       inline_spacing=24) for mplot, cl in zip(lp, clevs)]
@@ -354,8 +359,8 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
 def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                   ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                  img_dir, grid_coords, map_conf, map_grid, map_sets,
-                  line_grid, line_sets):
+                  img_dir, grid_coords, map_domain, map_conf, map_grid,
+                  map_sets, line_grid, line_sets):
     """
     Plotting annual cycle map plot
     """
@@ -370,7 +375,8 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     # Map settings
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
-    domain = grid_coords['meta data'][var][ref_model]['domain']
+    domain_model = map_domain if map_domain else ref_model
+    domain = grid_coords['meta data'][var][domain_model]['domain']
     mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
@@ -443,18 +449,18 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
         rpl.figure_init(plottype='map')
 
-        if var == 'psl':
-            map_kw = map_grid.copy()
-            if (('cbar_mode' in map_kw and
-                 map_kw['cbar_mode'] is not None)):
-                map_kw.update({'cbar_mode': None})
-            else:
-                map_kw.update({'cbar_mode': None})
-            fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                             **map_kw)
-        else:
-            fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                             **map_grid)
+        # if var == 'psl':
+        #     map_kw = map_grid.copy()
+        #     if (('cbar_mode' in map_kw and
+        #          map_kw['cbar_mode'] is not None)):
+        #         map_kw.update({'cbar_mode': None})
+        #     else:
+        #         map_kw.update({'cbar_mode': None})
+        #     fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
+        #                                      **map_kw)
+        # else:
+        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
+                                         **map_grid)
 
         # Create map object
         m, coords = rpl.map_setup(grid, lts, lns, **map_conf)
@@ -467,8 +473,8 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         if var == 'psl':
             lp = rpl.make_map_plot(dlist[p], grid, m, coords, clevs=clevs[p],
                                    filled=False, colors='#4f5254',
-                                   linewidths=2.3)
-            [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
+                                   linewidths=1.3)
+            # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
 
         # Map settings
         rpl.map_axes_settings(fig, grid, fontsize='large', headtitle=headtitle,
@@ -991,7 +997,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
 
 def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
              obs, var, tres, tstat, units, ytitle, regions, img_dir,
-             grid_coords, map_conf, map_grid, map_sets, line_grid,
+             grid_coords, map_domain, map_conf, map_grid, map_sets, line_grid,
              line_sets):
     """
     Plotting frequency-intensity-distribution plot

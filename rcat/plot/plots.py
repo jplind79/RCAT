@@ -302,7 +302,7 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, fcolors=None,
     if labels is not None:
         dlabels = [[labels]] if not isinstance(labels,
                                                (list, tuple)) else [labels]
-    if grid.size == 1:
+    if len(grid) == 1:
         xd = [xdata] if isinstance(xdata[0],
                                    (list, tuple, np.ndarray)) else [[xdata]]
         yd = [ydata] if isinstance(ydata[0],
@@ -334,13 +334,6 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, fcolors=None,
             if labels is not None:
                 [pt.set_label(lbl) for pt, lbl in zip(pts, labels[i])]
                 ax.legend(fontsize=lbl_fontsize)
-
-            if np.any([np.any(np.array(dd) > 0.0) for dd in xd[i]]) and\
-               np.any([np.any(np.array(dd) < 0.0) for dd in xd[i]]):
-                ax.axvline(color='k', lw=1, ls='--', alpha=.5)
-            if np.any([np.any(np.array(dd) > 0.0) for dd in yd[i]]) and\
-               np.any([np.any(np.array(dd) < 0.0) for dd in yd[i]]):
-                ax.axhline(color='k', lw=1, ls='--', alpha=.5)
 
             if axis_type in ('logx', 'logxy'):
                 ax.set_xscale('log')
@@ -389,13 +382,6 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, fcolors=None,
                 if labels is not None:
                     [pt.set_label(lbl) for pt, lbl in zip(pts, dlabels[i])]
 
-                if np.any([np.any(np.array(dd) > 0.0) for dd in xd]) and\
-                   np.any([np.any(np.array(dd) < 0.0) for dd in xd]):
-                    ax.axvline(color='k', lw=1, ls='--', alpha=.5)
-                if np.any([np.any(np.array(dd) > 0.0) for dd in yd]) and\
-                   np.any([np.any(np.array(dd) < 0.0) for dd in yd]):
-                    ax.axhline(color='k', lw=1, ls='--', alpha=.5)
-
             else:
                 if fcolors is not None:
                     if sdata is not None:
@@ -412,11 +398,6 @@ def make_scatter_plot(grid, xdata, ydata, sdata=None, fcolors=None,
 
                 if labels is not None:
                     pts.set_label(dlabels[i])
-
-                if np.any(np.array(xd) > 0.0) and np.any(np.array(xd) < 0.0):
-                    ax.axvline(color='k', lw=1, ls='--', alpha=.5)
-                if np.any(np.array(yd) > 0.0) and np.any(np.array(yd) < 0.0):
-                    ax.axhline(color='k', lw=1, ls='--', alpha=.5)
 
             if labels is not None:
                 ax.legend(fontsize=lbl_fontsize)
@@ -542,7 +523,7 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
             The axes objects created for each plot
     """
 
-    if grid.size == 1:
+    if len(grid) == 1:
 
         yd = [ydata] if isinstance(
             ydata[0], (list, tuple, range, np.ndarray)) else [[ydata]]
@@ -668,7 +649,7 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
             boxplot to a list of the `.Line2D` instances created.
     """
 
-    if grid.size == 1:
+    if len(grid) == 1:
         ldata = [data] if not isinstance(data, (list, tuple)) else data
         idata = [ldata] if len(ldata) > 1 else ldata
     else:
@@ -680,13 +661,13 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
         if labels is not None:
             msg = "*** ERROR *** \n 'labels' must be given in a list!"
             assert isinstance(labels, list), msg
-            lbls = labels[g] if grid.size > 1 else labels
+            lbls = labels[g] if len(grid) > 1 else labels
         else:
             lbls = labels
         if leg_labels is not None:
             msg = "*** ERROR *** \n 'leg_labels' must be given in a list!"
             assert isinstance(leg_labels, list), msg
-            lg_lbls = leg_labels[g] if grid.size > 1 else leg_labels
+            lg_lbls = leg_labels[g] if len(grid) > 1 else leg_labels
         else:
             lg_lbls = leg_labels
 
@@ -1178,12 +1159,15 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
         cs: Contour plot object
     """
 
+    m.drawmapboundary(fill_color='aqua')
     try:
-        m.drawcountries(linewidth=1.0, color="#272727")
+        # m.drawcountries(linewidth=1.0, color="#272727")
+        m.drawcountries(linewidth=1.7, color="#272727")
     except ValueError:
         pass
     try:
-        m.drawcoastlines(linewidth=0.8, color='#272727')
+        # m.drawcoastlines(linewidth=0.8, color='#272727')
+        m.drawcoastlines(linewidth=1.3, color='#272727')
     except ValueError:
         pass
 
