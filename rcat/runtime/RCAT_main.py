@@ -431,7 +431,7 @@ def get_grid_coords(ds, grid_coords):
         if lats.ndim == 1 else (lons, lats)
 
     # Calculate domain mid point if not given
-    idx = tuple([np.int(i/2) for i in lat.shape])
+    idx = tuple([int(i/2) for i in lat.shape])
     lat0 = lat[idx]
     lon0 = lon[idx]
 
@@ -582,7 +582,7 @@ def data_resampling(data, resample_conf):
                     f".interpolate('{resample_conf[2]}')")
         else:
             expr = (f"data.resample(time='{resample_conf[0]}')"
-                    f".{resample_conf[1]}('time').dropna('time', 'all')")
+                    f".{resample_conf[1]}('time').dropna('time', how='all')")
         if nsec != sec_resample:
             resampled_data = eval(expr)
             time_comp = (np.unique(resampled_data['time.month']) ==
@@ -596,7 +596,7 @@ def data_resampling(data, resample_conf):
                 data = eval(
                     f"data.resample(time='{resample_conf[0]}', "
                     f"label='right').{resample_conf[1]}('time')."
-                    f"dropna('time', 'all')")
+                    f"dropna('time', how='all')")
                 # EDIT 210608: Should the time stamp be set to midpoint?
                 resampled_data['time'] = resampled_data.time + np.timedelta64(
                     dt.timedelta(seconds=np.round(sec_resample/2)))
@@ -1231,7 +1231,7 @@ cluster_type = cdict['cluster type']
 cluster_kwargs = cdict['cluster kwargs']
 nnodes = cdict['nodes']
 
-cluster = cluster_setup()
+cluster = cluster_setup(cluster_type, cluster_kwargs, nnodes)
 client = Client(cluster)
 
 ####################################################
