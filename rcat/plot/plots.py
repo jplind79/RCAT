@@ -12,6 +12,8 @@ Authors: Petter Lind & David Lindstedt
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cf
 
 
 # Functions
@@ -88,7 +90,7 @@ def image_grid_setup(figsize=(12, 12), fshape=(1, 1), **grid_kwargs):
 
 def get_nrow_ncol(npanels):
     """
-    Return number of rows and columns from a given total no
+    Return number of rows and columns from a given total number
     of panels for a grid
     """
 
@@ -234,13 +236,13 @@ def map_axes_settings(fig, axs, figtitle=None, headtitle=None,
         fig.suptitle(headtitle, fontsize=fontsize_htitle)
 
     if time_mean == 'season':
-        assert len(laxs) % 4 == 0,\
+        assert len(laxs) % 4 == 0, \
                 "\n{}\n".format("For seasonal data, a plot (axis instance) "
                                 "for each of the four seasons "
                                 "must be provided")
         map_label(laxs, ["DJF", "MAM", "JJA", "SON"])
     elif time_mean == 'month':
-        assert len(laxs) % 12 == 0,\
+        assert len(laxs) % 12 == 0, \
                 "\n{}\n".format("For monthly data, a plot (axis instance) "
                                 "for each of the twelve months must "
                                 "be provided")
@@ -675,7 +677,7 @@ def make_box_plot(grid, data, labels=None, leg_labels=None, grouped=False,
         bdata = idata[g]
 
         if grouped:
-            assert isinstance(bdata, dict),\
+            assert isinstance(bdata, dict), \
                 "\n{}\n".format("**Error**\nIf plotting grouped boxplot "
                                 "(grouped=True), then input data must "
                                 "be a dictionary.")
@@ -823,7 +825,7 @@ def custom_legend(colors, labels, linestyles=None):
     """
 
     if linestyles is not None:
-        assert len(linestyles) == len(colors),\
+        assert len(linestyles) == len(colors), \
             "Length of linestyles must match length of colors."
 
     h = []
@@ -868,123 +870,117 @@ def gen_clevels(data, nsteps, robust=None):
     return np.arange(dmin, dmax+dstep, dstep)
 
 
-def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
-              lat_1=None, res='l', zoom='crnrs', crnr_vals=None,
-              zoom_geom=[None, None], **mkwargs):
+def map_setup(map_proj, map_extent, figsize=(12, 12), figshape=(1, 1),
+              grid_lines=False, **grid_kwargs):
     """
-    Create a basemap object to be used in the overlaying of 2d plots.
+    Create a Cartopy crs object to be used in the overlaying of 2d plots.
 
     Parameters
     ----------
-        grid: list
-            List with axes objects for each plot in figure
-        lats: array(s)
-            array or list of arrays with latitudes
-        lons: array(s)
-            array or list of arrays with longitudes
-        proj: string
-            the projection to be used (so far only two proj's:
-            sterographic and lambert conformal)
-        lat_0/lon_0: float
-            centre latitude and longitude location of map
-        lat_1: float
-            first standard parallell. if proj='lcc', lat_1 must be given.
-        res: string
-            resolution (low 'l', intermediate 'i' or high 'h')
-        zoom: string
-            "cornrs" or "geom", how to set the extent of map
-        crnr_vals: 1D list/array
-            List of values for corners given as [llcrnrlat, llcrnrlon,
-            urcrnrlat, urcrnrlon]
-        zoom_geom: 1D list/array
-            Integers setting map geometry [width, height] in meters.
-        **mkwargs: key word arguments
-            Additional arguments provided to Basemap call. See
-            http://matplotlib.org/basemap/# for more info.
+        map_proj: Cartopy map projection
+            Generated from the 'define_map_object' function
+        map_extent: list/tuple
+            Longitude/latitude values for map extent;
+            [lon_start, lon_end, lat_start, lat_end]
+        figsize: tuple
+            The requested size of figure object
+        figshape: tuple
+            The requested shape (rows, columns) of figure panels
+        grid_lines: boolean
+            Whether to plot grid lines (lat/lon) with values along the
+            left and bottom axes. Default False.
+        **grid_kwargs: key word arguments
+            Additional arguments provided to AxesGrid (See below for
+            more info).
 
     Returns
     -------
-        m: Basemap object
-            map object
-        coords: list
-            list containing x,y arrays of the transformed longitudes
-            to map coordinates
+        fig:
+            figure object
+        axgrid: list
+            List with axes objects, with GeoAxes class, for each plot in figure
+
+    With AxesGrid and GeoAxes, a grid is created and corresponding axes are
+    classified with GeoAxes. Read more about AxesGrid, and the available
+    options, here:
+    https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html
+
+    Examples of ``**kwargs`` with default values:
+        direction="row",
+        axes_pad=0.02,
+        add_all=True,
+        share_all=False,
+        label_mode="L",
+        aspect=True,
+        cbar_mode=None,
+        cbar_location="right",
+        cbar_size="5%",
+        cbar_pad=None,
+
     """
 
-    from mpl_toolkits.basemap import Basemap
+    from cartopy.mpl.geoaxes import GeoAxes
+    from mpl_toolkits.axes_grid1 import AxesGrid
 
-    def _get_mapobj(ax, lats, lons, _lon0, _lat0, lat1):
-        # Make sure lons are +/- 180 deg.
-        if lons.max() > 180:
-            lons[lons > 180] -= 360.
+    fig = plt.figure(figsize=figsize)
 
-        # If lon/lat is 1D; create 2D meshgrid
-        lon, lat = np.meshgrid(lons, lats)\
-            if lats.ndim == 1 else (lons, lats)
+    # Initiate an axes class with Cartopy GeoAxes
+    axes_class = (GeoAxes, dict(projection=map_proj))
 
-        # Calculate domain mid point if not given
-        idx = tuple([np.int(i/2) for i in lat.shape])
-        lat0 = lat[idx] if _lat0 is None else _lat0
-        lon0 = lon[idx] if _lon0 is None else _lon0
+    # Create axes grid
+    axgrid = AxesGrid(fig, 111,
+                      axes_class=axes_class,
+                      nrows_ncols=figshape,
+                      **grid_kwargs
+                      )
 
-        if zoom == 'crnrs':
-            if crnr_vals is None:
-                corners = [lat[0, 0], lon[0, 0], lat[-1, -1], lon[-1, -1]]
-            else:
-                corners = [crnr_vals[i] for i in range(4)]
-        else:
-            corners = [None for i in range(4)]
-            assert zoom_geom, '''\nError! zoom_geom argument is not set
-            correctly.\nSet to [width/height] in meters, and try again.'''
+    # Add features to map
+    for ax in axgrid:
 
-        m = Basemap(projection=proj, ax=ax,
-                    lat_0=lat0, lon_0=lon0, lat_1=lat1,
-                    width=zoom_geom[0], height=zoom_geom[1],
-                    llcrnrlat=(corners[0]), urcrnrlat=(corners[2]),
-                    llcrnrlon=(corners[1]), urcrnrlon=(corners[3]),
-                    rsphere=(6378137.00, 6356752.3142), resolution=res,
-                    **mkwargs)
-        return m, m(lon, lat)
+        ax.add_feature(cf.COASTLINE, edgecolor='#606060', linewidth=.7)
+        ax.add_feature(cf.BORDERS, edgecolor='#606060', linewidth=.4)
 
-    ngrid = grid.ngrids
+        # Set the lat/lon extent of map
+        ax.set_extent(map_extent, crs=ccrs.PlateCarree())
 
-    if isinstance(lats, list):
-        if len(lats) != ngrid:
-            grid = grid[:len(lats)]
-            ngrid = len(grid)
-            print("\n{}\n{}\n\n".format(
-                "***** WARNING *****",
-                "Number of lat/lon arrays provided does not "
-                "match number of plots (axes instances from "
-                "grid setup). Map objects created only for "
-                "provided lat/lon arrays"))
-        llats = lats
-        llons = lons
-    else:
-        llats = [lats]*ngrid
-        llons = [lons]*ngrid
+        if grid_lines:
+            gl = ax.gridlines(
+                draw_labels=True, linewidth=0.5, color='gray',
+                x_inline=False, y_inline=False, linestyle='-',
+                alpha=.7, crs=ccrs.PlateCarree())
+            gl.top_labels = False
+            gl.right_labels = False
 
-    # Lat 0/1, Lon 0
-    llon0 = lon_0 if isinstance(lon_0, list) else [lon_0]*ngrid
-    llat0 = lat_0 if isinstance(lat_0, list) else [lat_0]*ngrid
-    if proj == 'lcc':
-        _llat1 = lat_1 if isinstance(lat_1, list) else [lat_1]*ngrid
-        llat1 = np.copy(llat0) if np.isin(None, _llat1) else _llat1
-    else:
-        llat1 = [None]*ngrid
-
-    ms, crds = zip(*[
-        _get_mapobj(ax, llats[i], llons[i], llon0[i], llat0[i], llat1[i])
-                     for i, ax in enumerate(grid)])
-    m_arr, coords = (ms[0], crds[0]) if len(grid) == 1 else (ms, crds)
-
-    return m_arr, coords
+    return fig, axgrid
 
 
-def make_map_plot(data, grid=None, map_obj=None, coords=None,
-                  lats=None, lons=None, cmap=None, clevs=None,
-                  robust=None, norm=None, mesh=False, filled=True,
-                  **map_kwargs):
+def define_map_object(projection='Stereographic', **proj_kwargs):
+    """
+    Create a Cartopy map object
+
+    Available map projections and configurations:
+    https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html
+    """
+
+    projection_dict = {
+        'Stereographic': ccrs.Stereographic,
+        'LambertConformal': ccrs.LambertConformal,
+        'LambertCylindrical': ccrs.LambertCylindrical,
+        'Mercator': ccrs.Mercator,
+        'Miller': ccrs.Miller,
+        'Mollweide': ccrs.Mollweide,
+        'Robinson': ccrs.Robinson,
+        'AzimuthalEquidistant': ccrs.AzimuthalEquidistant,
+        'InterruptedGoodeHomolosine': ccrs.InterruptedGoodeHomolosine,
+        'SouthPolarStereo': ccrs.SouthPolarStereo,
+        'NorthPolarStereo': ccrs.NorthPolarStereo,
+    }
+
+    return projection_dict[projection](**proj_kwargs)
+
+
+def make_map_plot(data, grid, lats, lons, mesh=False, filled=True,
+                  cmap=None, clevs=None, robust=None, norm=None, **map_kwargs):
     """
     Producing  map plots
 
@@ -993,18 +989,16 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
         data: array/list/tuple
             Array or list/tuple of 2D data array(s) to plot
         grid: AxesGrid object
-            returned from the 'image_grid_setup' function
-            If not provided it is generated using number of data arrays as
-            input.
-        map_obj: tuple
-            List with Basemap objects returned from 'map_setup' function.
-            If not provided, it is generated within this function.
-        coords: tuple
-            List with arrays of map coordinates; returned from
-            'map_setup' function
-        lats, lons: arrays
-            If map_obj is not provided, latitudes and longitudes need to be
-            provided to setup a Basemap object.
+            Returned from the 'map_setup' function
+        lats, lons: arrays/list of arrays
+            Values of latitudes and longitudes needed for the map plotting.
+            If different lats/lons should be used in the figure panels, these
+            arrays should be provided in a list; [lons_1, lons_2, ...].
+        mesh: boolean
+            Whether to plot data as mesh. If false (default), contour plot is
+            made.
+        filled: boolean
+            Whether to color fill between contours or not. Defaults to True
         cmap: string/list
             String or list with strings of predefined Matplotlib colormaps.
             For filled contour plots it defaults to 'viridis'.
@@ -1016,15 +1010,9 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
         norm: BoundaryNorm object
             Object generated from matplotlib.colors.BoundaryNorm function.
             Generate a colormap index based on discrete intervals.
-        mesh: boolean
-            Whether to plot data as mesh. If false (default), contour plot is
-            made.
-        filled: boolean
-            Whether to color fill between contours or not. Defaults to True
         **map_kwargs: keyword arguments
-            arguments (key=value) that can be used in pyplot.contour(f)
-            See
-            http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contour
+            arguments (key=value) that can be used in pyplot.contour/f
+            (if mesh=False) or pcolormesh (if mesh=True)
     Returns
     -------
         mplots: List
@@ -1034,16 +1022,37 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
     # Single or multiple 2d data arrays
     iter_data = data if isinstance(data, (list, tuple)) else [data]
 
-    igrid = image_grid_setup(fshape=get_nrow_ncol(len(iter_data)))[1]\
-        if grid is None else grid
-    if map_obj is None:
-        assert lats is not None, "Lats and lons must be provided"
-        imap_obj, icrds = map_setup(igrid, lats, lons)
-    else:
-        imap_obj, icrds = (map_obj, coords)
-
     # Number of grids
-    nplots = len(iter_data)
+    ndata = len(iter_data)
+
+    # Check Number of axes in provided ImageGrid object
+    ngrid = grid.ngrids
+    if isinstance(lats, list):
+        if len(lats) != ngrid:
+            grid = grid[:len(lats)]
+            ngrid = len(grid)
+            print("\n{}\n{}\n\n".format(
+                "***** WARNING *****",
+                "Number of lat/lon arrays provided does not "
+                "match number of plots (axes instances from "
+                "grid setup). Map objects created only for "
+                "provided lat/lon arrays"))
+        iter_x = lons
+        iter_y = lats
+    else:
+        iter_x = [lons]*ngrid
+        iter_y = [lats]*ngrid
+
+    if ndata != grid.ngrids:
+        ll = list(set(range(ndata)).symmetric_difference(
+            set(range(grid.ngrids))))
+        [grid[i].remove() for i in ll]
+        grid = grid[:ndata]
+        print("\n{}\n{}\n\n".format(
+            "***** WARNING *****",
+            "Mismatch in number of plots "
+            "(axes instances from grid setup) and number"
+            " of 2D data arrays provided. Excess grids are removed"))
 
     # Make sure clevs is provided
     if clevs is None:
@@ -1059,9 +1068,9 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
         clevs = [gen_clevels(iter_data[i], 15, robust) if cl is None else cl
                  for i, cl in enumerate(clevs)]
 
-    # Create iterators of input arguments
+    # Create iterators of other input arguments
     iter_clevs = clevs if hasattr(clevs[0], '__iter__') else [clevs for i in
-                                                              range(nplots)]
+                                                              range(ndata)]
     if cmap is None:
         if filled:
             cmap = 'viridis'
@@ -1069,10 +1078,10 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
             pass
 
     iter_cmap = cmap if isinstance(cmap, (list, tuple)) else [cmap for i
-                                                              in range(nplots)]
+                                                              in range(ndata)]
     if norm is None:
         if cmap is None:
-            iter_norm = [None]*nplots
+            iter_norm = [None]*ndata
         else:
             iter_norm = []
             for cl, cm in zip(iter_clevs, iter_cmap):
@@ -1080,19 +1089,13 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
                     iter_norm.append(None)
                 else:
                     if isinstance(cm, str):
-                        ncolrs = mpl.cm.get_cmap(cm).N
+                        ncolrs = mpl.colormaps.get_cmap(cm).N
                     else:
                         ncolrs = cm.N
                     iter_norm.append(mpl.colors.BoundaryNorm(cl, ncolrs))
     else:
         iter_norm = norm if hasattr(norm, '__iter__') else [norm for i in
-                                                            range(nplots)]
-    iter_x = [icrds[0]]*nplots if not isinstance(icrds[0], tuple) else\
-        [icrds[i][0] for i in range(len(icrds))]
-    iter_y = [icrds[1]]*nplots if not isinstance(icrds[0], tuple) else\
-        [icrds[i][1] for i in range(len(icrds))]
-    iter_m = imap_obj if isinstance(imap_obj, (list, tuple)) else\
-        [imap_obj]*nplots
+                                                            range(ndata)]
 
     # !! NB It would be nice to use map or starmap but don't know how to handle
     # **kwargs.
@@ -1104,20 +1107,10 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
     # arg_iter = zip(grid, iter_m, iter_x, iter_y, data, iter_clevs, iter_cmap,
     #               iter_norm, cycle([filled]), **iter_kwargs)
     # plots = smap(plot_map, arg_iter)
-    if nplots != igrid.ngrids:
-        ll = list(set(range(nplots)).symmetric_difference(
-            set(range(igrid.ngrids))))
-        [igrid[i].remove() for i in ll]
-        igrid = igrid[:nplots]
-        print("\n{}\n{}\n\n".format(
-            "***** WARNING *****",
-            "Mismatch in number of plots "
-            "(axes instances from grid setup) and number"
-            " of 2D data arrays provided. Excess grids are removed"))
 
     mplots = []
-    for i in range(nplots):
-        mplots.append(plot_map(iter_m[i], iter_x[i], iter_y[i],
+    for i in range(ndata):
+        mplots.append(plot_map(grid[i], iter_x[i], iter_y[i],
                                iter_data[i], iter_clevs[i], iter_cmap[i],
                                iter_norm[i], mesh, filled, **map_kwargs))
 
@@ -1125,18 +1118,18 @@ def make_map_plot(data, grid=None, map_obj=None, coords=None,
     return out_mplots
 
 
-def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
+def plot_map(ax, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
     """
     Producing a map plot
 
     Parameters
     ----------
-        m: Basemap object
-            Handle for the map object returned from 'map_setup' function
+        ax: Axis object
+            Axis generated in 'map_setup' function
         data: numpy array
             2D data array to plot
         x,y: numpy arrays
-            Arrays of map coordinates; returned from 'map_setup' function
+            Arrays of lat/lon coordinates
         clevs: List/array
             Contour levels
         cmap: string
@@ -1150,54 +1143,378 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
         filled: Boolean
             Whether to color fill between contours or not. Defaults to True
         **map_kwargs: keyword arguments
-            arguments (key=value) that can be used in pyplot.contour(f)
-            See
-            http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contour
+            arguments (key=value) that can be used in pyplot.contour/f
+            (if mesh=False) or pcolormesh (if mesh=True)
 
     Returns
     -------
         cs: Contour plot object
     """
 
-    m.drawmapboundary(fill_color='aqua')
-    try:
-        # m.drawcountries(linewidth=1.0, color="#272727")
-        m.drawcountries(linewidth=1.7, color="#272727")
-    except ValueError:
-        pass
-    try:
-        # m.drawcoastlines(linewidth=0.8, color='#272727')
-        m.drawcoastlines(linewidth=1.3, color='#272727')
-    except ValueError:
-        pass
-
     if mesh:
-        cs = m.pcolormesh(x, y, data,
-                          cmap=cmap,
-                          norm=norm,
-                          **map_kwargs)
+        cs = ax.pcolormesh(x, y, data,
+                           transform=ccrs.PlateCarree(),
+                           cmap=cmap,
+                           norm=norm,
+                           **map_kwargs)
     else:
         if filled:
-            cs = m.contourf(x, y, data,
-                            levels=clevs,
-                            norm=norm,
-                            cmap=cmap,
-                            **map_kwargs)
+            cs = ax.contourf(x, y, data,
+                             transform=ccrs.PlateCarree(),
+                             levels=clevs,
+                             norm=norm,
+                             cmap=cmap,
+                             extend='both',
+                             **map_kwargs)
         else:
             if cmap is not None:
                 map_kwargs['colors'] = None
-                cs = m.contour(x, y, data,
-                               levels=clevs,
-                               norm=norm,
-                               cmap=cmap,
-                               **map_kwargs)
+                cs = ax.contour(x, y, data,
+                                transform=ccrs.PlateCarree(),
+                                levels=clevs,
+                                norm=norm,
+                                cmap=cmap,
+                                **map_kwargs)
             else:
-                cs = m.contour(x, y, data,
-                               norm=norm,
-                               levels=clevs,
-                               **map_kwargs)
+                cs = ax.contour(x, y, data,
+                                transform=ccrs.PlateCarree(),
+                                norm=norm,
+                                levels=clevs,
+                                **map_kwargs)
 
     return cs
+
+
+# def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
+#               lat_1=None, res='l', zoom='crnrs', crnr_vals=None,
+#               zoom_geom=[None, None], **mkwargs):
+#     """
+#     Create a basemap object to be used in the overlaying of 2d plots.
+#
+#     Parameters
+#     ----------
+#         grid: list
+#             List with axes objects for each plot in figure
+#         lats: array(s)
+#             array or list of arrays with latitudes
+#         lons: array(s)
+#             array or list of arrays with longitudes
+#         proj: string
+#             the projection to be used (so far only two proj's:
+#             sterographic and lambert conformal)
+#         lat_0/lon_0: float
+#             centre latitude and longitude location of map
+#         lat_1: float
+#             first standard parallell. if proj='lcc', lat_1 must be given.
+#         res: string
+#             resolution (low 'l', intermediate 'i' or high 'h')
+#         zoom: string
+#             "cornrs" or "geom", how to set the extent of map
+#         crnr_vals: 1D list/array
+#             List of values for corners given as [llcrnrlat, llcrnrlon,
+#             urcrnrlat, urcrnrlon]
+#         zoom_geom: 1D list/array
+#             Integers setting map geometry [width, height] in meters.
+#         **mkwargs: key word arguments
+#             Additional arguments provided to Basemap call. See
+#             http://matplotlib.org/basemap/# for more info.
+#
+#     Returns
+#     -------
+#         m: Basemap object
+#             map object
+#         coords: list
+#             list containing x,y arrays of the transformed longitudes
+#             to map coordinates
+#     """
+#
+#     from mpl_toolkits.basemap import Basemap
+#
+#     def _get_mapobj(ax, lats, lons, _lon0, _lat0, lat1):
+#         # Make sure lons are +/- 180 deg.
+#         if lons.max() > 180:
+#             lons[lons > 180] -= 360.
+#
+#         # If lon/lat is 1D; create 2D meshgrid
+#         lon, lat = np.meshgrid(lons, lats)\
+#             if lats.ndim == 1 else (lons, lats)
+#
+#         # Calculate domain mid point if not given
+#         idx = tuple([np.int(i/2) for i in lat.shape])
+#         lat0 = lat[idx] if _lat0 is None else _lat0
+#         lon0 = lon[idx] if _lon0 is None else _lon0
+#
+#         if zoom == 'crnrs':
+#             if crnr_vals is None:
+#                 corners = [lat[0, 0], lon[0, 0], lat[-1, -1], lon[-1, -1]]
+#             else:
+#                 corners = [crnr_vals[i] for i in range(4)]
+#         else:
+#             corners = [None for i in range(4)]
+#             assert zoom_geom, '''\nError! zoom_geom argument is not set
+#             correctly.\nSet to [width/height] in meters, and try again.'''
+#
+#         m = Basemap(projection=proj, ax=ax,
+#                     lat_0=lat0, lon_0=lon0, lat_1=lat1,
+#                     width=zoom_geom[0], height=zoom_geom[1],
+#                     llcrnrlat=(corners[0]), urcrnrlat=(corners[2]),
+#                     llcrnrlon=(corners[1]), urcrnrlon=(corners[3]),
+#                     rsphere=(6378137.00, 6356752.3142), resolution=res,
+#                     **mkwargs)
+#         return m, m(lon, lat)
+#
+#     ngrid = grid.ngrids
+#
+#     if isinstance(lats, list):
+#         if len(lats) != ngrid:
+#             grid = grid[:len(lats)]
+#             ngrid = len(grid)
+#             print("\n{}\n{}\n\n".format(
+#                 "***** WARNING *****",
+#                 "Number of lat/lon arrays provided does not "
+#                 "match number of plots (axes instances from "
+#                 "grid setup). Map objects created only for "
+#                 "provided lat/lon arrays"))
+#         llats = lats
+#         llons = lons
+#     else:
+#         llats = [lats]*ngrid
+#         llons = [lons]*ngrid
+#
+#     # Lat 0/1, Lon 0
+#     llon0 = lon_0 if isinstance(lon_0, list) else [lon_0]*ngrid
+#     llat0 = lat_0 if isinstance(lat_0, list) else [lat_0]*ngrid
+#     if proj == 'lcc':
+#         _llat1 = lat_1 if isinstance(lat_1, list) else [lat_1]*ngrid
+#         llat1 = np.copy(llat0) if np.isin(None, _llat1) else _llat1
+#     else:
+#         llat1 = [None]*ngrid
+#
+#     ms, crds = zip(*[
+#         _get_mapobj(ax, llats[i], llons[i], llon0[i], llat0[i], llat1[i])
+#         for i, ax in enumerate(grid)])
+#     m_arr, coords = (ms[0], crds[0]) if len(grid) == 1 else (ms, crds)
+#
+#     return m_arr, coords
+
+
+# def make_map_plot(data, grid=None, map_obj=None, coords=None,
+#                   lats=None, lons=None, cmap=None, clevs=None,
+#                   robust=None, norm=None, mesh=False, filled=True,
+#                   **map_kwargs):
+#     """
+#     Producing  map plots
+#
+#     Parameters
+#     ----------
+#         data: array/list/tuple
+#             Array or list/tuple of 2D data array(s) to plot
+#         grid: AxesGrid object
+#             returned from the 'image_grid_setup' function
+#             If not provided it is generated using number of data arrays as
+#             input.
+#         map_obj: tuple
+#             List with Basemap objects returned from 'map_setup' function.
+#             If not provided, it is generated within this function.
+#         coords: tuple
+#             List with arrays of map coordinates; returned from
+#             'map_setup' function
+#         lats, lons: arrays
+#             If map_obj is not provided, latitudes and longitudes need to be
+#             provided to setup a Basemap object.
+#         cmap: string/list
+#             String or list with strings of predefined Matplotlib colormaps.
+#             For filled contour plots it defaults to 'viridis'.
+#         clevs: Iterable data structure
+#             Consisting of lists with defined contour levels; e.g.
+#             (np.arange(1,10,2), [0,2,4,6,8]), [np.arange(100,step=5)]*3
+#         robust: string
+#             See gen_clevs function for info
+#         norm: BoundaryNorm object
+#             Object generated from matplotlib.colors.BoundaryNorm function.
+#             Generate a colormap index based on discrete intervals.
+#         mesh: boolean
+#             Whether to plot data as mesh. If false (default), contour plot is
+#             made.
+#         filled: boolean
+#             Whether to color fill between contours or not. Defaults to True
+#         **map_kwargs: keyword arguments
+#             arguments (key=value) that can be used in pyplot.contour(f)
+#             See
+#             http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contour
+#     Returns
+#     -------
+#         mplots: List
+#             List with map plot instances
+#     """
+#
+#     # Single or multiple 2d data arrays
+#     iter_data = data if isinstance(data, (list, tuple)) else [data]
+#
+#     igrid = image_grid_setup(fshape=get_nrow_ncol(len(iter_data)))[1]\
+#         if grid is None else grid
+#     if map_obj is None:
+#         assert lats is not None, "Lats and lons must be provided"
+#         imap_obj, icrds = map_setup(igrid, lats, lons)
+#     else:
+#         imap_obj, icrds = (map_obj, coords)
+#
+#     # Number of grids
+#     nplots = len(iter_data)
+#
+#     # Make sure clevs is provided
+#     if clevs is None:
+#         if len(grid.cbar_axes) > 1 and all([cax.get_axes_locator() for cax in
+#                                             grid.cbar_axes]):
+#             clevs = list(map(gen_clevels, iter_data, [15]*len(iter_data),
+#                          [robust]*len(iter_data)))
+#         else:
+#             clevs = gen_clevels(np.stack(iter_data), 15, robust)
+#
+#     # Replace None in list of clevs with generated levels
+#     elif hasattr(clevs, '__iter__') and any([a is None for a in clevs]):
+#         clevs = [gen_clevels(iter_data[i], 15, robust) if cl is None else cl
+#                  for i, cl in enumerate(clevs)]
+#
+#     # Create iterators of input arguments
+#     iter_clevs = clevs if hasattr(clevs[0], '__iter__') else [clevs for i in
+#                                                               range(nplots)]
+#     if cmap is None:
+#         if filled:
+#             cmap = 'viridis'
+#         else:
+#             pass
+#
+#     iter_cmap = cmap if isinstance(cmap, (list, tuple)) else [cmap for i
+#                                                               in range(nplots)]
+#     if norm is None:
+#         if cmap is None:
+#             iter_norm = [None]*nplots
+#         else:
+#             iter_norm = []
+#             for cl, cm in zip(iter_clevs, iter_cmap):
+#                 if cm is None:
+#                     iter_norm.append(None)
+#                 else:
+#                     if isinstance(cm, str):
+#                         ncolrs = mpl.cm.get_cmap(cm).N
+#                     else:
+#                         ncolrs = cm.N
+#                     iter_norm.append(mpl.colors.BoundaryNorm(cl, ncolrs))
+#     else:
+#         iter_norm = norm if hasattr(norm, '__iter__') else [norm for i in
+#                                                             range(nplots)]
+#     iter_x = [icrds[0]]*nplots if not isinstance(icrds[0], tuple) else\
+#         [icrds[i][0] for i in range(len(icrds))]
+#     iter_y = [icrds[1]]*nplots if not isinstance(icrds[0], tuple) else\
+#         [icrds[i][1] for i in range(len(icrds))]
+#     iter_m = imap_obj if isinstance(imap_obj, (list, tuple)) else\
+#         [imap_obj]*nplots
+#
+#     # !! NB It would be nice to use map or starmap but don't know how to handle
+#     # **kwargs.
+#     # Ex.
+#     # from itertools import starmap as smap
+#     # from itertools import cycle
+#     # iter_kwargs = [{'alpha': .6, 'lw': 2} for i in range(nplots)]
+#     #
+#     # arg_iter = zip(grid, iter_m, iter_x, iter_y, data, iter_clevs, iter_cmap,
+#     #               iter_norm, cycle([filled]), **iter_kwargs)
+#     # plots = smap(plot_map, arg_iter)
+#     if nplots != igrid.ngrids:
+#         ll = list(set(range(nplots)).symmetric_difference(
+#             set(range(igrid.ngrids))))
+#         [igrid[i].remove() for i in ll]
+#         igrid = igrid[:nplots]
+#         print("\n{}\n{}\n\n".format(
+#             "***** WARNING *****",
+#             "Mismatch in number of plots "
+#             "(axes instances from grid setup) and number"
+#             " of 2D data arrays provided. Excess grids are removed"))
+#
+#     mplots = []
+#     for i in range(nplots):
+#         mplots.append(plot_map(iter_m[i], iter_x[i], iter_y[i],
+#                                iter_data[i], iter_clevs[i], iter_cmap[i],
+#                                iter_norm[i], mesh, filled, **map_kwargs))
+#
+#     out_mplots = mplots.pop() if len(mplots) == 1 else mplots
+#     return out_mplots
+
+
+# def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
+#     """
+#     Producing a map plot
+#
+#     Parameters
+#     ----------
+#         m: Basemap object
+#             Handle for the map object returned from 'map_setup' function
+#         data: numpy array
+#             2D data array to plot
+#         x,y: numpy arrays
+#             Arrays of map coordinates; returned from 'map_setup' function
+#         clevs: List/array
+#             Contour levels
+#         cmap: string
+#             Color map. See http://matplotlib.org/users/colormaps.html for more
+#             information.
+#         norm: Boundary norm object
+#             Normalize data to [0,1] to use for mapping colors
+#         mesh: boolean
+#             Whether to plot data as mesh. If false (default), contour plot is
+#             made.
+#         filled: Boolean
+#             Whether to color fill between contours or not. Defaults to True
+#         **map_kwargs: keyword arguments
+#             arguments (key=value) that can be used in pyplot.contour(f)
+#             See
+#             http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contour
+#
+#     Returns
+#     -------
+#         cs: Contour plot object
+#     """
+#
+#     m.drawmapboundary(fill_color='aqua')
+#     try:
+#         # m.drawcountries(linewidth=1.0, color="#272727")
+#         m.drawcountries(linewidth=1.7, color="#272727")
+#     except ValueError:
+#         pass
+#     try:
+#         # m.drawcoastlines(linewidth=0.8, color='#272727')
+#         m.drawcoastlines(linewidth=1.3, color='#272727')
+#     except ValueError:
+#         pass
+#
+#     if mesh:
+#         cs = m.pcolormesh(x, y, data,
+#                           cmap=cmap,
+#                           norm=norm,
+#                           **map_kwargs)
+#     else:
+#         if filled:
+#             cs = m.contourf(x, y, data,
+#                             levels=clevs,
+#                             norm=norm,
+#                             cmap=cmap,
+#                             **map_kwargs)
+#         else:
+#             if cmap is not None:
+#                 map_kwargs['colors'] = None
+#                 cs = m.contour(x, y, data,
+#                                levels=clevs,
+#                                norm=norm,
+#                                cmap=cmap,
+#                                **map_kwargs)
+#             else:
+#                 cs = m.contour(x, y, data,
+#                                norm=norm,
+#                                levels=clevs,
+#                                **map_kwargs)
+#
+#     return cs
 
 
 def image_colorbar(cs, cbaxs, title=None, labelspacing=1,

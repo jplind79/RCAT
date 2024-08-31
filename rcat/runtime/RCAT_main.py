@@ -20,7 +20,7 @@ from rcat.utils.polygons import mask_region
 import rcat.runtime.RCAT_stats as st
 import rcat.utils.grids as gr
 
-# warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore")
 
 
 # Functions
@@ -41,9 +41,12 @@ def get_config_settings(config_file):
         'requested_stats': conf_dict['STATISTICS']['stats'],
         'stats_conf': st.mod_stats_config(conf_dict['STATISTICS']['stats']),
         'validation plot': conf_dict['PLOTTING']['validation plot'],
-        'map configure': conf_dict['PLOTTING']['map configure'],
-        'map grid setup': conf_dict['PLOTTING']['map grid setup'],
-        'map kwargs': conf_dict['PLOTTING']['map kwargs'],
+        'map projection': conf_dict['PLOTTING']['map projection'],
+        'map extent': conf_dict['PLOTTING']['map extent'],
+        'map gridlines': conf_dict['PLOTTING']['map gridlines'],
+        'map configuration': conf_dict['PLOTTING']['map configuration'],
+        'map grid config': conf_dict['PLOTTING']['map grid config'],
+        'map plot kwargs': conf_dict['PLOTTING']['map plot kwargs'],
         'map domain': conf_dict['PLOTTING']['map model domain'],
         'line grid setup': conf_dict['PLOTTING']['line grid setup'],
         'line kwargs': conf_dict['PLOTTING']['line kwargs'],
@@ -905,7 +908,7 @@ def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
     """Saving data to netcdf files"""
 
     # Encoding for time variable
-    encoding = {'time': {'dtype': 'i4'}}
+    # encoding = {'time': {'dtype': 'i4'}}
 
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
         tstat = '_' + stat_dict['stat method'].replace(' ', '')
@@ -925,24 +928,21 @@ def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
             fname = '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, rn, grid,
                 start_year, end_year, tsuffix)
-            data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname),
-                                         encoding=encoding)
+            data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname))
         if fulldomain:
             fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, grid,
                 start_year, end_year, tsuffix)
             data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(
                 start_year, end_year, tsuffix)
-            data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
-                                     encoding=encoding)
+            data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
     else:
         fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
             label, stat_fn, var, thr, tres, tstat, grid,
             start_year, end_year, tsuffix)
         data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(
             start_year, end_year, tsuffix)
-        data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
-                                 encoding=encoding)
+        data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
 
 
 def get_masked_data(data, var, mask):
@@ -1148,9 +1148,12 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         'stat method': tstat,
         'units': vconf['units'],
         'grid coords': grid_coords,
-        'map configure': cdict['map configure'],
-        'map grid setup': cdict['map grid setup'],
-        'map kwargs': cdict['map kwargs'],
+        'map projection': cdict['map projection'],
+        'map extent': cdict['map extent'],
+        'map gridlines': cdict['map gridlines'],
+        'map config': cdict['map configuration'],
+        'map grid setup': cdict['map grid config'],
+        'map plot kwargs': cdict['map plot kwargs'],
         'map domain': cdict['map domain'],
         'line grid setup': cdict['line grid setup'],
         'line kwargs': cdict['line kwargs'],
