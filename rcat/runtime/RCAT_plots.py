@@ -1,6 +1,5 @@
-"""
-Module script for plotting
-"""
+""" Module script for plotting """
+
 import os
 import sys
 import xarray as xa
@@ -597,7 +596,7 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
 
 def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
               obs, var, tres, tstat, units, ytitle, regions, img_dir,
-              grid_coords, map_conf, map_grid, map_sets, line_grid,
+              grid_coords, map_domain, map_conf, map_grid, map_sets, line_grid,
               line_sets):
     """
     Plotting percentile map plot
@@ -613,7 +612,8 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Map settings
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
-    domain = grid_coords['meta data'][var][ref_model]['domain']
+    domain_model = map_domain if map_domain else ref_model
+    domain = grid_coords['meta data'][var][domain_model]['domain']
     mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
@@ -725,8 +725,8 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
 def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                       ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                      img_dir, grid_coords, map_conf, map_grid, map_sets,
-                      line_grid, line_sets):
+                      img_dir, grid_coords, map_domain, map_conf, map_grid,
+                      map_sets, line_grid, line_sets):
     """
     Plotting diurnal cycle map plot
     """
@@ -741,7 +741,8 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     # Map settings
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
-    domain = grid_coords['meta data'][var][ref_model]['domain']
+    domain_model = map_domain if map_domain else ref_model
+    domain = grid_coords['meta data'][var][domain_model]['domain']
     mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)

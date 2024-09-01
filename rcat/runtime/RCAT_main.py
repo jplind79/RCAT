@@ -15,12 +15,13 @@ from itertools import product
 import numpy as np
 import re
 from dask.distributed import Client
+from dask.diagnostics import ProgressBar
 from rcat.utils import ini_reader
 from rcat.utils.polygons import mask_region
 import rcat.runtime.RCAT_stats as st
 import rcat.utils.grids as gr
 
-# warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore")
 
 
 # Functions
@@ -75,7 +76,7 @@ def cluster_setup(clr_type, clr_kwargs, nrnodes=1):
     elif clr_type == 'slurm':
         from dask_jobqueue import SLURMCluster
         cluster = SLURMCluster(**clr_kwargs)
-        cluster.scale(nrnodes)
+        cluster.scale(jobs=nrnodes)
     else:
         print(f"\n\tCluster type {cluster_type} not implemented! Exiting...")
         sys.exit()
@@ -229,12 +230,13 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     ch_x = mconf['chunks_x']
     ch_y = mconf['chunks_y']
 
+    # breakpoint()
     # -- Opening files (possibly with de-accumulation preprocessing)
     if deacc:
         _mdata = xa.open_mfdataset(
             flist, parallel=True,
             data_vars='minimal', coords='minimal', combine='by_coords',
-            chunks={**ch_t, **ch_x, **ch_y},
+            chunks={**ch_t, **ch_x, **ch_y}, autoclose=True,
             preprocess=(lambda arr: arr.diff('time'))).drop_duplicates(
                 dim='time', keep='last')
         _mdata = _mdata.chunk({**ch_t}).unify_chunks()
@@ -248,7 +250,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
         _mdata = xa.open_mfdataset(
             flist, parallel=True,
             data_vars='minimal', coords='minimal', combine='by_coords',
-            chunks={**ch_t, **ch_x, **ch_y}).drop_duplicates(
+            chunks={**ch_t, **ch_x, **ch_y}, autoclose=True).drop_duplicates(
                 dim='time', keep='last')
         _mdata = _mdata.chunk({**ch_t}).unify_chunks()
 
@@ -492,11 +494,11 @@ def data_interpolation(dd, var, varconf, modnames, obsnames, griddict):
             griddict.update({'lon': {gridname: target_grid['lon'].values},
                             'lat': {gridname: target_grid['lat'].values}})
             for mod in modnames:
-                dd[mod]['data'] = regrid_calc(dd, mod, v, target_grid,
+                dd[mod]['data'] = regrid_calc(dd, mod, var, target_grid,
                                               varconf['rgr method'])
             if None not in obsnames:
                 for obs in obsnames:
-                    dd[obs]['data'] = regrid_calc(dd, obs, v, target_grid,
+                    dd[obs]['data'] = regrid_calc(dd, obs, var, target_grid,
                                                   varconf['rgr method'])
         elif varconf['regrid'] in obsnames:
             rgr_oname = varconf['regrid']
@@ -505,13 +507,13 @@ def data_interpolation(dd, var, varconf, modnames, obsnames, griddict):
             griddict.update({'lon': {rgr_oname: target_grid['lon']},
                              'lat': {rgr_oname: target_grid['lat']}})
             for m in modnames:
-                dd[m]['data'] = regrid_calc(dd, m, v, target_grid,
+                dd[m]['data'] = regrid_calc(dd, m, var, target_grid,
                                             varconf['rgr method'])
             if len(obsnames) > 1:
                 obslist = obsnames.copy()
                 obslist.remove(rgr_oname)
                 for obs in obslist:
-                    dd[obs]['data'] = regrid_calc(dd, obs, v, target_grid,
+                    dd[obs]['data'] = regrid_calc(dd, obs, var, target_grid,
                                                   varconf['rgr method'])
         elif varconf['regrid'] in modnames:
             mname = varconf['regrid']
@@ -522,11 +524,11 @@ def data_interpolation(dd, var, varconf, modnames, obsnames, griddict):
             griddict.update({'lon': {mname: target_grid['lon']},
                             'lat': {mname: target_grid['lat']}})
             for mod in modlist:
-                dd[mod]['data'] = regrid_calc(dd, mod, v, target_grid,
+                dd[mod]['data'] = regrid_calc(dd, mod, var, target_grid,
                                               varconf['rgr method'])
             if None not in obsnames:
                 for obs in obsnames:
-                    dd[obs]['data'] = regrid_calc(dd, obs, v, target_grid,
+                    dd[obs]['data'] = regrid_calc(dd, obs, var, target_grid,
                                                   varconf['rgr method'])
         else:
             raise ValueError(("\n\n\tTarget grid name not found!\n"
@@ -904,8 +906,8 @@ def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
                  tsuffix, stat_dict, tres, thr='', regs=None, fulldomain=True):
     """Saving data to netcdf files"""
 
-    # Encoding for time variable
-    encoding = {'time': {'dtype': 'i4'}}
+    # Encoding for time variable. EDIT 240826: Often not applicable
+    # encoding = {'time': {'dtype': 'i4'}}
 
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
         tstat = '_' + stat_dict['stat method'].replace(' ', '')
@@ -917,7 +919,7 @@ def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
     else:
         stat_fn = stat_name
 
-    if regs is not None:
+    if regs:
         for r in regs:
             rn = r.replace(' ', '_')
             data['regions'][r].attrs['Analysed time'] =\
@@ -925,24 +927,21 @@ def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
             fname = '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, rn, grid,
                 start_year, end_year, tsuffix)
-            data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname),
-                                         encoding=encoding)
+            data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname))
         if fulldomain:
             fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, grid,
                 start_year, end_year, tsuffix)
             data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(
                 start_year, end_year, tsuffix)
-            data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
-                                     encoding=encoding)
+            data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
     else:
         fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
             label, stat_fn, var, thr, tres, tstat, grid,
             start_year, end_year, tsuffix)
         data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(
             start_year, end_year, tsuffix)
-        data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
-                                 encoding=encoding)
+        data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
 
 
 def get_masked_data(data, var, mask):
@@ -1260,8 +1259,8 @@ for var in cdict['variables']:
     tres = ([tres]*len(cdict['models'].keys())
             if not isinstance(tres, list) else tres)
 
-    print(f"""\n\tvariable: {var}  |  input resolution:
-          {', '.join(np.unique(tres))}""")
+    print(f"\n\tvariable: {var}  |  input resolution: "
+          f"{', '.join(np.unique(tres))}")
 
     # Model data
     mod_names = []

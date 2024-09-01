@@ -923,7 +923,7 @@ def map_setup(grid, lats, lons, proj='stere', lon_0=None, lat_0=None,
             if lats.ndim == 1 else (lons, lats)
 
         # Calculate domain mid point if not given
-        idx = tuple([np.int(i/2) for i in lat.shape])
+        idx = tuple([int(i/2) for i in lat.shape])
         lat0 = lat[idx] if _lat0 is None else _lat0
         lon0 = lon[idx] if _lon0 is None else _lon0
 
@@ -1159,7 +1159,7 @@ def plot_map(m, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
         cs: Contour plot object
     """
 
-    m.drawmapboundary(fill_color='aqua')
+    # m.drawmapboundary(fill_color='aqua')
     try:
         # m.drawcountries(linewidth=1.0, color="#272727")
         m.drawcountries(linewidth=1.7, color="#272727")
