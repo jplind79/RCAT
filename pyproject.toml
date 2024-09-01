@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "RCAT"
+version = "0.1"
+description = """
+The Regional Climate Analysis Tool (RCAT), is a tool to calculate
+and visualize weather and climate model statistics.
+"""
+authors = [
+    { name = "Petter Lind", email = "petter.lind@smhi.se" },
+]
+maintainers = [
+    { name = "Petter Lind", email = "petter.lind@smhi.se" },
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.9"
+keywords = [
+    "climate",
+    "dask",
+    "diagnostic",
+    "interpolation",
+    "model",
+    "numpy",
+    "xarray",
+    "statistics",
+    "plotting",
+    "python",
+    "science",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = [
+    "cartopy",
+    "dask-jobqueue",
+    "dask[complete]",
+    "esmpy",
+    "matplotlib",
+    "netcdf4",
+    "numpy",
+    "xarray",
+    "xesmf",
+]
+
+[project.urls]
+Homepage = "https://regional-climate-analysis-tool.readthedocs.io/en/latest/"
+Source = "https://github.com/jplind79/RCAT"
+Issues = "https://github.com/jplind79/RCAT/issues"
+
+[tool.hatch.version]
+path = "rcat/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/rcat",
+]

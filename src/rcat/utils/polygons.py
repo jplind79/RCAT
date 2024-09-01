@@ -10,7 +10,8 @@
 import sys
 import numpy as np
 import os
-from mpl_toolkits.basemap import Basemap
+import cartopy.crs as ccrs
+import cartopy.feature as cf
 import matplotlib.pyplot as plt
 import argparse
 
@@ -193,7 +194,7 @@ def create_polygon():
     """
     from rcat.utils import draw_polygon
 
-    def get_map(area, map_resolution='l', map_dict=None):
+    def get_map(area, map_dict=None):
         # Create map object
         if area == 'latlon':
             s1 = "Type in southern-most latitude"
@@ -204,104 +205,104 @@ def create_polygon():
             lat2 = input('\n{}\n>> '.format(s2))
             lon1 = input('\n{}\n>> '.format(s3))
             lon2 = input('\n{}\n>> '.format(s4))
-            lat1 = float(lat1)
-            lat2 = float(lat2)
-            lon1 = float(lon1)
-            lon2 = float(lon2)
-            m = Basemap(ax=ax,
-                        llcrnrlat=lat1, urcrnrlat=lat2,
-                        llcrnrlon=lon1, urcrnrlon=lon2,
-                        lat_0=(lat1+lat2)/2, lon_0=(lon1+lon2)/2,
-                        projection='lcc',
-                        resolution=map_resolution)
+            extent = [float(lon1), float(lon2),
+                      float(lat1), float(lat2)]
         else:
-            m = Basemap(ax=ax,
-                        width=map_dict[area]['wdth'],
-                        height=map_dict[area]['hght'],
-                        projection=map_dict[area]['proj'],
-                        resolution=map_resolution,
-                        lat_0=map_dict[area]['lat0'],
-                        lon_0=map_dict[area]['lon0'])
-        m.drawmapboundary(fill_color='#e6f2ff')
-        m.fillcontinents(color='#e6e6e6', lake_color='#e6f2ff')
-        m.drawcoastlines(color='#262626')
-        m.drawcountries()
-        m.drawstates(color='darkgrey')
-        return m
+            extent = [
+                map_dict[area]['lon1'],
+                map_dict[area]['lon2'],
+                map_dict[area]['lat1'],
+                map_dict[area]['lat2']
+            ]
+
+        central_lon = np.mean(extent[:2])
+        central_lat = np.mean(extent[2:])
+
+        print(f"central lon: {central_lon}\ncentral lat: {central_lat}")
+        fig = plt.figure(1, (16, 16))
+        ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.AlbersEqualArea(
+            central_lon, central_lat))
+        ax.set_extent(extent)
+
+        ax.add_feature(cf.OCEAN)
+        ax.add_feature(cf.LAND, edgecolor='black')
+        ax.add_feature(cf.LAKES, edgecolor='black')
+        ax.add_feature(cf.BORDERS)
+        if area == 'North America':
+            ax.add_feature(cf.STATES)
+
+        gl = ax.gridlines(
+            draw_labels=True, linewidth=0.5, color='gray',
+            x_inline=False, y_inline=False, linestyle='-',
+            alpha=.7, crs=ccrs.PlateCarree())
+        gl.top_labels = False
+        gl.right_labels = False
+
+        return fig, ax
 
     map_dict = {
             "Europe": {
-                        "proj": "lcc",
-                        "wdth": 5e6,
-                        "hght": 5e6,
-                        "lon0": 17,
-                        "lat0": 51,
-                        },
+                "lon1": -10,
+                "lon2": 40,
+                "lat1": 25,
+                "lat2": 72,
+            },
             "North America": {
-                        "proj": "lcc",
-                        "wdth": 9e6,
-                        "hght": 7e6,
-                        "lon0": -110,
-                        "lat0": 47,
-                        },
-            "South America": {
-                        "proj": "lcc",
-                        "wdth": 7e6,
-                        "hght": 9e6,
-                        "lon0": -59,
-                        "lat0": -22,
-                        },
-            "Africa": {
-                        "proj": "lcc",
-                        "wdth": 10e6,
-                        "hght": 9.5e6,
-                        "lon0": 16,
-                        "lat0": 2,
-                        },
-            "Australia": {
-                        "proj": "lcc",
-                        "wdth": 7e6,
-                        "hght": 6e6,
-                        "lon0": 145,
-                        "lat0": -25,
-                        },
-            "South-East Asia": {
-                        "proj": "lcc",
-                        "wdth": 7e6,
-                        "hght": 6e6,
-                        "lon0": 98,
-                        "lat0": 12,
-                        },
-            "East Asia": {
-                        "proj": "lcc",
-                        "wdth": 7e6,
-                        "hght": 4.5e6,
-                        "lon0": 111,
-                        "lat0": 35,
-                        },
-            "Central Asia": {
-                        "proj": "lcc",
-                        "wdth": 4.8e6,
-                        "hght": 3e6,
-                        "lon0": 54,
-                        "lat0": 49,
-                        },
-            "Middle East": {
-                        "proj": "lcc",
-                        "wdth": 5e6,
-                        "hght": 4e6,
-                        "lon0": 51,
-                        "lat0": 27,
-                        },
+                "lon1": -120,
+                "lon2": -70,
+                "lat1": 22,
+                "lat2": 51,
+            },
+            # "South America": {
+            #             "proj": "lcc",
+            #             "wdth": 7e6,
+            #             "hght": 9e6,
+            #             "lon0": -59,
+            #             "lat0": -22,
+            #             },
+            # "Africa": {
+            #             "proj": "lcc",
+            #             "wdth": 10e6,
+            #             "hght": 9.5e6,
+            #             "lon0": 16,
+            #             "lat0": 2,
+            #             },
+            # "Australia": {
+            #             "proj": "lcc",
+            #             "wdth": 7e6,
+            #             "hght": 6e6,
+            #             "lon0": 145,
+            #             "lat0": -25,
+            #             },
+            # "South-East Asia": {
+            #             "proj": "lcc",
+            #             "wdth": 7e6,
+            #             "hght": 6e6,
+            #             "lon0": 98,
+            #             "lat0": 12,
+            #             },
+            # "East Asia": {
+            #             "proj": "lcc",
+            #             "wdth": 7e6,
+            #             "hght": 4.5e6,
+            #             "lon0": 111,
+            #             "lat0": 35,
+            #             },
+            # "Central Asia": {
+            #             "proj": "lcc",
+            #             "wdth": 4.8e6,
+            #             "hght": 3e6,
+            #             "lon0": 54,
+            #             "lat0": 49,
+            #             },
+            # "Middle East": {
+            #             "proj": "lcc",
+            #             "wdth": 5e6,
+            #             "hght": 4e6,
+            #             "lon0": 51,
+            #             "lat0": 27,
+            #             },
             }
-
-    fig = plt.figure(1, (16, 16))
-    ax = fig.add_subplot(111)
-
-    # Create Canvas object and mouse click settings
-    cnv = draw_polygon.Canvas(ax)
-    plt.connect('motion_notify_event', cnv.set_location)
-    plt.connect('button_press_event', cnv.update_path)
 
     print("Welcome!\n")
     s1 = "What area would you like to show on map?"
@@ -309,30 +310,24 @@ def create_polygon():
     s3 = "Type 'latlon' to choose area manually"
     area = input('{}\n{}\n{}\n\n>> '.format(s1, s2, s3))
 
-    mres = input("\nOne more thing before continuing -- what resolution would "
-                 "you like for the map?\nOptions are 'c' (crude), 'l' (low), "
-                 "'i' (intermediate), 'h' (high), 'f' (full).\nDefault is low"
-                 " -- if this is ok just press enter ...\n>> ")
-    mres = 'l' if not mres else mres
-
     if area == 'print areas':
         print()
         print("Available map areas:\n")
         [print('{}'.format(ar)) for ar in map_dict.keys()]
 
         area = input("\n\nOk, so what area have you chosen?\n>> ")
-        m = get_map(area, mres, map_dict)
+        fig, ax = get_map(area, map_dict)
     elif area == 'latlon':
-        m = get_map(area, mres)
+        fig, ax = get_map(area)
     else:
         try:
-            m = get_map(area, mres, map_dict)
+            fig, ax = get_map(area, map_dict)
         except ValueError:
             print("The area you provided is not available.\nPlease, try"
                   " again ...")
             area = input("What area would you like to show on map?\n\n>> ")
             try:
-                m = get_map(area, mres, map_dict)
+                fig, ax = get_map(area, map_dict)
             except ValueError:
                 print("Sorry! Something is wrong ... exiting")
                 sys.exit()
@@ -345,12 +340,18 @@ def create_polygon():
     print('\n\n{}\n{}\n   1) {}\n   2) {}\n'.format(s1, s2, s3, s4))
     input("To continue, please press enter...")
 
+    # Create Canvas object and mouse click settings
+    cnv = draw_polygon.Canvas(ax)
+    plt.connect('motion_notify_event', cnv.set_location)
+    plt.connect('button_press_event', cnv.update_path)
     plt.show()
 
-    verts = np.array(cnv.vert)
-    lonpt, latpt = m(verts[:, 0], verts[:, 1], inverse=True)
-
-    poly = [(x, y) for x, y in zip(lonpt, latpt)]
+    # convert from data to cartesian coordinates
+    poly = [ccrs.PlateCarree().transform_point(
+        *pt, src_crs=ccrs.AlbersEqualArea(
+            central_longitude=ax.projection.proj4_params['lon_0'],
+            central_latitude=ax.projection.proj4_params['lat_0']))
+            for pt in cnv.vert]
 
     s1 = "Do you want to write the polygon to disk?"
     s2 = "Then, type 'write' and instructions will follow."
@@ -376,8 +377,7 @@ def create_polygon():
     return poly
 
 
-def plot_polygon(polygon, map_resolution='l', map_proj='stere',
-                 savefig=False, figpath=None):
+def plot_polygon(polygon, savefig=False, figpath=None):
     """
     Plot polygon on map.
 
@@ -387,13 +387,6 @@ def plot_polygon(polygon, map_resolution='l', map_proj='stere',
         Name of polygon as defined by poly_dict dictionary in 'polygons'
         function, or list with polygon coordinates [[lon1, lat1], [lon2, lat2],
         ..., [lon1, lat1]].
-    map_resolution: string
-        The resolution for the plotted map (resolution of boundary database to
-        use). Can be 'c' (crude), 'l' (low), 'i' (intermediate), 'h' (high),
-        'f' (full). Crude and low are installed by default. If higher
-        resolution is wanted ('i', 'h' or 'f') high-res data must be installed.
-        In conda this can be achieved by running:
-        conda install -c conda-forge basemap-data-hires
     savefig: boolean
         If True, figure is saved to 'figpath' location ('figpath' must be set).
         If false, figure is displayed on screen.
@@ -423,37 +416,33 @@ def plot_polygon(polygon, map_resolution='l', map_proj='stere',
 
     # Lats/lons
     lons = [p[0] for p in poly]
-    lon_incr = (max(lons) - min(lons))*.2
     lon_0 = (max(lons) + min(lons))/2
 
     lats = [p[1] for p in poly]
-    lat_incr = (max(lats) - min(lats))*.2
     lat_0 = (max(lats) + min(lats))/2
 
-    # Initalize figure
-    fig = plt.figure(figsize=[12, 13])
-    ax = fig.add_subplot(111)
+    extent = [min(lons), max(lons), min(lats), max(lats)]
 
-    mm = Basemap(resolution=map_resolution, projection=map_proj, ellps='WGS84',
-                 lon_0=lon_0, lat_0=lat_0,
-                 llcrnrlon=min(lons)-lon_incr, llcrnrlat=min(lats)-lat_incr,
-                 urcrnrlon=max(lons)+lon_incr, urcrnrlat=max(lats)+lat_incr,
-                 ax=ax)
-    mm.drawmapboundary(fill_color=water)
-    try:
-        mm.drawcoastlines()
-    except ValueError:
-        pass
-    try:
-        mm.fillcontinents(color=earth, lake_color=water)
-    except ValueError:
-        pass
-    try:
-        mm.drawcountries()
-    except ValueError:
-        pass
+    # Plot map
+    fig = plt.figure(1, (16, 16))
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.AlbersEqualArea(
+        central_longitude=lon_0, central_latitude=lat_0))
+    ax.set_extent(extent)
 
-    _draw_screen_poly(lats, lons, ax, mm, linewidth=4, color='m')
+    ax.add_feature(cf.OCEAN, facecolor=water)
+    ax.add_feature(cf.LAND, facecolor=earth, edgecolor='black')
+    ax.add_feature(cf.LAKES, edgecolor='black')
+    ax.add_feature(cf.BORDERS)
+    ax.add_feature(cf.STATES)
+
+    gl = ax.gridlines(
+        draw_labels=True, linewidth=0.5, color='gray',
+        x_inline=False, y_inline=False, linestyle='-',
+        alpha=.7, crs=ccrs.PlateCarree())
+    gl.top_labels = False
+    gl.right_labels = False
+
+    _draw_screen_poly(lats, lons, ax, linewidth=4, color='m')
 
     if savefig:
         errmsg = "Error! 'figpath' must be set if saving figure"
@@ -463,13 +452,12 @@ def plot_polygon(polygon, map_resolution='l', map_proj='stere',
         plt.show()
 
 
-def _draw_screen_poly(lats, lons, ax, m, color='k', linewidth=3, alpha=1.0):
+def _draw_screen_poly(lats, lons, ax, color='k', linewidth=3, alpha=1.0):
     from matplotlib.patches import Polygon
 
-    x, y = m(lons, lats)
-    xy = list(zip(x, y))
-    poly = Polygon(xy, edgecolor=color, facecolor='none',
-                   lw=linewidth, alpha=alpha)
+    xy = list(zip(lons, lats))
+    poly = Polygon(xy, transform=ccrs.PlateCarree(), edgecolor=color,
+                   facecolor='none', lw=linewidth, alpha=alpha)
     ax.add_patch(poly)
 
 
