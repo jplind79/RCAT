@@ -87,49 +87,6 @@ def _map_grid_setup(map_grid_set):
     return map_grid_set
 
 
-# def _map_configurations(map_conf_args, grid_conf_args, invar, ref_mod):
-#     """
-#     Create and/or modify map configuration dictionary for map plots
-#     """
-#     if not map_conf_args.keys():
-#         map_conf = {
-#             'proj': 'stere',
-#             'zoom': 'crnrs',
-#             'crnr_vals': grid_conf_args['meta data'][invar][ref_mod]['crnrs'],
-#             'lon_0': grid_conf_args['meta data'][invar][ref_mod]['lon_0']
-#         }
-#     else:
-#         map_conf = map_conf_args.copy()
-#         if 'zoom' in map_conf_args:
-#             if map_conf_args['zoom'] == 'crnrs' and\
-#                'crnr_vals' not in map_conf_args:
-#                 map_conf.update(
-#                     {'crnr_vals':
-#                      grid_conf_args['meta data'][invar][ref_mod]['crnrs']})
-#             elif map_conf_args['zoom'] == 'geom':
-#                 errmsg = ("\t\tFor map plot with 'zoom': 'geom', 'zoom_geom' "
-#                           "(zoom geometry -- width/height)must be set!")
-#                 assert 'zoom_geom' in map_conf_args, errmsg
-#         else:
-#             map_conf.update(
-#                 {'zoom': 'crnrs',
-#                  'crnr_vals':
-#                  grid_conf_args['meta data'][invar][ref_mod]['crnrs']})
-#         if 'proj' in map_conf_args and map_conf_args['proj'] == 'lcc':
-#             if 'lat_0' not in map_conf_args:
-#                 map_conf.update(
-#                     {'lat_0':
-#                      grid_conf_args['meta data'][invar][ref_mod]['lat_0']})
-#         else:
-#             map_conf.update({'proj': 'stere'})
-#         if 'lon_0' not in map_conf_args:
-#             map_conf.update({
-#                 'lon_0': grid_conf_args['meta data'][invar][ref_mod]['lon_0']
-#             })
-# 
-#     return map_conf
-
-
 def _plots(stat):
     p = {
         'seasonal cycle': map_season,
@@ -336,14 +293,8 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
     # Add contour plot if mslp
     if var == 'psl':
-        lp = rpl.make_map_plot(dlist, axs_grid, lts, lns,  clevs=clevs,
-                               filled=False, colors='#4f5254', linewidths=1.3)
-    #     # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
-    #     cls = [plt.clabel(
-    # mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
-    # inline_spacing=24) for mplot, cl in zip(lp, clevs)]
-    #     [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
-    #       for txt in cl] for cl in cls]
+        rpl.make_map_plot(dlist, axs_grid, lts, lns,  clevs=clevs,
+                          filled=False, colors='#4f5254', linewidths=1.3)
 
     # Map settings
     rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle,
@@ -358,151 +309,11 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
 
-def OLD_map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
-               obs, var, tres, tstat, units, ytitle, regions, img_dir,
-               grid_coords, map_domain, map_conf, map_grid, map_sets,
-               line_grid, line_sets):
-    """
-    Plotting seasonal mean map plot
-    """
-
-    ref_mnme = ref_model.upper()
-    othr_mod = models.copy()
-    othr_mod.remove(ref_model)
-
-    # Obs data list
-    obslist = [obs] if not isinstance(obs, list) else obs
-
-    # Map settings
-    target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
-    tgname = target_grid_names[0]
-    domain_model = map_domain if map_domain else ref_model
-    domain = grid_coords['meta data'][var][domain_model]['domain']
-    mask = mask_region(
-        grid_coords['target grid'][var]['lon'][tgname],
-        grid_coords['target grid'][var]['lat'][tgname], domain)
-
-    # Data
-    fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_list)}
-    fmod_msk = {m: _mask_data(ds, var, mask) for m, ds in fmod.items()}
-
-    if obslist[0] is not None:
-        obslbl = "_".join(s for s in obslist)
-        ref_obs = obslist[0]
-        fobs = {o: xa.open_dataset(f) for o, f in zip(obslist, fo_list)}
-        fobs_msk = {o: _mask_data(ds, var, mask) for o, ds in fobs.items()}
-        dlist = [fobs_msk[ref_obs][var].values[i, :] for i in range(4)] +\
-                [fmod_msk[m][var].values[i, :] -
-                 fobs_msk[ref_obs][var].values[i, :]
-                 for m in models for i in range(4)]
-        if len(obslist) > 1:
-            dlist += [fobs_msk[o][var].values[i, :] -
-                      fobs_msk[ref_obs][var].values[i, :]
-                      for o in obslist[1:] for i in range(4)]
-            ndata = nmod + len(obslist[1:])
-            ftitles = [ref_obs] + ["{} - {}".format(m, ref_obs)
-                                   for m in models + obslist[1:]]
-        else:
-            ndata = nmod
-            ftitles = [ref_obs] + ["{} - {}".format(m, ref_obs)
-                                   for m in models]
-    else:
-        dlist = [fmod_msk[ref_model][var].values[i, :] for i in range(4)] +\
-                [fmod_msk[m][var].values[i, :] -
-                 fmod_msk[ref_model][var].values[i, :]
-                 for m in othr_mod for i in range(4)]
-        ndata = nmod-1
-        ftitles = [ref_mnme] + ["{} - {}".format(m, ref_mnme)
-                                for m in othr_mod]
-
-    # figure settings
-    figshape = (ndata + 1, 4)
-    if np.prod(figshape) > 8:
-        figsize = (22, 14)
-    else:
-        figsize = (20, 9)
-
-    thr = fmod_msk[ref_model].attrs['Description'].\
-        split('|')[2].split(':')[1].strip()
-    if thr != 'None':
-        headtitle = '{} [{}] | Threshold: {}\n{}'.format(
-            var, units, thr, ytitle)
-        if obs is not None:
-            fn = '{}_thr{}{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
-                var, thr, tres, tstat, obslbl, ytitle.replace(' ', '_'))
-        else:
-            fn = '{}_thr{}{}{}_map_seasonal_cycle_model_{}.png'.format(
-                var, thr, tres, tstat, ytitle.replace(' ', '_'))
-    else:
-        headtitle = '{} [{}] | {}'.format(var, units, ytitle)
-        if obs is not None:
-            fn = '{}{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
-                var, tres, tstat, obslbl, ytitle.replace(' ', '_'))
-        else:
-            fn = '{}{}{}_map_seasonal_cycle_model_{}.png'.format(
-                var, tres, tstat, ytitle.replace(' ', '_'))
-
-    if var == 'pr':
-        cmap = [mpl.cm.YlGnBu]*4 + [mpl.cm.BrBG]*ndata*4
-    else:
-        cmap = [mpl.cm.Spectral_r]*4 + [mpl.cm.RdBu_r]*ndata*4
-
-    clevs_abs = get_clevs(np.array(dlist[0:4]), centered=False)
-    clevs_rel = get_clevs(np.array(dlist[4:8]), centered=True)
-    clevs = [clevs_abs]*4 + [clevs_rel]*ndata*4
-
-    # TBD: Try to find appropriate formatting for color bar
-    # cb_fmt_abs = [str(f)[::-1].find('.') for f in clevs_abs]
-    # cb_fmt_rel = [str(f)[::-1].find('.') for f in clevs_rel]
-
-    rpl.figure_init(plottype='map')
-
-    # if var == 'psl':
-    #     map_kw = map_grid.copy()
-    #     map_kw.update({'cbar_mode': None})
-    #     fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-    #                                      **map_kw)
-    # else:
-    fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                     **map_grid)
-
-    lts = grid_coords['target grid'][var]['lat'][tgname]
-    lns = grid_coords['target grid'][var]['lon'][tgname]
-
-    # Create map object
-    m, coords = rpl.map_setup(grid, lts, lns, **map_conf)
-
-    mp = rpl.make_map_plot(dlist, grid, m, coords,  cmap=cmap,
-                           clevs=clevs, **map_sets)
-    rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
-
-    # Add contour plot if mslp
-    if var == 'psl':
-        lp = rpl.make_map_plot(dlist, grid, m, coords,  clevs=clevs,
-                               filled=False, colors='#4f5254', linewidths=1.3)
-    #     # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
-    #     cls = [plt.clabel(mplot, cl, fmt='%.1f', colors='#4c4c4c', fontsize=15,
-    #                       inline_spacing=24) for mplot, cl in zip(lp, clevs)]
-    #     [[txt.set_bbox(dict(facecolor='white', edgecolor='none', pad=0))
-    #       for txt in cl] for cl in cls]
-
-    # Map settings
-    rpl.map_axes_settings(fig, grid, headtitle=headtitle,
-                          time_mean='season')
-
-    # Annotate
-    [ax.text(-0.05, 0.5, ft.upper(), va='center', ha='center',
-             rotation=90, transform=ax.transAxes)
-     for ft, ax in zip(ftitles, [grid[i]
-                                 for i in [p*4 for p in range(ndata+1)]])]
-
-    plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
-
-
 def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                   ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                  img_dir, grid_coords, map_domain, map_conf, map_grid,
-                  map_sets, line_grid, line_sets):
+                  img_dir, grid_coords, map_domain, map_projection, map_config,
+                  map_extent, map_gridlines, map_axes_conf, map_plot_conf,
+                  line_grid, line_sets):
     """
     Plotting annual cycle map plot
     """
@@ -591,36 +402,28 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
         rpl.figure_init(plottype='map')
 
-        # if var == 'psl':
-        #     map_kw = map_grid.copy()
-        #     if (('cbar_mode' in map_kw and
-        #          map_kw['cbar_mode'] is not None)):
-        #         map_kw.update({'cbar_mode': None})
-        #     else:
-        #         map_kw.update({'cbar_mode': None})
-        #     fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-        #                                      **map_kw)
-        # else:
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_grid)
+        # Create map object and axes grid
+        map_proj = rpl.define_map_object(map_projection, **map_config)
+        fig, axs_grid = rpl.map_setup(
+            map_proj, map_extent, figsize, figshape, grid_lines=map_gridlines,
+            **map_axes_conf)
 
-        # Create map object
-        m, coords = rpl.map_setup(grid, lts, lns, **map_conf)
-
-        mp = rpl.make_map_plot(dlist[p], grid, m, coords, cmap=cmap[p],
-                               clevs=clevs[p], **map_sets)
-        rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
+        # Plot the maps
+        mp = rpl.make_map_plot(
+            dlist[p], axs_grid, lts, lns, cmap=cmap[p], clevs=clevs[p],
+            **map_plot_conf)
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter='{:.1f}')
 
         # Add contour plot if mslp
         if var == 'psl':
-            lp = rpl.make_map_plot(dlist[p], grid, m, coords, clevs=clevs[p],
-                                   filled=False, colors='#4f5254',
-                                   linewidths=1.3)
-            # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
+            rpl.make_map_plot(
+                dlist[p], axs_grid, lts, lns, clevs=clevs[p], filled=False,
+                colors='#4f5254', linewidths=1.3)
+        # [plt.clabel(mm, fmt='%.1f', colors='k', fontsize=15) for mm in lp]
 
         # Map settings
-        rpl.map_axes_settings(fig, grid, fontsize='large', headtitle=headtitle,
-                              time_mean='month')
+        rpl.map_axes_settings(fig, axs_grid, fontsize='large',
+                              headtitle=headtitle, time_mean='month')
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
@@ -737,10 +540,11 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
 
-def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
-              obs, var, tres, tstat, units, ytitle, regions, img_dir,
-              grid_coords, map_conf, map_grid, map_sets, line_grid,
-              line_sets):
+def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
+              ref_model, obs, var, tres, tstat, units, ytitle, regions,
+              img_dir, grid_coords, map_domain, map_projection, map_config,
+              map_extent, map_gridlines, map_axes_conf, map_plot_conf,
+              line_grid, line_sets):
     """
     Plotting percentile map plot
     """
@@ -755,7 +559,8 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Map settings
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
-    domain = grid_coords['meta data'][var][ref_model]['domain']
+    domain_model = map_domain if map_domain else ref_model
+    domain = grid_coords['meta data'][var][domain_model]['domain']
     mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
@@ -841,34 +646,36 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
         rpl.figure_init(plottype='map')
 
-        # Setup figure grid with colorbar settings
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_grid)
-
-        # Create map object
-        m, coords = rpl.map_setup(grid, lts, lns, **map_conf)
+        # Create map object and axes grid
+        map_proj = rpl.define_map_object(map_projection, **map_config)
+        fig, axs_grid = rpl.map_setup(
+            map_proj, map_extent, figsize, figshape, grid_lines=map_gridlines,
+            **map_axes_conf)
 
         clevs_abs = get_clevs(np.array(dlist[p][0]), centered=False)
         clevs_rel = get_clevs(np.array(dlist[p][1]), centered=True)
         clevs = [clevs_abs] + [clevs_rel]*ndata
 
-        mp = rpl.make_map_plot(dlist[p], grid, m, coords,  cmap=cmap,
-                               clevs=clevs, **map_sets)
-        rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
+        # Plot the maps
+        mp = rpl.make_map_plot(
+            dlist[p], axs_grid, lts, lns, cmap=cmap, clevs=clevs,
+            **map_plot_conf)
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter='{:.1f}')
 
         # Map settings
-        rpl.map_axes_settings(fig, grid, headtitle=headtitle)
+        rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
 
         [ax.text(0.5, 1.04, ft.upper(), size=21, va='center', ha='center',
-                 transform=ax.transAxes) for ft, ax in zip(ftitles, grid)]
+                 transform=ax.transAxes) for ft, ax in zip(ftitles, axs_grid)]
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
 
 def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                       ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                      img_dir, grid_coords, map_conf, map_grid, map_sets,
-                      line_grid, line_sets):
+                      img_dir, grid_coords, map_domain, map_projection,
+                      map_config, map_extent, map_gridlines, map_axes_conf,
+                      map_plot_conf, line_grid, line_sets):
     """
     Plotting diurnal cycle map plot
     """
@@ -883,7 +690,8 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     # Map settings
     target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
     tgname = target_grid_names[0]
-    domain = grid_coords['meta data'][var][ref_model]['domain']
+    domain_model = map_domain if map_domain else ref_model
+    domain = grid_coords['meta data'][var][domain_model]['domain']
     mask = mask_region(
         grid_coords['target grid'][var]['lon'][tgname],
         grid_coords['target grid'][var]['lat'][tgname], domain)
@@ -980,22 +788,26 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
         rpl.figure_init(plottype='map')
 
-        # Setup figure grid with colorbar settings
-        fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                         **map_grid)
+        # Create map object and axes grid
+        map_proj = rpl.define_map_object(map_projection, **map_config)
+        fig, axs_grid = rpl.map_setup(
+            map_proj, map_extent, figsize, figshape, grid_lines=map_gridlines,
+            **map_axes_conf)
 
-        # Create map object
-        m, coords = rpl.map_setup(grid, lts, lns, **map_conf)
+        # Plot the maps
+        mp = rpl.make_map_plot(
+            dlist[p], axs_grid, lts, lns, cmap=cmap[p], clevs=clevs[p],
+            **map_plot_conf)
 
-        mp = rpl.make_map_plot(dlist[p], grid, m, coords,  cmap=cmap[p],
-                               clevs=clevs[p], **map_sets)
         if var == 'pr':
-            rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.2f}')
+            rpl.image_colorbar(mp, axs_grid, labelspacing=2,
+                               formatter='{:.2f}')
         else:
-            rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
+            rpl.image_colorbar(mp, axs_grid, labelspacing=2,
+                               formatter='{:.1f}')
 
         # Map settings
-        rpl.map_axes_settings(fig, grid, headtitle=headtitle,
+        rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle,
                               time_mean='hour', time_units=hours)
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
@@ -1252,8 +1064,9 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
 def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
              obs, var, tres, tstat, units, ytitle, regions, img_dir,
-             grid_coords, map_conf, map_grid, map_sets, line_grid,
-             line_sets):
+             grid_coords, map_domain, map_projection, map_config,
+             map_extent, map_gridlines, map_axes_conf, map_plot_conf,
+             line_grid, line_sets):
     """
     Plotting ASoP FC factor map plot
     """
@@ -1332,28 +1145,28 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
     rpl.figure_init(plottype='map')
 
-    # Setup figure grid with colorbar settings
-    fig, grid = rpl.image_grid_setup(figsize=figsize, fshape=figshape,
-                                     **map_grid)
+    # Create map object and axes grid
+    map_proj = rpl.define_map_object(map_projection, **map_config)
+    fig, axs_grid = rpl.map_setup(
+        map_proj, map_extent, figsize, figshape, grid_lines=map_gridlines,
+        **map_axes_conf)
 
     lts = grid_coords['target grid'][var]['lat'][tgname]
     lns = grid_coords['target grid'][var]['lon'][tgname]
 
-    # Create map object
-    m, coords = rpl.map_setup(grid, lts, lns, **map_conf)
-
     cmap = [mpl.cm.PuRd]*ndata
     clevs = [np.linspace(0, 2, 21)]*ndata
 
-    mp = rpl.make_map_plot(dlist, grid, m, coords,  cmap=cmap,
-                           clevs=clevs, **map_sets)
-    rpl.image_colorbar(mp, grid, labelspacing=2, formatter='{:.1f}')
+    # Plot the maps
+    mp = rpl.make_map_plot(
+        dlist, axs_grid, lts, lns, cmap=cmap, clevs=clevs, **map_plot_conf)
+    rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter='{:.1f}')
 
     # Map settings
-    rpl.map_axes_settings(fig, grid, headtitle=headtitle)
+    rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
 
     [ax.text(0.5, 1.02, ft.upper(), size=21, va='center', ha='center',
-             transform=ax.transAxes) for ft, ax in zip(ftitles, grid)]
+             transform=ax.transAxes) for ft, ax in zip(ftitles, axs_grid)]
 
     plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 

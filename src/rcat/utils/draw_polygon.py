@@ -29,8 +29,8 @@ class Canvas(object):
         self.ax = ax
 
         # Set limits to unit square
-        self.ax.set_xlim((0,1))
-        self.ax.set_ylim((0,1))
+        # self.ax.set_xlim((0,1))
+        # self.ax.set_ylim((0,1))
 
         # turn off axis
         self.ax.set_xticklabels([])
