@@ -948,10 +948,11 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
 
-def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
-             obs, var, tres, tstat, units, ytitle, regions, img_dir,
-             grid_coords, map_domain, map_conf, map_grid, map_sets, line_grid,
-             line_sets):
+def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
+             ref_model, obs, var, tres, tstat, units, ytitle, regions,
+             img_dir, grid_coords, map_domain, map_projection,
+             map_config, map_extent, map_gridlines, map_axes_conf,
+             map_plot_conf, line_grid, line_sets):
     """
     Plotting frequency-intensity-distribution plot
     """
