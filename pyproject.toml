@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "RCAT"
+name = "rcatool"
 version = "0.1"
 description = """
 The Regional Climate Analysis Tool (RCAT), is a tool to calculate
@@ -17,7 +17,7 @@ maintainers = [
 ]
 readme = "README.md"
 license = {file = "LICENSE"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = [
     "climate",
     "dask",
