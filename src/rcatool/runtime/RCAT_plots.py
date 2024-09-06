@@ -8,8 +8,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import math
-import rcat.plot.plots as rpl
-from rcat.utils.polygons import mask_region
+import rcatool.plot.plots as rpl
+from rcatool.utils.polygons import mask_region
 from copy import deepcopy
 
 # Colors

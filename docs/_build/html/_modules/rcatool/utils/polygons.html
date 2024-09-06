@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.utils.polygons &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcatool.utils.polygons</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcatool.utils.polygons</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#  Routine for Masking Data with Polygons ##</span>
+<span class="c1">#</span>
+<span class="c1">#  By: Petter Lind</span>
+<span class="c1">#      2014-03-02  v1.0</span>
+<span class="c1">#      2016-11-04  v2.0</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>
+<span class="kn">import</span> <span class="nn">cartopy.feature</span> <span class="k">as</span> <span class="nn">cf</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+
+<div class="viewcode-block" id="polygons">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.polygons.polygons">[docs]</a>
+<span class="k">def</span> <span class="nf">polygons</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">poly_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See available polygons and retrieve path to polygon files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    area: string</span>
+<span class="sd">        name of polygon to be extracted</span>
+<span class="sd">    poly_print: boolean</span>
+<span class="sd">        if available polygons should be printed</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    area_file: string</span>
+<span class="sd">        path to the text file with polygon data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># -------- Dictionary of predfined regions -------- #</span>
+    <span class="n">file_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">polypath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">file_dir</span><span class="p">,</span> <span class="s1">&#39;polygon_files&#39;</span><span class="p">)</span>
+
+    <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Folder to polygons: </span><span class="si">{}</span><span class="s2">, does not seem to exist!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polypath</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">polypath</span><span class="p">),</span> <span class="n">errmsg</span>
+
+    <span class="n">polygons</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">polypath</span><span class="p">)</span>
+    <span class="n">poly_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">):</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">polygons</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">poly_print</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Available polygons/regions:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ar</span><span class="p">))</span> <span class="k">for</span> <span class="n">ar</span> <span class="ow">in</span> <span class="n">poly_dict</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n\t</span><span class="s2">Oohps! &#39;</span><span class="si">{0}</span><span class="s2">&#39; is not a pre-defined area. Check polygon&quot;</span>
+                  <span class="s2">&quot; folder for the correct name or create a new &quot;</span>
+                  <span class="s2">&quot;polygon.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">poly_dict</span><span class="p">,</span> <span class="n">errmsg</span>
+
+        <span class="n">area_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">polypath</span><span class="p">,</span> <span class="n">poly_dict</span><span class="p">[</span><span class="n">area</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">area_file</span></div>
+
+
+
+<div class="viewcode-block" id="mask_region">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.polygons.mask_region">[docs]</a>
+<span class="k">def</span> <span class="nf">mask_region</span><span class="p">(</span><span class="n">xp</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">area</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">iter_3d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cut_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to mask grid points outside a specified polygon.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xp,yp: numpy arrays</span>
+<span class="sd">        eastward and northward grid points respectively, normally lon/lat</span>
+<span class="sd">        arrays.</span>
+<span class="sd">    area: string or list with tuples</span>
+<span class="sd">        Either name of predefined region to extract (see reg_dict function for</span>
+<span class="sd">        more info.), or a list with tuples defining a polygon;</span>
+<span class="sd">        e.g. [(lon1, lat1), (lon2, lat2),...,(lonN, latN), (lon1, lat1)].</span>
+<span class="sd">        NB! First and last tuple must be the same, closing the polygon.</span>
+<span class="sd">    data: 2D/3D numpy array, optional</span>
+<span class="sd">        data matrix</span>
+<span class="sd">    iter_3d: int, optional</span>
+<span class="sd">        If set, masking is performed along the zeroth dimension of array. Thus</span>
+<span class="sd">        array must be 3D and have shape [iter_3d, y, x].</span>
+<span class="sd">    cut_data: boolean, optional</span>
+<span class="sd">        If True, the data will be cut to a box that covers the input area,</span>
+<span class="sd">        leaving one extra (masked) grid point beyond each limiting</span>
+<span class="sd">        north/south/east/west grid point. This option will</span>
+<span class="sd">        return not only masked and cut data but also cut lon/lat data as well</span>
+<span class="sd">        as the box edges (as indices) in the x,y plane.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mask_out: boolean array</span>
+<span class="sd">        A 2D mask with True inside region of interest, False outside. Returned</span>
+<span class="sd">        if data is None.</span>
+<span class="sd">    masked_data: 2D/3D numpy array</span>
+<span class="sd">        If data is passed to function, this is the returned masked data.</span>
+<span class="sd">    xp_cut/yp_cut: numpy arrays</span>
+<span class="sd">        If cut_data is True, these arrays are the cut xp/yp arrays</span>
+<span class="sd">    reg_x_edges, reg_y_edges: tuples</span>
+<span class="sd">        If cut_data is True, the tuples contain index of the edges of cropped</span>
+<span class="sd">        region in x and y directions respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">matplotlib.path</span> <span class="kn">import</span> <span class="n">Path</span>
+
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">iter_3d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ERROR!</span><span class="se">\n</span><span class="s2">If iter_3d is set data array must be &quot;</span>
+                   <span class="s2">&quot;three-dimensional with shape (iter_3d, y, x).&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="n">msg</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ERROR!</span><span class="se">\n</span><span class="s2">If iter_3d is NOT set data array &quot;</span>
+                   <span class="s2">&quot;must be two-dimensional with shape (y, x).&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span>
+
+    <span class="c1"># Dimensions of grid</span>
+    <span class="k">if</span> <span class="n">xp</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">xp</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">ny</span> <span class="o">=</span> <span class="n">yp</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="c1"># Rearrange grid points into a list of tuples</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">yp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="k">if</span> <span class="n">xp</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">(</span><span class="n">xp</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">yp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+              <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">area</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">coord_return</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+        <span class="n">reg_file</span> <span class="o">=</span> <span class="n">polygons</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">reg_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+            <span class="n">ff</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>       <span class="c1"># Skip first line</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="p">[</span><span class="n">coord_return</span><span class="p">(</span><span class="n">ln</span><span class="p">)</span> <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">ff</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">area</span>
+    <span class="n">reg_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poly</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">reg_path</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">cut_data</span><span class="p">:</span>
+        <span class="c1"># Cut out region</span>
+        <span class="n">yp_r</span><span class="p">,</span> <span class="n">xp_r</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">)[</span><span class="n">i</span><span class="p">]),</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">)[</span><span class="n">i</span><span class="p">]))</span>
+                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="n">reg_x_edges</span><span class="p">,</span> <span class="n">reg_y_edges</span> <span class="o">=</span> <span class="n">xp_r</span><span class="p">,</span> <span class="n">yp_r</span>
+        <span class="n">xr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">xp_r</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">yr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">yp_r</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">xp</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">xp_cut</span> <span class="o">=</span> <span class="n">xp</span><span class="p">[</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">yp_cut</span> <span class="o">=</span> <span class="n">yp</span><span class="p">[</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xp_cut</span> <span class="o">=</span> <span class="n">xp</span><span class="p">[</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">yp_cut</span> <span class="o">=</span> <span class="n">yp</span><span class="p">[</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">mask_cut</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">mask_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">mask_cut</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">iter_3d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">masked_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">iter_3d</span><span class="p">,</span> <span class="n">yr</span><span class="p">,</span> <span class="n">xr</span><span class="p">))</span>
+                <span class="n">masked_data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">yp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">mask_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">mask_cut</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                    <span class="n">iter_3d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">mask_3d</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">masked_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">yr</span><span class="p">,</span> <span class="n">xr</span><span class="p">))</span>
+                <span class="n">masked_data</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">yp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">xp_r</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">xp_r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">mask_cut</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">masked_out</span> <span class="o">=</span> <span class="p">(</span><span class="n">masked_data</span><span class="p">,</span> <span class="n">xp_cut</span><span class="p">,</span> <span class="n">yp_cut</span><span class="p">,</span> <span class="n">reg_x_edges</span><span class="p">,</span>
+                          <span class="n">reg_y_edges</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">masked_out</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask_out</span><span class="p">,</span> <span class="n">xp_cut</span><span class="p">,</span> <span class="n">yp_cut</span><span class="p">,</span> <span class="n">reg_x_edges</span><span class="p">,</span>
+                          <span class="n">reg_y_edges</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">masked_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">iter_3d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mask_3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">iter_3d</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">mask_3d</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">masked_out</span> <span class="o">=</span> <span class="n">masked_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">masked_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">masked_out</span></div>
+
+
+
+<div class="viewcode-block" id="create_polygon">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.polygons.create_polygon">[docs]</a>
+<span class="k">def</span> <span class="nf">create_polygon</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve polygon arbitrarily drawn interactively on a map</span>
+<span class="sd">    by mouse clicking.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    print_zoom_areas: Boolean</span>
+<span class="sd">        Prints available zoom regions for polygon selection.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    poly: list</span>
+<span class="sd">        List with tuples of lat/lon coordinates for drawn polygon</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">rcat.utils</span> <span class="kn">import</span> <span class="n">draw_polygon</span>
+
+    <span class="k">def</span> <span class="nf">get_map</span><span class="p">(</span><span class="n">area</span><span class="p">,</span> <span class="n">map_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Create map object</span>
+        <span class="k">if</span> <span class="n">area</span> <span class="o">==</span> <span class="s1">&#39;latlon&#39;</span><span class="p">:</span>
+            <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;Type in southern-most latitude&quot;</span>
+            <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;Type in northern-most latitude&quot;</span>
+            <span class="n">s3</span> <span class="o">=</span> <span class="s2">&quot;Type in western-most longitude&quot;</span>
+            <span class="n">s4</span> <span class="o">=</span> <span class="s2">&quot;Type in eastern-most longitude&quot;</span>
+            <span class="n">lat1</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="p">))</span>
+            <span class="n">lat2</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s2</span><span class="p">))</span>
+            <span class="n">lon1</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s3</span><span class="p">))</span>
+            <span class="n">lon2</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s4</span><span class="p">))</span>
+            <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">lon1</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">lon2</span><span class="p">),</span>
+                      <span class="nb">float</span><span class="p">(</span><span class="n">lat1</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">lat2</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">map_dict</span><span class="p">[</span><span class="n">area</span><span class="p">][</span><span class="s1">&#39;lon1&#39;</span><span class="p">],</span>
+                <span class="n">map_dict</span><span class="p">[</span><span class="n">area</span><span class="p">][</span><span class="s1">&#39;lon2&#39;</span><span class="p">],</span>
+                <span class="n">map_dict</span><span class="p">[</span><span class="n">area</span><span class="p">][</span><span class="s1">&#39;lat1&#39;</span><span class="p">],</span>
+                <span class="n">map_dict</span><span class="p">[</span><span class="n">area</span><span class="p">][</span><span class="s1">&#39;lat2&#39;</span><span class="p">]</span>
+            <span class="p">]</span>
+
+        <span class="n">central_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">extent</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">central_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;central lon: </span><span class="si">{</span><span class="n">central_lon</span><span class="si">}</span><span class="se">\n</span><span class="s2">central lat: </span><span class="si">{</span><span class="n">central_lat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">projection</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">AlbersEqualArea</span><span class="p">(</span>
+            <span class="n">central_lon</span><span class="p">,</span> <span class="n">central_lat</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_extent</span><span class="p">(</span><span class="n">extent</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">OCEAN</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">LAND</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">LAKES</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">BORDERS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">area</span> <span class="o">==</span> <span class="s1">&#39;North America&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">STATES</span><span class="p">)</span>
+
+        <span class="n">gl</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">gridlines</span><span class="p">(</span>
+            <span class="n">draw_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+            <span class="n">x_inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">.7</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">())</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">top_labels</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">right_labels</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+    <span class="n">map_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Europe&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;lon1&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
+                <span class="s2">&quot;lon2&quot;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
+                <span class="s2">&quot;lat1&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+                <span class="s2">&quot;lat2&quot;</span><span class="p">:</span> <span class="mi">72</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;North America&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;lon1&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">120</span><span class="p">,</span>
+                <span class="s2">&quot;lon2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">70</span><span class="p">,</span>
+                <span class="s2">&quot;lat1&quot;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+                <span class="s2">&quot;lat2&quot;</span><span class="p">:</span> <span class="mi">51</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="c1"># &quot;South America&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 7e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 9e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: -59,</span>
+            <span class="c1">#             &quot;lat0&quot;: -22,</span>
+            <span class="c1">#             },</span>
+            <span class="c1"># &quot;Africa&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 10e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 9.5e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: 16,</span>
+            <span class="c1">#             &quot;lat0&quot;: 2,</span>
+            <span class="c1">#             },</span>
+            <span class="c1"># &quot;Australia&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 7e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 6e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: 145,</span>
+            <span class="c1">#             &quot;lat0&quot;: -25,</span>
+            <span class="c1">#             },</span>
+            <span class="c1"># &quot;South-East Asia&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 7e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 6e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: 98,</span>
+            <span class="c1">#             &quot;lat0&quot;: 12,</span>
+            <span class="c1">#             },</span>
+            <span class="c1"># &quot;East Asia&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 7e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 4.5e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: 111,</span>
+            <span class="c1">#             &quot;lat0&quot;: 35,</span>
+            <span class="c1">#             },</span>
+            <span class="c1"># &quot;Central Asia&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 4.8e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 3e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: 54,</span>
+            <span class="c1">#             &quot;lat0&quot;: 49,</span>
+            <span class="c1">#             },</span>
+            <span class="c1"># &quot;Middle East&quot;: {</span>
+            <span class="c1">#             &quot;proj&quot;: &quot;lcc&quot;,</span>
+            <span class="c1">#             &quot;wdth&quot;: 5e6,</span>
+            <span class="c1">#             &quot;hght&quot;: 4e6,</span>
+            <span class="c1">#             &quot;lon0&quot;: 51,</span>
+            <span class="c1">#             &quot;lat0&quot;: 27,</span>
+            <span class="c1">#             },</span>
+            <span class="p">}</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Welcome!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;What area would you like to show on map?&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;Type &#39;print areas&#39; to see selectable areas&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="s2">&quot;Type &#39;latlon&#39; to choose area manually&quot;</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">area</span> <span class="o">==</span> <span class="s1">&#39;print areas&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available map areas:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ar</span><span class="p">))</span> <span class="k">for</span> <span class="n">ar</span> <span class="ow">in</span> <span class="n">map_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+        <span class="n">area</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Ok, so what area have you chosen?</span><span class="se">\n</span><span class="s2">&gt;&gt; &quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_map</span><span class="p">(</span><span class="n">area</span><span class="p">,</span> <span class="n">map_dict</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">area</span> <span class="o">==</span> <span class="s1">&#39;latlon&#39;</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_map</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_map</span><span class="p">(</span><span class="n">area</span><span class="p">,</span> <span class="n">map_dict</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The area you provided is not available.</span><span class="se">\n</span><span class="s2">Please, try&quot;</span>
+                  <span class="s2">&quot; again ...&quot;</span><span class="p">)</span>
+            <span class="n">area</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;What area would you like to show on map?</span><span class="se">\n\n</span><span class="s2">&gt;&gt; &quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_map</span><span class="p">(</span><span class="n">area</span><span class="p">,</span> <span class="n">map_dict</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sorry! Something is wrong ... exiting&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;It&#39;s time to choose a polygon in the map soon to be shown ...&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;This is done in two steps:&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;With left mouse button click points for polygon; &quot;</span>
+          <span class="s2">&quot;right click to connect end points.&quot;</span><span class="p">)</span>
+    <span class="n">s4</span> <span class="o">=</span> <span class="s2">&quot;When finished, close map window&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">   1) </span><span class="si">{}</span><span class="se">\n</span><span class="s1">   2) </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">,</span> <span class="n">s4</span><span class="p">))</span>
+    <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;To continue, please press enter...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create Canvas object and mouse click settings</span>
+    <span class="n">cnv</span> <span class="o">=</span> <span class="n">draw_polygon</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;motion_notify_event&#39;</span><span class="p">,</span> <span class="n">cnv</span><span class="o">.</span><span class="n">set_location</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="n">cnv</span><span class="o">.</span><span class="n">update_path</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c1"># convert from data to cartesian coordinates</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="p">[</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">()</span><span class="o">.</span><span class="n">transform_point</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">pt</span><span class="p">,</span> <span class="n">src_crs</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">AlbersEqualArea</span><span class="p">(</span>
+            <span class="n">central_longitude</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">proj4_params</span><span class="p">[</span><span class="s1">&#39;lon_0&#39;</span><span class="p">],</span>
+            <span class="n">central_latitude</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">proj4_params</span><span class="p">[</span><span class="s1">&#39;lat_0&#39;</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">cnv</span><span class="o">.</span><span class="n">vert</span><span class="p">]</span>
+
+    <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;Do you want to write the polygon to disk?&quot;</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;Then, type &#39;write&#39; and instructions will follow.&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="s2">&quot;If not, just press enter ...&quot;</span>
+    <span class="n">write</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">write</span> <span class="o">==</span> <span class="s1">&#39;write&#39;</span><span class="p">:</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;Type file directory path and file name as: fdir, fname&quot;</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="s2">&quot;Make sure &#39;fname&#39; is an appropriate name for the polygon.&quot;</span>
+        <span class="n">s3</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;N.B.</span><span class="se">\n</span><span class="s2">If polygon should be added to RCAT, make sure directory &quot;</span>
+              <span class="s2">&quot;path is set to: &lt;path-to-RCAT&gt;/rcat/utils/polygon_files&quot;</span><span class="p">)</span>
+        <span class="n">file_info</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\t\n</span><span class="si">{}</span><span class="se">\t\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&gt;&gt; &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">s3</span><span class="p">))</span>
+        <span class="n">file_info</span> <span class="o">=</span> <span class="n">file_info</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+        <span class="n">fdir</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">_fname</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_fname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fdir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">poly</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">poly</span></div>
+
+
+
+<div class="viewcode-block" id="plot_polygon">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.polygons.plot_polygon">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot polygon on map.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polygon: string or list</span>
+<span class="sd">        Name of polygon as defined by poly_dict dictionary in &#39;polygons&#39;</span>
+<span class="sd">        function, or list with polygon coordinates [[lon1, lat1], [lon2, lat2],</span>
+<span class="sd">        ..., [lon1, lat1]].</span>
+<span class="sd">    savefig: boolean</span>
+<span class="sd">        If True, figure is saved to &#39;figpath&#39; location (&#39;figpath&#39; must be set).</span>
+<span class="sd">        If false, figure is displayed on screen.</span>
+<span class="sd">    figpath: string</span>
+<span class="sd">        Path to folder for saved polygon figure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+    <span class="c1"># Colors</span>
+    <span class="n">water</span> <span class="o">=</span> <span class="s1">&#39;lightskyblue&#39;</span>
+    <span class="n">earth</span> <span class="o">=</span> <span class="s1">&#39;cornsilk&#39;</span>
+
+    <span class="c1"># Read polygon</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">coord_return</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+        <span class="n">reg_file</span> <span class="o">=</span> <span class="n">polygons</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">reg_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+            <span class="n">ff</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>       <span class="c1"># Skip first line</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="p">[</span><span class="n">coord_return</span><span class="p">(</span><span class="n">ln</span><span class="p">)</span> <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">ff</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_polygon_plot.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">polygon</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%y%m</span><span class="si">%d</span><span class="s1">T%H%M&#39;</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;polygon_plot_</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
+
+    <span class="c1"># Lats/lons</span>
+    <span class="n">lons</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">poly</span><span class="p">]</span>
+    <span class="n">lon_0</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">lons</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="n">lats</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">poly</span><span class="p">]</span>
+    <span class="n">lat_0</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span> <span class="o">+</span> <span class="nb">min</span><span class="p">(</span><span class="n">lats</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">lons</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">lons</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">lats</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">lats</span><span class="p">)]</span>
+
+    <span class="c1"># Plot map</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">projection</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">AlbersEqualArea</span><span class="p">(</span>
+        <span class="n">central_longitude</span><span class="o">=</span><span class="n">lon_0</span><span class="p">,</span> <span class="n">central_latitude</span><span class="o">=</span><span class="n">lat_0</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_extent</span><span class="p">(</span><span class="n">extent</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">OCEAN</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">water</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">LAND</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">earth</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">LAKES</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">BORDERS</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">STATES</span><span class="p">)</span>
+
+    <span class="n">gl</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">gridlines</span><span class="p">(</span>
+        <span class="n">draw_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+        <span class="n">x_inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">.7</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">())</span>
+    <span class="n">gl</span><span class="o">.</span><span class="n">top_labels</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">gl</span><span class="o">.</span><span class="n">right_labels</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">_draw_screen_poly</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;m&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Error! &#39;figpath&#39; must be set if saving figure&quot;</span>
+        <span class="k">assert</span> <span class="n">figpath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">errmsg</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">figpath</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_draw_screen_poly</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Polygon</span>
+
+    <span class="n">xy</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">))</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                   <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="topo_mask">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.polygons.topo_mask">[docs]</a>
+<span class="k">def</span> <span class="nf">topo_mask</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">orog</span><span class="p">,</span> <span class="n">orog_int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rotuine to mask grid points outside a specified height interval.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data:  2D numpy array</span>
+<span class="sd">        the data matrix</span>
+<span class="sd">    orog:  2D numpy array</span>
+<span class="sd">        array containing topographical heights (same resolution as data)</span>
+<span class="sd">    orog_int: 1D array,list,tuple</span>
+<span class="sd">        the height interval outside which data should be masked.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    masked_data: 2D numpy array</span>
+<span class="sd">        the masked data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> \
+        <span class="s2">&quot;Error! data array must be two-dimensional.&quot;</span>
+
+    <span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">()</span> <span class="o">==</span> <span class="n">orog</span><span class="o">.</span><span class="n">shape</span><span class="p">(),</span> \
+        <span class="s2">&quot;Error! data and orography arrays must have identical grids&quot;</span>
+
+    <span class="c1"># Create topographical mask</span>
+    <span class="n">orog_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_outside</span><span class="p">(</span><span class="n">orog</span><span class="p">,</span> <span class="n">orog_int</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">orog_int</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">orog_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">getmask</span><span class="p">(</span><span class="n">orog_mask</span><span class="p">)</span>
+
+    <span class="n">masked_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">orog_mask</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">masked_data</span></div>
+
+
+
+<div class="viewcode-block" id="find_geo_indices">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.polygons.find_geo_indices">[docs]</a>
+<span class="k">def</span> <span class="nf">find_geo_indices</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Search for nearest decimal degree in an array of decimal degrees and</span>
+<span class="sd">    return the index.</span>
+<span class="sd">    np.argmin returns the indices of minimum value along an axis.</span>
+<span class="sd">    Subtract dd from all values in dd_array, take absolute value and find index</span>
+<span class="sd">    of minimum.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lons/lats: 1D/2D numpy array</span>
+<span class="sd">        Latitude and longitude values defining the grid.</span>
+<span class="sd">    x, y: int/float</span>
+<span class="sd">        Coordinates of searched for data point</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lat_idx/lon_idx: ints</span>
+<span class="sd">        The latitude and longitude indices where closest to searched</span>
+<span class="sd">        data point.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">lons</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">lons2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">lons</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:],</span> <span class="n">lats</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">lats2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">lats</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">lons</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lons2d</span> <span class="o">=</span> <span class="n">lons</span>
+        <span class="n">lats2d</span> <span class="o">=</span> <span class="n">lats</span>
+
+    <span class="n">lonlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">lons2d</span><span class="p">,</span> <span class="n">lats2d</span><span class="p">])</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lonlat</span><span class="o">-</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+    <span class="n">ij_1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+    <span class="n">lat_idx</span><span class="p">,</span> <span class="n">lon_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">ij_1d</span><span class="p">,</span> <span class="n">lons2d</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lat_idx</span><span class="p">,</span> <span class="n">lon_idx</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Script to create or plot polygons&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--purpose&#39;</span><span class="p">,</span> <span class="s1">&#39;-p&#39;</span><span class="p">,</span>  <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;PURPOSE&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;&lt;Required&gt; Purpose of application; either &#39;</span>
+                              <span class="s1">&#39;&quot;create&quot;, &quot;plot&quot; or &quot;printareas&quot; for creating, &#39;</span>
+                              <span class="s1">&#39;plotting or printing available polygons &#39;</span>
+                              <span class="s1">&#39;respectively.&#39;</span><span class="p">),</span>
+                        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--area&#39;</span><span class="p">,</span> <span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;If purpose is to plot, this is the name of &#39;</span>
+                              <span class="s1">&#39;polygon to be plotted&#39;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--proj&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;MAP PROJECTION&#39;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;stere&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;The map projection to use if plotting polygon&#39;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--resolution&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;MAP_RESOLUTION&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+                            <span class="s1">&#39;If purpose is to plot, this is the resolution &#39;</span>
+                            <span class="s1">&#39;of the drawn map (resolution of boundary database&#39;</span>
+                            <span class="s1">&#39; to use). Can be &quot;c&quot; (crude), &quot;l&quot; (low), &quot;i&quot; &#39;</span>
+                            <span class="s1">&#39;(intermediate), &quot;h&quot; (high), &quot;f&quot; (full). Crude &#39;</span>
+                            <span class="s1">&#39;and low are installed by default. Default &#39;</span>
+                            <span class="s1">&#39;resolution is &quot;low&quot;. If higher &#39;</span>
+                            <span class="s1">&#39;resolution is wanted (&quot;i&quot;, &quot;h&quot; or &quot;f&quot;) high-res&#39;</span>
+                            <span class="s1">&#39; data must be installed. In conda this can be &#39;</span>
+                            <span class="s1">&#39;achieved by running:</span><span class="se">\n</span><span class="s1"> conda install -c &#39;</span>
+                            <span class="s1">&#39;conda-forge basemap-data-hires.&#39;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--save&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;BOOLEAN&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Wether to save polygon plot. Provide&#39;</span>
+                                         <span class="s1">&#39; also figpath (--figpath) if needed &#39;</span>
+                                         <span class="s1">&#39;(defaults to ./)&#39;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--figpath&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILEPATH&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Where to save polygon plot. &#39;</span>
+                                        <span class="s1">&#39;Defaults to ./&#39;</span><span class="p">))</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">purpose</span> <span class="o">==</span> <span class="s1">&#39;create&#39;</span><span class="p">:</span>
+        <span class="n">create_polygon</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">purpose</span> <span class="o">==</span> <span class="s1">&#39;plot&#39;</span><span class="p">:</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">area</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">When plotting polygon, polygon name must be provided&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">errmsg</span>
+
+        <span class="n">mproj</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">proj</span>
+        <span class="n">plot_polygon</span><span class="p">(</span><span class="n">area</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">mproj</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">figpath</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">purpose</span> <span class="o">==</span> <span class="s1">&#39;printareas&#39;</span><span class="p">:</span>
+        <span class="n">polygons</span><span class="p">(</span><span class="n">poly_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unknown purpose of application (--purpose)!</span><span class="se">\n</span><span class="s2">Exiting...&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

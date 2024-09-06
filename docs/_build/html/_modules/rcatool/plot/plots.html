@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.plot.plots &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcatool.plot.plots</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcatool.plot.plots</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Graphics module</span>
+<span class="sd">---------------</span>
+<span class="sd">Functions for different plots such as scatterplots and mapplots,</span>
+<span class="sd">initiation and configuration of figure objects etc</span>
+
+<span class="sd">Created: Autumn 2016</span>
+<span class="sd">Authors: Petter Lind &amp; David Lindstedt</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Global modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>
+<span class="kn">import</span> <span class="nn">cartopy.feature</span> <span class="k">as</span> <span class="nn">cf</span>
+
+
+<span class="c1"># Functions</span>
+<div class="viewcode-block" id="figure_init">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.figure_init">[docs]</a>
+<span class="k">def</span> <span class="nf">figure_init</span><span class="p">(</span><span class="n">plottype</span><span class="o">=</span><span class="s1">&#39;line&#39;</span><span class="p">,</span> <span class="n">printtypes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Setting up a figure object</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    plottype: string</span>
+<span class="sd">        Type of plot to make</span>
+<span class="sd">    printtypes: boolean</span>
+<span class="sd">        If available plottypes should be printed on screen</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pltypes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;map&#39;</span><span class="p">:</span> <span class="s1">&#39;classic&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;line&#39;</span><span class="p">:</span> <span class="s1">&#39;ggplot&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;scatter&#39;</span><span class="p">:</span> <span class="s1">&#39;fivethirtyeight&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;raster&#39;</span><span class="p">:</span> <span class="s1">&#39;seaborn-white&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;box&#39;</span><span class="p">:</span> <span class="s1">&#39;fivethirtyeight&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">printtypes</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available plot types: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pltypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">pltypes</span><span class="p">[</span><span class="n">plottype</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="image_grid_setup">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.image_grid_setup">[docs]</a>
+<span class="k">def</span> <span class="nf">image_grid_setup</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">fshape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">grid_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up the plot axes using mpl_toolkits.axes_grid1.ImageGrid</span>
+<span class="sd">    Used primarily when plotting maps or for image analysis</span>
+<span class="sd">    For more information on available settings:</span>
+<span class="sd">    https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        figsize: tuple</span>
+<span class="sd">            Size of figure in inches; (width, height)</span>
+<span class="sd">        fshape: tuple</span>
+<span class="sd">            setting the shape of figure (nrow, ncol)</span>
+<span class="sd">        **grid_kwargs: Additional keyword arguments</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        fig: Figure object</span>
+<span class="sd">        grid: AxesGrid object</span>
+
+<span class="sd">    Examples of ``**kwargs`` with default values:</span>
+<span class="sd">        direction=&quot;row&quot;,</span>
+<span class="sd">        axes_pad=0.02,</span>
+<span class="sd">        add_all=True,</span>
+<span class="sd">        share_all=False,</span>
+<span class="sd">        label_mode=&quot;L&quot;,</span>
+<span class="sd">        aspect=True,</span>
+<span class="sd">        cbar_mode=None,</span>
+<span class="sd">        cbar_location=&quot;right&quot;,</span>
+<span class="sd">        cbar_size=&quot;5%&quot;,</span>
+<span class="sd">        cbar_pad=None,</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">ImageGrid</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">ImageGrid</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span>
+                     <span class="mi">111</span><span class="p">,</span>
+                     <span class="n">nrows_ncols</span><span class="o">=</span><span class="n">fshape</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">grid_kwargs</span>
+                     <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">grid</span></div>
+
+
+
+<div class="viewcode-block" id="get_nrow_ncol">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.get_nrow_ncol">[docs]</a>
+<span class="k">def</span> <span class="nf">get_nrow_ncol</span><span class="p">(</span><span class="n">npanels</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return number of rows and columns from a given total number</span>
+<span class="sd">    of panels for a grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">floor</span><span class="p">,</span> <span class="n">ceil</span>
+    <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">npanels</span><span class="p">)),</span> <span class="n">ceil</span><span class="p">(</span><span class="n">npanels</span><span class="o">/</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="n">npanels</span><span class="p">)))))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fig_grid_setup">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.fig_grid_setup">[docs]</a>
+<span class="k">def</span> <span class="nf">fig_grid_setup</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">fshape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;row&#39;</span><span class="p">,</span>
+                   <span class="n">axes_pad</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="o">**</span><span class="n">grid_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up the plot axes using pyplot.subplots</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        figsize: tuple</span>
+<span class="sd">            Size of figure in inches; (width, height)</span>
+<span class="sd">        fshape: tuple</span>
+<span class="sd">            setting the shape of figure (nrow, ncol)</span>
+<span class="sd">        direction: string</span>
+<span class="sd">            &#39;row&#39; or &#39;col&#39;; rowwise or columnwise order of axes instances</span>
+<span class="sd">        axes_pad: tuple</span>
+<span class="sd">            padding (height,width) between edges of adjacent subplots</span>
+<span class="sd">        **grid_kwargs: Additional keyword arguments</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        fig: Figure object</span>
+<span class="sd">        grid: List with axes instances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+                                <span class="n">fshape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="n">fshape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="n">squeeze</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">grid_kwargs</span>
+                            <span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">h_pad</span><span class="o">=</span><span class="n">axes_pad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">w_pad</span><span class="o">=</span><span class="n">axes_pad</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;row&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="axes_settings">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.axes_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">axes_settings</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">figtitle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xtlabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">ytlabels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">yticks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">,</span>
+                  <span class="n">fontsize_lbls</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">,</span> <span class="n">fontsize_title</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">,</span>
+                  <span class="n">ftitle_location</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration of axes; titles and labels</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        ax: axes object</span>
+<span class="sd">            Axes object assoicated with figure</span>
+<span class="sd">        figtitle: string</span>
+<span class="sd">            The headtitle</span>
+<span class="sd">        xlabel, ylabel: strings</span>
+<span class="sd">            Labels of the axes</span>
+<span class="sd">        xticks, yticks: lists or arrays</span>
+<span class="sd">            If set, location of ticks</span>
+<span class="sd">        xtlabels, ytlabels: lists</span>
+<span class="sd">            Contains tick labels (corresponding to ticks location)</span>
+<span class="sd">        xlim, ylim: lists</span>
+<span class="sd">            Limits of the axes</span>
+<span class="sd">        color: str</span>
+<span class="sd">            Color for the xtick labels</span>
+<span class="sd">        fontsize/fontsize_lbls/fontsize_title: string or int</span>
+<span class="sd">            Size of font for axes labels, ticklabels, and figure title</span>
+<span class="sd">            respectively</span>
+<span class="sd">        ftitle_location: str</span>
+<span class="sd">            Horizontal alignment of figure title; center (default),</span>
+<span class="sd">            right or left.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">figtitle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">figtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize_title</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                     <span class="n">loc</span><span class="o">=</span><span class="n">ftitle_location</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ylabel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+    <span class="p">((</span><span class="n">xticks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">xtlabels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xtlabels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">yticks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">yticks</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">ytlabels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">ytlabels</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">))</span>
+
+    <span class="p">((</span><span class="n">xlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">))</span>
+    <span class="p">((</span><span class="n">ylim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">))</span>
+
+    <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="n">fontsize_lbls</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()]</span>
+    <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="n">fontsize_lbls</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">()]</span></div>
+
+
+
+<div class="viewcode-block" id="map_axes_settings">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.map_axes_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">map_axes_settings</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span><span class="p">,</span> <span class="n">figtitle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headtitle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">time_mean</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_units</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span>
+                      <span class="n">fontsize_htitle</span><span class="o">=</span><span class="s1">&#39;xx-large&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Settings for map plot axes</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        fig: Object handle</span>
+<span class="sd">            Figure handle</span>
+<span class="sd">        axs: Axes objects</span>
+<span class="sd">            Single object or list with axes from map plot</span>
+<span class="sd">        figtitle: Strings</span>
+<span class="sd">            Single title or list of titles for each plot in figure</span>
+<span class="sd">        headtitle: String</span>
+<span class="sd">            Head title of figure</span>
+<span class="sd">        time_mean: string</span>
+<span class="sd">            If maps should be labeled according to time averages;</span>
+<span class="sd">            &#39;season&#39;/&#39;month&#39;/&#39;hour&#39;</span>
+<span class="sd">        time_units: list/array</span>
+<span class="sd">            Optional. If time_mean is set, time_units is a list of seasons,</span>
+<span class="sd">            months or hours to be used in the labeling.</span>
+<span class="sd">        fontsize: string or int</span>
+<span class="sd">            Size of font for figure title</span>
+<span class="sd">        fontsize_htitle: string or int</span>
+<span class="sd">            Size of font for suptitle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+
+    <span class="k">def</span> <span class="nf">map_label</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                 <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span>
+                 <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span>
+                           <span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">),</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
+         <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">cycle</span><span class="p">(</span><span class="n">labels</span><span class="p">))]</span>
+
+    <span class="n">laxs</span> <span class="o">=</span> <span class="n">axs</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">axs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">figtitle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ftitles</span> <span class="o">=</span> <span class="n">figtitle</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">figtitle</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">figtitle</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span> <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+         <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cycle</span><span class="p">(</span><span class="n">ftitles</span><span class="p">),</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">laxs</span><span class="p">))]</span>
+    <span class="k">if</span> <span class="n">headtitle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">headtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize_htitle</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">time_mean</span> <span class="o">==</span> <span class="s1">&#39;season&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">laxs</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> \
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;For seasonal data, a plot (axis instance) &quot;</span>
+                                <span class="s2">&quot;for each of the four seasons &quot;</span>
+                                <span class="s2">&quot;must be provided&quot;</span><span class="p">)</span>
+        <span class="n">map_label</span><span class="p">(</span><span class="n">laxs</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;DJF&quot;</span><span class="p">,</span> <span class="s2">&quot;MAM&quot;</span><span class="p">,</span> <span class="s2">&quot;JJA&quot;</span><span class="p">,</span> <span class="s2">&quot;SON&quot;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">time_mean</span> <span class="o">==</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">laxs</span><span class="p">)</span> <span class="o">%</span> <span class="mi">12</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> \
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;For monthly data, a plot (axis instance) &quot;</span>
+                                <span class="s2">&quot;for each of the twelve months must &quot;</span>
+                                <span class="s2">&quot;be provided&quot;</span><span class="p">)</span>
+        <span class="n">map_label</span><span class="p">(</span><span class="n">laxs</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;JAN&quot;</span><span class="p">,</span> <span class="s2">&quot;FEB&quot;</span><span class="p">,</span> <span class="s2">&quot;MAR&quot;</span><span class="p">,</span> <span class="s2">&quot;APR&quot;</span><span class="p">,</span> <span class="s2">&quot;MAY&quot;</span><span class="p">,</span> <span class="s2">&quot;JUN&quot;</span><span class="p">,</span> <span class="s2">&quot;JUL&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;AUG&quot;</span><span class="p">,</span> <span class="s2">&quot;SEP&quot;</span><span class="p">,</span> <span class="s2">&quot;OCT&quot;</span><span class="p">,</span> <span class="s2">&quot;NOV&quot;</span><span class="p">,</span> <span class="s2">&quot;DEC&quot;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">time_mean</span> <span class="o">==</span> <span class="s1">&#39;hour&#39;</span><span class="p">:</span>
+        <span class="n">map_label</span><span class="p">(</span><span class="n">laxs</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{:02d}</span><span class="s2"> Z&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">time_units</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="make_scatter_plot">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.make_scatter_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">make_scatter_plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">sdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fcolors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">ecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lbl_fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span>
+                      <span class="n">axis_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a scatter plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        grid: AxesGrid object</span>
+<span class="sd">            returned from the &#39;fig_grid_setup&#39; function</span>
+<span class="sd">        xdata/ydata: Array/list</span>
+<span class="sd">            1D array or list of 1D arrays with data for x/y axis</span>
+<span class="sd">        fcolors: array/list</span>
+<span class="sd">            List of colors to be used for each data set in input data. This is</span>
+<span class="sd">            separate from &#39;color&#39;/&#39;c&#39; option available from matplotlib.scatter</span>
+<span class="sd">            call (and set in sc_kwargs) where all individual input data sets</span>
+<span class="sd">            will have that specific color/s. If set, then</span>
+<span class="sd">            ecolors need also be supplied.</span>
+<span class="sd">        ecolors: array/list</span>
+<span class="sd">            List of edge colors to be used for each data set in input data.</span>
+<span class="sd">            This is separate from &#39;edgecolors&#39;/&#39;ec&#39; option available from</span>
+<span class="sd">            matplotlib.scatter call (and set in sc_kwargs) where all individual</span>
+<span class="sd">            input data sets will have that specific color/s. If set, then</span>
+<span class="sd">            fcolors need also be supplied.</span>
+<span class="sd">        lbl_fontsize: string/float</span>
+<span class="sd">            Fontsize for legend labels</span>
+<span class="sd">        axis_type: str</span>
+<span class="sd">            Linear or log axes: &#39;linear&#39; (defualt), &#39;logx&#39;/&#39;logy&#39;/&#39;logxy&#39; (log</span>
+<span class="sd">            x, y or both axes).</span>
+<span class="sd">        labels: String/List</span>
+<span class="sd">            String or list of strings with legend labels</span>
+<span class="sd">        **sc_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.scatter</span>
+<span class="sd">            See matplotlib.org for more information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: Axes objects</span>
+<span class="sd">            The axes objects created for each plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check that necessary color settings are supplied</span>
+    <span class="k">if</span> <span class="n">ecolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;If edgecolors (ecolors) is set, so must also fcolors!&quot;</span>
+        <span class="k">assert</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">errmsg</span>
+    <span class="k">if</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;If facecolors (fcolors) is set, so must also ecolors!&quot;</span>
+        <span class="k">assert</span> <span class="n">ecolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">errmsg</span>
+
+    <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dlabels</span> <span class="o">=</span> <span class="p">[[</span><span class="n">labels</span><span class="p">]]</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span>
+                                               <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">labels</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">xd</span> <span class="o">=</span> <span class="p">[</span><span class="n">xdata</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xdata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                   <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">xdata</span><span class="p">]]</span>
+        <span class="n">yd</span> <span class="o">=</span> <span class="p">[</span><span class="n">ydata</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ydata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                   <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">ydata</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="p">[</span><span class="n">sdata</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">sdata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">sdata</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fcls</span> <span class="o">=</span> <span class="p">[</span><span class="n">fcolors</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">fcolors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">fcolors</span><span class="p">]]</span>
+            <span class="n">ecls</span> <span class="o">=</span> <span class="p">[</span><span class="n">ecolors</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">ecolors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">ecolors</span><span class="p">]]</span>
+
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cc</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">ec</span><span class="p">,</span> <span class="n">ss</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                               <span class="n">xd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fcls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ecls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sd</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cc</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">ec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                               <span class="n">xd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fcls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ecls</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">ss</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sd</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="p">[</span><span class="n">pt</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">lbl</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">lbl_fontsize</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logx&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logy&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+            <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> x data must be in a list when multiple figures&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> y data must be in a list when multiple figures&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ydata</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> Labels must be in a list when &quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;multiple figures&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fcls</span> <span class="o">=</span> <span class="n">fcolors</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">fcolors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">fcolors</span><span class="p">]</span>
+            <span class="n">ecls</span> <span class="o">=</span> <span class="n">ecolors</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">ecolors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">ecolors</span><span class="p">]</span>
+
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+            <span class="n">xd</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">yd</span> <span class="o">=</span> <span class="n">ydata</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cc</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">ec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                                   <span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">sdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fcls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ecls</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cc</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">cc</span><span class="p">,</span> <span class="n">ec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                                   <span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">fcls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ecls</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">ss</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">ss</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">sdata</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="p">[</span><span class="n">pt</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">lbl</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">dlabels</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fcolors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">sdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">fcls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                         <span class="n">ec</span><span class="o">=</span><span class="n">ecls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">fcls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ec</span><span class="o">=</span><span class="n">ecls</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                         <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">sdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">sdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pts</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="o">**</span><span class="n">sc_kwargs</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">pts</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">dlabels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">lbl_fontsize</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logx&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logy&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+            <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axs</span></div>
+
+
+
+<div class="viewcode-block" id="make_raster_plot">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.make_raster_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">make_raster_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clevs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">rs_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a raster plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        grid: AxesGrid object</span>
+<span class="sd">            returned from the &#39;image_grid_setup&#39; function</span>
+<span class="sd">        data: List</span>
+<span class="sd">            List with 2D array(s) of data</span>
+<span class="sd">        cmap: string/list</span>
+<span class="sd">            String or list with strings of predefined Matplotlib colormaps.</span>
+<span class="sd">            Defaults to &#39;viridis&#39;</span>
+<span class="sd">        clevs: Iterable data structure</span>
+<span class="sd">            Consisting of lists with defined contour levels; e.g.</span>
+<span class="sd">            (np.arange(1,10,2), [0,2,4,6,8]), [np.arange(100,step=5)]*3</span>
+<span class="sd">        norm: BoundaryNorm object</span>
+<span class="sd">            Object generated from matplotlib.colors.BoundaryNorm function.</span>
+<span class="sd">            Generate a colormap index based on discrete intervals.</span>
+<span class="sd">        **rs_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.imshow</span>
+<span class="sd">            See matplotlib.org for more information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: Axes objects</span>
+<span class="sd">            The axes objects created for each plot</span>
+<span class="sd">        rasters: Plot objects</span>
+<span class="sd">            The raster plot objects created for each plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Single or multiple 2d data arrays</span>
+    <span class="n">iter_data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+
+    <span class="n">igrid</span> <span class="o">=</span> <span class="n">image_grid_setup</span><span class="p">(</span><span class="n">fshape</span><span class="o">=</span><span class="n">get_nrow_ncol</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">iter_data</span><span class="p">)))[</span><span class="mi">1</span><span class="p">]</span>\
+        <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">grid</span>
+
+    <span class="c1"># Number of grids</span>
+    <span class="n">nplots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iter_data</span><span class="p">)</span>
+
+    <span class="c1"># Make sure clevs is provided</span>
+    <span class="k">if</span> <span class="n">clevs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">cbar_axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">([</span><span class="n">cax</span><span class="o">.</span><span class="n">get_axes_locator</span><span class="p">()</span> <span class="k">for</span> <span class="n">cax</span> <span class="ow">in</span>
+                                            <span class="n">grid</span><span class="o">.</span><span class="n">cbar_axes</span><span class="p">]):</span>
+            <span class="n">clevs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">gen_clevels</span><span class="p">,</span> <span class="n">iter_data</span><span class="p">,</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">iter_data</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clevs</span> <span class="o">=</span> <span class="n">gen_clevels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">iter_data</span><span class="p">),</span> <span class="mi">15</span><span class="p">)</span>
+
+    <span class="c1"># Replace None in list of clevs with generated levels</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">clevs</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">([</span><span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">clevs</span><span class="p">]):</span>
+        <span class="n">clevs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gen_clevels</span><span class="p">(</span><span class="n">iter_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">15</span><span class="p">)</span> <span class="k">if</span> <span class="n">cl</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cl</span>
+                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clevs</span><span class="p">)]</span>
+
+    <span class="c1"># Create iterators of input arguments</span>
+    <span class="n">iter_clevs</span> <span class="o">=</span> <span class="n">clevs</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">clevs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">clevs</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                                                              <span class="nb">range</span><span class="p">(</span><span class="n">nplots</span><span class="p">)]</span>
+    <span class="n">iter_cmap</span> <span class="o">=</span> <span class="n">cmap</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmap</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">cmap</span> <span class="k">for</span> <span class="n">i</span>
+                                                              <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nplots</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">iter_norm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cl</span><span class="p">,</span> <span class="n">cm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_clevs</span><span class="p">,</span> <span class="n">iter_cmap</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">ncolrs</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span><span class="o">.</span><span class="n">N</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ncolrs</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">N</span>
+            <span class="n">iter_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">cl</span><span class="p">,</span> <span class="n">ncolrs</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">iter_norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">norm</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                                                            <span class="nb">range</span><span class="p">(</span><span class="n">nplots</span><span class="p">)]</span>
+    <span class="n">rasters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">igrid</span><span class="p">):</span>
+
+        <span class="n">rasters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">iter_data</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">iter_cmap</span><span class="p">[</span><span class="n">g</span><span class="p">],</span>
+                                 <span class="n">norm</span><span class="o">=</span><span class="n">iter_norm</span><span class="p">[</span><span class="n">g</span><span class="p">],</span> <span class="o">**</span><span class="n">rs_kwargs</span><span class="p">))</span>
+        <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axs</span><span class="p">,</span> <span class="n">rasters</span></div>
+
+
+
+<div class="viewcode-block" id="make_line_plot">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.make_line_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">make_line_plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ydata</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">lbl_fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span> <span class="n">axis_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a line plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        grid: Axis object</span>
+<span class="sd">            returned from the &#39;fig_grid_setup&#39; function</span>
+<span class="sd">        ydata: array/list</span>
+<span class="sd">            Required. 1D array or list of 1D arrays with data for y axis</span>
+<span class="sd">        xdata: array/list</span>
+<span class="sd">            Optional. 1D array or list of 1D arrays with data for x axis</span>
+<span class="sd">        labels: string/list</span>
+<span class="sd">            String or list of strings with line labels</span>
+<span class="sd">        lbl_fontsize: string/float</span>
+<span class="sd">            Fontsize for legend labels</span>
+<span class="sd">        axis_type: str</span>
+<span class="sd">            Linear or log axes: &#39;linear&#39; (defualt), &#39;logx&#39;/&#39;logy&#39;/&#39;logxy&#39; (log</span>
+<span class="sd">            x, y or both axes).</span>
+<span class="sd">        **lp_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.line</span>
+<span class="sd">            See matplotlib.org for more information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: Axes objects</span>
+<span class="sd">            The axes objects created for each plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+
+        <span class="n">yd</span> <span class="o">=</span> <span class="p">[</span><span class="n">ydata</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">ydata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">ydata</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">xdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">xd</span> <span class="o">=</span> <span class="p">[</span><span class="n">xdata</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">xdata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="k">else</span> <span class="p">[[</span><span class="n">xdata</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dlabels</span> <span class="o">=</span> <span class="p">[[</span><span class="n">labels</span><span class="p">]]</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span>
+                                                   <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">labels</span><span class="p">]</span>
+
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">xdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                         <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">yy</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">yy</span> <span class="ow">in</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+
+            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">lbl</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">dlabels</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">lbl_fontsize</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="ow">and</span>\
+               <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">yd</span><span class="p">[</span><span class="n">i</span><span class="p">]]):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.7</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logx&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logy&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+            <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> y data must be in a list when multiple figures&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ydata</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+
+        <span class="k">if</span> <span class="n">xdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> x data must be in a list &quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;when multiple figures&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xdata</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> Labels must be in a list when &quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;multiple figures&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+
+        <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+            <span class="n">yd</span> <span class="o">=</span> <span class="n">ydata</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">xdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">xd</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                             <span class="k">for</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">yy</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">yy</span> <span class="ow">in</span> <span class="n">yd</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">lbl</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">lbl_fontsize</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">yd</span><span class="p">])</span> <span class="ow">and</span>\
+                   <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">dd</span> <span class="ow">in</span> <span class="n">yd</span><span class="p">]):</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.7</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">xdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xdata</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">yd</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">yd</span><span class="p">,</span> <span class="o">**</span><span class="n">lp_kwargs</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">lbl_fontsize</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">yd</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">yd</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.7</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logx&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">axis_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;logy&#39;</span><span class="p">,</span> <span class="s1">&#39;logxy&#39;</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+            <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axs</span></div>
+
+
+
+<div class="viewcode-block" id="make_box_plot">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.make_box_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">make_box_plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">leg_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grouped</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">box_colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">box_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a box plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        grid: AxesGrid object</span>
+<span class="sd">            returned from the &#39;fig_grid_setup&#39; function</span>
+<span class="sd">        data: List/Array</span>
+<span class="sd">            1d array or list of 1d arrays with data for boxplot</span>
+<span class="sd">        labels: str/list</span>
+<span class="sd">            String or a list of strings with xtick labels (for each box/group</span>
+<span class="sd">            of boxes)</span>
+<span class="sd">        leg_labels: str/list</span>
+<span class="sd">            String or a list of strings with legend labels (mostly used for</span>
+<span class="sd">            grouped boxplots).</span>
+<span class="sd">        grouped: boolean</span>
+<span class="sd">            Whether to plot grouped boxplot. If True, input data must be a</span>
+<span class="sd">            dictionary. See _grouped_boxplot function for more info.</span>
+<span class="sd">        box_colors: array/list</span>
+<span class="sd">            Optional list of colors to be used for the boxes.</span>
+<span class="sd">        **box_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.boxplot</span>
+<span class="sd">            See matplotlib.org for more information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        axs: list</span>
+<span class="sd">            Axes objects for each plot</span>
+<span class="sd">        bps: list</span>
+<span class="sd">            Each item in list is a dictionary mapping each component of the</span>
+<span class="sd">            boxplot to a list of the `.Line2D` instances created.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ldata</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="n">data</span>
+        <span class="n">idata</span> <span class="o">=</span> <span class="p">[</span><span class="n">ldata</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ldata</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">ldata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">idata</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="n">axs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> &#39;labels&#39; must be given in a list!&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+            <span class="n">lbls</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">labels</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lbls</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="k">if</span> <span class="n">leg_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;*** ERROR *** </span><span class="se">\n</span><span class="s2"> &#39;leg_labels&#39; must be given in a list!&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">leg_labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="n">msg</span>
+            <span class="n">lg_lbls</span> <span class="o">=</span> <span class="n">leg_labels</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">leg_labels</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lg_lbls</span> <span class="o">=</span> <span class="n">leg_labels</span>
+
+        <span class="c1"># data to plot</span>
+        <span class="n">bdata</span> <span class="o">=</span> <span class="n">idata</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">grouped</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> \
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;**Error**</span><span class="se">\n</span><span class="s2">If plotting grouped boxplot &quot;</span>
+                                <span class="s2">&quot;(grouped=True), then input data must &quot;</span>
+                                <span class="s2">&quot;be a dictionary.&quot;</span><span class="p">)</span>
+            <span class="n">bp</span> <span class="o">=</span> <span class="n">_grouped_boxplot</span><span class="p">(</span>
+                <span class="n">ax</span><span class="p">,</span> <span class="n">bdata</span><span class="p">,</span> <span class="n">group_names</span><span class="o">=</span><span class="n">lbls</span><span class="p">,</span> <span class="n">leg_labels</span><span class="o">=</span><span class="n">lg_lbls</span><span class="p">,</span>
+                <span class="n">box_colors</span><span class="o">=</span><span class="n">box_colors</span><span class="p">,</span> <span class="o">**</span><span class="n">box_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bp</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">bdata</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">lbls</span><span class="p">,</span> <span class="n">patch_artist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">box_kwargs</span><span class="p">)</span>
+            <span class="n">_decorate_box</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">box_colors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">leg_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">bx</span><span class="o">.</span><span class="n">get_facecolor</span><span class="p">()</span> <span class="k">for</span> <span class="n">bx</span> <span class="ow">in</span> <span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">]]</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">custom_legend</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">lg_lbls</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">)</span>
+
+        <span class="n">axs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">bps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axs</span><span class="p">,</span> <span class="n">bps</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_grouped_boxplot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">group_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">leg_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">box_colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box_width</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">box_spacing</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">box_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws a grouped boxplot.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        data: dictionary</span>
+<span class="sd">            A dictionary of length equal to the number of the groups.</span>
+<span class="sd">            If group_names are not provided, the group names will be taken from</span>
+<span class="sd">            the keys of the dictionary (data.keys()). The key values should</span>
+<span class="sd">            be a list of arrays. The length of the list should be equal to</span>
+<span class="sd">            the number of subgroups.</span>
+<span class="sd">        group_names:</span>
+<span class="sd">            The group names, should be the same as data.keys(),</span>
+<span class="sd">            but can be ordered.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nsubgroups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="c1"># assert len(np.unique(nsubgroups)) == 1,\</span>
+    <span class="c1">#     &quot;\n{}\n&quot;.format(&quot;Number of subgroups for each property &quot;</span>
+    <span class="c1">#                     &quot;differ!&quot;)</span>
+    <span class="c1"># nsubgroups = nsubgroups[0]</span>
+
+    <span class="n">bps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cpos</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">label_pos</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ngrp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nsubgroups</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ngrp</span><span class="p">)</span> <span class="o">+</span> <span class="n">cpos</span>
+        <span class="n">label_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+        <span class="n">bp</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">widths</span><span class="o">=</span><span class="n">box_width</span><span class="p">,</span> <span class="n">patch_artist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">box_kwargs</span><span class="p">)</span>
+        <span class="n">_decorate_box</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">box_colors</span><span class="p">)</span>
+        <span class="n">cpos</span> <span class="o">+=</span> <span class="n">ngrp</span> <span class="o">+</span> <span class="n">box_spacing</span>
+        <span class="n">bps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;vert&#39;</span> <span class="ow">in</span> <span class="n">box_kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">box_kwargs</span><span class="p">[</span><span class="s1">&#39;vert&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cpos</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">label_pos</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">group_names</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">(),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1">#     ax.set_yticklabels(data.keys())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cpos</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">label_pos</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">group_names</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1">#     ax.set_xticklabels(data.keys())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cpos</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">label_pos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">group_names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1">#     ax.set_xticklabels(data.keys())</span>
+
+    <span class="k">if</span> <span class="n">leg_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">bx</span><span class="o">.</span><span class="n">get_facecolor</span><span class="p">()</span> <span class="k">for</span> <span class="n">bx</span> <span class="ow">in</span> <span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">]]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">custom_legend</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">leg_labels</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bps</span>
+
+
+<span class="k">def</span> <span class="nf">_decorate_box</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration of the boxes in a boxplot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        ax: Axes handle</span>
+<span class="sd">        bp: boxplot object; i.e. returned from pyplot.boxplot call</span>
+<span class="sd">        colors: List/array of colors for the boxes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
+
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.prop_cycle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span>
+    <span class="n">bxcolors</span> <span class="o">=</span> <span class="p">[</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">]</span>
+    <span class="n">facecolors</span> <span class="o">=</span> <span class="p">[</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">]</span>
+
+    <span class="c1"># fill in each box with a color</span>
+    <span class="p">[</span><span class="n">box</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="n">box</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span>
+        <span class="nb">zip</span><span class="p">(</span><span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">],</span> <span class="n">cycle</span><span class="p">(</span><span class="n">facecolors</span><span class="p">))]</span>
+    <span class="p">[</span><span class="n">box</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">box</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span>
+        <span class="nb">zip</span><span class="p">(</span><span class="n">bp</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">],</span> <span class="n">cycle</span><span class="p">(</span><span class="n">bxcolors</span><span class="p">))]</span>
+
+    <span class="c1"># change color of whiskers</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">w2</span><span class="p">),</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bp</span><span class="p">[</span><span class="s1">&#39;whiskers&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span> <span class="n">bp</span><span class="p">[</span><span class="s1">&#39;whiskers&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]),</span>
+                           <span class="n">cycle</span><span class="p">(</span><span class="n">bxcolors</span><span class="p">)):</span>
+        <span class="n">w1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">w2</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># draw a black line for the median</span>
+    <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bp</span><span class="p">[</span><span class="s1">&#39;medians&#39;</span><span class="p">],</span>
+                                                   <span class="n">cycle</span><span class="p">(</span><span class="n">bxcolors</span><span class="p">))]</span>
+
+    <span class="c1"># Set fliers</span>
+    <span class="k">for</span> <span class="n">flier</span> <span class="ow">in</span> <span class="n">bp</span><span class="p">[</span><span class="s1">&#39;fliers&#39;</span><span class="p">]:</span>
+        <span class="n">flier</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                  <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="custom_legend">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.custom_legend">[docs]</a>
+<span class="k">def</span> <span class="nf">custom_legend</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a list of matplotlib Patch objects that can be passed to</span>
+<span class="sd">    the legend(...) function to create a custom legend.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        colors: list</span>
+<span class="sd">            A list of colors, one for each entry in the legend.</span>
+<span class="sd">            You can also include a linestyle, for example: &#39;k--&#39;</span>
+<span class="sd">        labels: list</span>
+<span class="sd">            A list of labels, one for each entry in the legend.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">linestyles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">linestyles</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> \
+            <span class="s2">&quot;Length of linestyles must match length of colors.&quot;</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">labels</span><span class="p">)):</span>
+        <span class="n">clr</span> <span class="o">=</span> <span class="n">c</span>
+        <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;solid&#39;</span>
+        <span class="k">if</span> <span class="n">linestyles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ls</span> <span class="o">=</span> <span class="n">linestyles</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">patch</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">clr</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">l</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">h</span></div>
+
+
+
+<div class="viewcode-block" id="gen_clevels">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.gen_clevels">[docs]</a>
+<span class="k">def</span> <span class="nf">gen_clevels</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create contour levels based on min and max of input data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        data: array</span>
+<span class="sd">            data array</span>
+<span class="sd">        nsteps: int</span>
+<span class="sd">            number of levels to be produced</span>
+<span class="sd">        robust: None or string</span>
+<span class="sd">            If to soften the max/min limits due to extreme values;</span>
+<span class="sd">            &quot;top&quot;/&quot;bottom&quot;/&quot;both&quot;, which end(s) to soften.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dmin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+    <span class="n">dmin</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dmin</span><span class="o">-</span><span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span> <span class="k">else</span> <span class="n">dmin</span>
+    <span class="n">dmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">robust</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">dmin</span>
+    <span class="n">dmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+    <span class="n">dmax</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dmax</span><span class="o">-</span><span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-10</span> <span class="k">else</span> <span class="n">dmax</span>
+    <span class="n">dmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">98</span><span class="p">)</span> <span class="k">if</span> <span class="n">robust</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">dmax</span>
+    <span class="n">frac</span> <span class="o">=</span> <span class="p">(</span><span class="n">dmax</span> <span class="o">-</span> <span class="n">dmin</span><span class="p">)</span><span class="o">/</span><span class="n">nsteps</span>
+    <span class="c1"># if frac &gt; 1.0:</span>
+    <span class="c1">#     dstep = np.round(frac)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     dstep = np.round(frac, decimals=1)</span>
+    <span class="n">dstep</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:.2g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frac</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="o">+</span><span class="n">dstep</span><span class="p">,</span> <span class="n">dstep</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="map_setup">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.map_setup">[docs]</a>
+<span class="k">def</span> <span class="nf">map_setup</span><span class="p">(</span><span class="n">map_proj</span><span class="p">,</span> <span class="n">map_extent</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">figshape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+              <span class="n">grid_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">grid_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a Cartopy crs object to be used in the overlaying of 2d plots.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        map_proj: Cartopy map projection</span>
+<span class="sd">            Generated from the &#39;define_map_object&#39; function</span>
+<span class="sd">        map_extent: list/tuple</span>
+<span class="sd">            Longitude/latitude values for map extent;</span>
+<span class="sd">            [lon_start, lon_end, lat_start, lat_end]</span>
+<span class="sd">        figsize: tuple</span>
+<span class="sd">            The requested size of figure object</span>
+<span class="sd">        figshape: tuple</span>
+<span class="sd">            The requested shape (rows, columns) of figure panels</span>
+<span class="sd">        grid_lines: boolean</span>
+<span class="sd">            Whether to plot grid lines (lat/lon) with values along the</span>
+<span class="sd">            left and bottom axes. Default False.</span>
+<span class="sd">        **grid_kwargs: key word arguments</span>
+<span class="sd">            Additional arguments provided to AxesGrid (See below for</span>
+<span class="sd">            more info).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        fig:</span>
+<span class="sd">            figure object</span>
+<span class="sd">        axgrid: list</span>
+<span class="sd">            List with axes objects, with GeoAxes class, for each plot in figure</span>
+
+<span class="sd">    With AxesGrid and GeoAxes, a grid is created and corresponding axes are</span>
+<span class="sd">    classified with GeoAxes. Read more about AxesGrid, and the available</span>
+<span class="sd">    options, here:</span>
+<span class="sd">    https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html</span>
+
+<span class="sd">    Examples of ``**kwargs`` with default values:</span>
+<span class="sd">        direction=&quot;row&quot;,</span>
+<span class="sd">        axes_pad=0.02,</span>
+<span class="sd">        add_all=True,</span>
+<span class="sd">        share_all=False,</span>
+<span class="sd">        label_mode=&quot;L&quot;,</span>
+<span class="sd">        aspect=True,</span>
+<span class="sd">        cbar_mode=None,</span>
+<span class="sd">        cbar_location=&quot;right&quot;,</span>
+<span class="sd">        cbar_size=&quot;5%&quot;,</span>
+<span class="sd">        cbar_pad=None,</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">cartopy.mpl.geoaxes</span> <span class="kn">import</span> <span class="n">GeoAxes</span>
+    <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">AxesGrid</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+    <span class="c1"># Initiate an axes class with Cartopy GeoAxes</span>
+    <span class="n">axes_class</span> <span class="o">=</span> <span class="p">(</span><span class="n">GeoAxes</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">map_proj</span><span class="p">))</span>
+
+    <span class="c1"># Create axes grid</span>
+    <span class="n">axgrid</span> <span class="o">=</span> <span class="n">AxesGrid</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">111</span><span class="p">,</span>
+                      <span class="n">axes_class</span><span class="o">=</span><span class="n">axes_class</span><span class="p">,</span>
+                      <span class="n">nrows_ncols</span><span class="o">=</span><span class="n">figshape</span><span class="p">,</span>
+                      <span class="o">**</span><span class="n">grid_kwargs</span>
+                      <span class="p">)</span>
+
+    <span class="c1"># Add features to map</span>
+    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axgrid</span><span class="p">:</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">COASTLINE</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;#606060&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">.7</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">BORDERS</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;#606060&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">.4</span><span class="p">)</span>
+
+        <span class="c1"># Set the lat/lon extent of map</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_extent</span><span class="p">(</span><span class="n">map_extent</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">grid_lines</span><span class="p">:</span>
+            <span class="n">gl</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">gridlines</span><span class="p">(</span>
+                <span class="n">draw_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
+                <span class="n">x_inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_inline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mf">.7</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">())</span>
+            <span class="n">gl</span><span class="o">.</span><span class="n">top_labels</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">gl</span><span class="o">.</span><span class="n">right_labels</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axgrid</span></div>
+
+
+
+<div class="viewcode-block" id="define_map_object">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.define_map_object">[docs]</a>
+<span class="k">def</span> <span class="nf">define_map_object</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;Stereographic&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">proj_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a Cartopy map object</span>
+
+<span class="sd">    Available map projections and configurations:</span>
+<span class="sd">    https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">projection_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Stereographic&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Stereographic</span><span class="p">,</span>
+        <span class="s1">&#39;LambertConformal&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">LambertConformal</span><span class="p">,</span>
+        <span class="s1">&#39;LambertCylindrical&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">LambertCylindrical</span><span class="p">,</span>
+        <span class="s1">&#39;Mercator&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Mercator</span><span class="p">,</span>
+        <span class="s1">&#39;Miller&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Miller</span><span class="p">,</span>
+        <span class="s1">&#39;Mollweide&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Mollweide</span><span class="p">,</span>
+        <span class="s1">&#39;Robinson&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">Robinson</span><span class="p">,</span>
+        <span class="s1">&#39;AzimuthalEquidistant&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">AzimuthalEquidistant</span><span class="p">,</span>
+        <span class="s1">&#39;InterruptedGoodeHomolosine&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">InterruptedGoodeHomolosine</span><span class="p">,</span>
+        <span class="s1">&#39;SouthPolarStereo&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">SouthPolarStereo</span><span class="p">,</span>
+        <span class="s1">&#39;NorthPolarStereo&#39;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">NorthPolarStereo</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">projection_dict</span><span class="p">[</span><span class="n">projection</span><span class="p">](</span><span class="o">**</span><span class="n">proj_kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_map_plot">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.make_map_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">make_map_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">mesh</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clevs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">map_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Producing  map plots</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        data: array/list/tuple</span>
+<span class="sd">            Array or list/tuple of 2D data array(s) to plot</span>
+<span class="sd">        grid: AxesGrid object</span>
+<span class="sd">            Returned from the &#39;map_setup&#39; function</span>
+<span class="sd">        lats, lons: arrays/list of arrays</span>
+<span class="sd">            Values of latitudes and longitudes needed for the map plotting.</span>
+<span class="sd">            If different lats/lons should be used in the figure panels, these</span>
+<span class="sd">            arrays should be provided in a list; [lons_1, lons_2, ...].</span>
+<span class="sd">        mesh: boolean</span>
+<span class="sd">            Whether to plot data as mesh. If false (default), contour plot is</span>
+<span class="sd">            made.</span>
+<span class="sd">        filled: boolean</span>
+<span class="sd">            Whether to color fill between contours or not. Defaults to True</span>
+<span class="sd">        cmap: string/list</span>
+<span class="sd">            String or list with strings of predefined Matplotlib colormaps.</span>
+<span class="sd">            For filled contour plots it defaults to &#39;viridis&#39;.</span>
+<span class="sd">        clevs: Iterable data structure</span>
+<span class="sd">            Consisting of lists with defined contour levels; e.g.</span>
+<span class="sd">            (np.arange(1,10,2), [0,2,4,6,8]), [np.arange(100,step=5)]*3</span>
+<span class="sd">        robust: string</span>
+<span class="sd">            See gen_clevs function for info</span>
+<span class="sd">        norm: BoundaryNorm object</span>
+<span class="sd">            Object generated from matplotlib.colors.BoundaryNorm function.</span>
+<span class="sd">            Generate a colormap index based on discrete intervals.</span>
+<span class="sd">        **map_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.contour/f</span>
+<span class="sd">            (if mesh=False) or pcolormesh (if mesh=True)</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        mplots: List</span>
+<span class="sd">            List with map plot instances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Single or multiple 2d data arrays</span>
+    <span class="n">iter_data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">data</span><span class="p">]</span>
+
+    <span class="c1"># Number of grids</span>
+    <span class="n">ndata</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iter_data</span><span class="p">)</span>
+
+    <span class="c1"># Check Number of axes in provided ImageGrid object</span>
+    <span class="n">ngrid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">ngrids</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ngrid</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">lats</span><span class="p">)]</span>
+            <span class="n">ngrid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;***** WARNING *****&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Number of lat/lon arrays provided does not &quot;</span>
+                <span class="s2">&quot;match number of plots (axes instances from &quot;</span>
+                <span class="s2">&quot;grid setup). Map objects created only for &quot;</span>
+                <span class="s2">&quot;provided lat/lon arrays&quot;</span><span class="p">))</span>
+        <span class="n">iter_x</span> <span class="o">=</span> <span class="n">lons</span>
+        <span class="n">iter_y</span> <span class="o">=</span> <span class="n">lats</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">iter_x</span> <span class="o">=</span> <span class="p">[</span><span class="n">lons</span><span class="p">]</span><span class="o">*</span><span class="n">ngrid</span>
+        <span class="n">iter_y</span> <span class="o">=</span> <span class="p">[</span><span class="n">lats</span><span class="p">]</span><span class="o">*</span><span class="n">ngrid</span>
+
+    <span class="k">if</span> <span class="n">ndata</span> <span class="o">!=</span> <span class="n">grid</span><span class="o">.</span><span class="n">ngrids</span><span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ndata</span><span class="p">))</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">ngrids</span><span class="p">))))</span>
+        <span class="p">[</span><span class="n">grid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ll</span><span class="p">]</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[:</span><span class="n">ndata</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">&quot;***** WARNING *****&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Mismatch in number of plots &quot;</span>
+            <span class="s2">&quot;(axes instances from grid setup) and number&quot;</span>
+            <span class="s2">&quot; of 2D data arrays provided. Excess grids are removed&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Make sure clevs is provided</span>
+    <span class="k">if</span> <span class="n">clevs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">cbar_axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">([</span><span class="n">cax</span><span class="o">.</span><span class="n">get_axes_locator</span><span class="p">()</span> <span class="k">for</span> <span class="n">cax</span> <span class="ow">in</span>
+                                            <span class="n">grid</span><span class="o">.</span><span class="n">cbar_axes</span><span class="p">]):</span>
+            <span class="n">clevs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">gen_clevels</span><span class="p">,</span> <span class="n">iter_data</span><span class="p">,</span> <span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">iter_data</span><span class="p">),</span>
+                         <span class="p">[</span><span class="n">robust</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">iter_data</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clevs</span> <span class="o">=</span> <span class="n">gen_clevels</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">iter_data</span><span class="p">),</span> <span class="mi">15</span><span class="p">,</span> <span class="n">robust</span><span class="p">)</span>
+
+    <span class="c1"># Replace None in list of clevs with generated levels</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">clevs</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">([</span><span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">clevs</span><span class="p">]):</span>
+        <span class="n">clevs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gen_clevels</span><span class="p">(</span><span class="n">iter_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">15</span><span class="p">,</span> <span class="n">robust</span><span class="p">)</span> <span class="k">if</span> <span class="n">cl</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cl</span>
+                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clevs</span><span class="p">)]</span>
+
+    <span class="c1"># Create iterators of other input arguments</span>
+    <span class="n">iter_clevs</span> <span class="o">=</span> <span class="n">clevs</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">clevs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">clevs</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                                                              <span class="nb">range</span><span class="p">(</span><span class="n">ndata</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filled</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="s1">&#39;viridis&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="n">iter_cmap</span> <span class="o">=</span> <span class="n">cmap</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmap</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="k">else</span> <span class="p">[</span><span class="n">cmap</span> <span class="k">for</span> <span class="n">i</span>
+                                                              <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndata</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">norm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">iter_norm</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">ndata</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iter_norm</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">cl</span><span class="p">,</span> <span class="n">cm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_clevs</span><span class="p">,</span> <span class="n">iter_cmap</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">iter_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">ncolrs</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colormaps</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span><span class="o">.</span><span class="n">N</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ncolrs</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">N</span>
+                    <span class="n">iter_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">BoundaryNorm</span><span class="p">(</span><span class="n">cl</span><span class="p">,</span> <span class="n">ncolrs</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">iter_norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">norm</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                                                            <span class="nb">range</span><span class="p">(</span><span class="n">ndata</span><span class="p">)]</span>
+
+    <span class="c1"># !! NB It would be nice to use map or starmap but don&#39;t know how to handle</span>
+    <span class="c1"># **kwargs.</span>
+    <span class="c1"># Ex.</span>
+    <span class="c1"># from itertools import starmap as smap</span>
+    <span class="c1"># from itertools import cycle</span>
+    <span class="c1"># iter_kwargs = [{&#39;alpha&#39;: .6, &#39;lw&#39;: 2} for i in range(nplots)]</span>
+    <span class="c1">#</span>
+    <span class="c1"># arg_iter = zip(grid, iter_m, iter_x, iter_y, data, iter_clevs, iter_cmap,</span>
+    <span class="c1">#               iter_norm, cycle([filled]), **iter_kwargs)</span>
+    <span class="c1"># plots = smap(plot_map, arg_iter)</span>
+
+    <span class="n">mplots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndata</span><span class="p">):</span>
+        <span class="n">mplots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot_map</span><span class="p">(</span><span class="n">grid</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">iter_x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">iter_y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                               <span class="n">iter_data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">iter_clevs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">iter_cmap</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                               <span class="n">iter_norm</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">filled</span><span class="p">,</span> <span class="o">**</span><span class="n">map_kwargs</span><span class="p">))</span>
+
+    <span class="n">out_mplots</span> <span class="o">=</span> <span class="n">mplots</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mplots</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">mplots</span>
+    <span class="k">return</span> <span class="n">out_mplots</span></div>
+
+
+
+<div class="viewcode-block" id="plot_map">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.plot_map">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_map</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">clevs</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">filled</span><span class="p">,</span> <span class="o">**</span><span class="n">map_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Producing a map plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        ax: Axis object</span>
+<span class="sd">            Axis generated in &#39;map_setup&#39; function</span>
+<span class="sd">        data: numpy array</span>
+<span class="sd">            2D data array to plot</span>
+<span class="sd">        x,y: numpy arrays</span>
+<span class="sd">            Arrays of lat/lon coordinates</span>
+<span class="sd">        clevs: List/array</span>
+<span class="sd">            Contour levels</span>
+<span class="sd">        cmap: string</span>
+<span class="sd">            Color map. See http://matplotlib.org/users/colormaps.html for more</span>
+<span class="sd">            information.</span>
+<span class="sd">        norm: Boundary norm object</span>
+<span class="sd">            Normalize data to [0,1] to use for mapping colors</span>
+<span class="sd">        mesh: boolean</span>
+<span class="sd">            Whether to plot data as mesh. If false (default), contour plot is</span>
+<span class="sd">            made.</span>
+<span class="sd">        filled: Boolean</span>
+<span class="sd">            Whether to color fill between contours or not. Defaults to True</span>
+<span class="sd">        **map_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.contour/f</span>
+<span class="sd">            (if mesh=False) or pcolormesh (if mesh=True)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        cs: Contour plot object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">mesh</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                           <span class="n">transform</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                           <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                           <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+                           <span class="o">**</span><span class="n">map_kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">filled</span><span class="p">:</span>
+            <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                             <span class="n">transform</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                             <span class="n">levels</span><span class="o">=</span><span class="n">clevs</span><span class="p">,</span>
+                             <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+                             <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                             <span class="n">extend</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">map_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">map_kwargs</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                                <span class="n">transform</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                                <span class="n">levels</span><span class="o">=</span><span class="n">clevs</span><span class="p">,</span>
+                                <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+                                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">map_kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                                <span class="n">transform</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
+                                <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+                                <span class="n">levels</span><span class="o">=</span><span class="n">clevs</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">map_kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cs</span></div>
+
+
+
+<div class="viewcode-block" id="image_colorbar">
+<a class="viewcode-back" href="../../../rcatool.plot.html#rcatool.plot.plots.image_colorbar">[docs]</a>
+<span class="k">def</span> <span class="nf">image_colorbar</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span> <span class="n">cbaxs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labelspacing</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                   <span class="n">labelsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">,</span> <span class="n">formatter</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">cbar_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add colobar to map plot</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        cs: Plot object</span>
+<span class="sd">            Such as an image (imshow) or a contour set (with contourf)</span>
+<span class="sd">        cbaxs: cbar axis object/list</span>
+<span class="sd">            Colorbar axis object or list with axes objects for each</span>
+<span class="sd">            plot in figure</span>
+<span class="sd">        title: list</span>
+<span class="sd">            list of strings with colorbar titles</span>
+<span class="sd">        labelspacing: int</span>
+<span class="sd">            Label spacing; the integer value represents the number of</span>
+<span class="sd">            steps between each label. 1 show each label (default), 2 every</span>
+<span class="sd">            second, etc.</span>
+<span class="sd">        labelsize: str/int</span>
+<span class="sd">            Size of labels; integer value or a string (e.g. &#39;large&#39;)</span>
+<span class="sd">        **cbar_kwargs: keyword arguments</span>
+<span class="sd">            arguments (key=value) that can be used in pyplot.colobar</span>
+<span class="sd">            See</span>
+<span class="sd">            http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.colorbar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">cs</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">cs</span><span class="p">]</span>
+    <span class="n">nplots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span>
+
+    <span class="c1"># Tick label format</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="n">formatter</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formatter</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">formatter</span><span class="p">]</span><span class="o">*</span><span class="n">nplots</span>
+
+    <span class="k">if</span> <span class="n">nplots</span> <span class="o">!=</span> <span class="n">cbaxs</span><span class="o">.</span><span class="n">ngrids</span><span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nplots</span><span class="p">))</span><span class="o">.</span><span class="n">symmetric_difference</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">cbaxs</span><span class="o">.</span><span class="n">ngrids</span><span class="p">))))</span>
+        <span class="p">[</span><span class="n">cbaxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ll</span><span class="p">]</span>
+        <span class="n">cbaxs</span> <span class="o">=</span> <span class="n">cbaxs</span><span class="p">[:</span><span class="n">nplots</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cb_title</span> <span class="o">=</span> <span class="p">[</span><span class="n">title</span><span class="p">]</span><span class="o">*</span><span class="n">nplots</span> \
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">title</span>
+
+    <span class="n">cbs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">ft</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nplots</span><span class="p">),</span> <span class="n">cbaxs</span><span class="p">,</span> <span class="n">fmt</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lvls</span> <span class="o">=</span> <span class="n">cs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span>
+            <span class="c1"># lvls = [round(i, 2) for i in lvls]</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">lvls</span> <span class="o">=</span> <span class="n">cs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">boundaries</span>
+            <span class="c1"># lvls = [round(i, 2) for i in lvls]</span>
+
+        <span class="c1"># Set format of tick labels</span>
+        <span class="n">tlbls</span> <span class="o">=</span> <span class="p">[</span><span class="n">ft</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lvls</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;ticks&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cbar_kwargs</span><span class="p">:</span>
+            <span class="n">ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lvls</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lvls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">lvls</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ticks</span> <span class="o">=</span> <span class="n">cbar_kwargs</span><span class="p">[</span><span class="s1">&#39;ticks&#39;</span><span class="p">]</span>
+        <span class="n">cb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                             <span class="n">spacing</span><span class="o">=</span><span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">cbar_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">orientation</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">]:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">[::</span><span class="n">labelspacing</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">tlbls</span><span class="p">[::</span><span class="n">labelspacing</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ticks</span><span class="p">[::</span><span class="n">labelspacing</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">tlbls</span><span class="p">[::</span><span class="n">labelspacing</span><span class="p">])</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">labelsize</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">axis</span><span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">cax</span><span class="o">.</span><span class="n">orientation</span><span class="p">]</span>
+            <span class="n">axis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">cb_title</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">axis</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="n">labelsize</span><span class="p">)</span>
+
+        <span class="n">cbs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cbs</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.utils.atmosphys &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcatool.utils.atmosphys</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcatool.utils.atmosphys</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Atmospheric Function Module</span>
+<span class="sd">---------------------------</span>
+<span class="sd">Functions for calculations of various physical properties</span>
+
+<span class="sd">Created: Autumn 2017</span>
+<span class="sd">Authors: Petter Lind &amp; David Lindstedt</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Constants/parameters</span>
+<span class="n">L</span> <span class="o">=</span> <span class="mf">2.501e6</span>     <span class="c1"># latent heat of vaporization</span>
+<span class="n">R</span> <span class="o">=</span> <span class="mf">287.04</span>      <span class="c1"># gas constant air</span>
+<span class="n">Rv</span> <span class="o">=</span> <span class="mf">461.5</span>      <span class="c1"># gas constant vapor</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="n">R</span><span class="o">/</span><span class="n">Rv</span>
+<span class="n">cp</span> <span class="o">=</span> <span class="mf">1005.</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="mf">718.</span>
+<span class="n">poisson</span> <span class="o">=</span> <span class="mi">2</span><span class="o">/</span><span class="mi">7</span>
+
+
+<div class="viewcode-block" id="rh2sh">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.rh2sh">[docs]</a>
+<span class="k">def</span> <span class="nf">rh2sh</span><span class="p">(</span><span class="n">rh</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="mf">1013.25</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert relative humidity to specific humidity</span>
+<span class="sd">    Code from:</span>
+<span class="sd">    https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</span>
+<span class="sd">    Equation for sh from standard literature, e.g. K. Emanuel (1994; eq. 4.1.4)</span>
+<span class="sd">    Reference:</span>
+<span class="sd">    * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:</span>
+<span class="sd">      Oxford University Press, 580 pp.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rh, float/array of floats</span>
+<span class="sd">        Relative humidity in proportion, not percent</span>
+<span class="sd">    T, float/array of floats</span>
+<span class="sd">        Absolute temperature in Kelvin</span>
+<span class="sd">    P, float/array of floats</span>
+<span class="sd">        Pressure in hPa (mb)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sh,</span>
+<span class="sd">        Specific humidity in kg/kg</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">calc_es</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">rh</span> <span class="o">*</span> <span class="n">es</span>
+    <span class="n">sh</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">e</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">eps</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">sh</span></div>
+
+
+
+<div class="viewcode-block" id="sh2rh">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.sh2rh">[docs]</a>
+<span class="k">def</span> <span class="nf">sh2rh</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="mf">1013.25</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert specific humidity to relative humidity</span>
+<span class="sd">    Code from:</span>
+<span class="sd">    https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sh, float/array of floats</span>
+<span class="sd">        Specific humidity in kg/kg</span>
+<span class="sd">    T, float/array of floats</span>
+<span class="sd">        Absolute temperature in Kelvin</span>
+<span class="sd">    P, float/array of floats</span>
+<span class="sd">        Pressure in hPa (mb)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rh,</span>
+<span class="sd">        Relative humidity in fraction (not percent)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">es</span> <span class="o">=</span> <span class="n">calc_es</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">calc_e_from_sh</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span>
+    <span class="n">rh</span> <span class="o">=</span> <span class="n">e</span> <span class="o">/</span> <span class="n">es</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rh</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)):</span>
+        <span class="n">rh</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">rh</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">rh</span>
+        <span class="n">rh</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">rh</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">rh</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rh</span><span class="p">[</span><span class="n">rh</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">rh</span><span class="p">[</span><span class="n">rh</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">rh</span></div>
+
+
+
+<div class="viewcode-block" id="td2sh">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.td2sh">[docs]</a>
+<span class="k">def</span> <span class="nf">td2sh</span><span class="p">(</span><span class="n">Td</span><span class="p">,</span> <span class="n">P</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert dew point temperature to specific humidity</span>
+<span class="sd">    https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Td, float/array of floats</span>
+<span class="sd">        Absolute dew point temperature in Kelvin</span>
+<span class="sd">    P, float/array of floats</span>
+<span class="sd">        Pressure in mb</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    p, float/array of floats</span>
+<span class="sd">        Specific humidity in g/kg</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Td_C</span> <span class="o">=</span> <span class="n">Td</span> <span class="o">-</span> <span class="mf">273.15</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="mf">6.112</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="mf">17.67</span> <span class="o">*</span> <span class="n">Td_C</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">Td_C</span> <span class="o">+</span> <span class="mf">243.5</span><span class="p">))</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps</span> <span class="o">*</span> <span class="n">e</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.378</span> <span class="o">*</span> <span class="n">e</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">q</span></div>
+
+
+
+<div class="viewcode-block" id="sh2td">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.sh2td">[docs]</a>
+<span class="k">def</span> <span class="nf">sh2td</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns dew point temperature (K) at mixing ratio sh (kg/kg) and</span>
+<span class="sd">    pressure p (Pa). Insert Td in 2.17 in Rogers&amp;Yau and solve for Td</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ep</span> <span class="o">=</span> <span class="n">calc_e_from_sh</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">243.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ep</span><span class="o">/</span><span class="mf">611.2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">17.67</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ep</span><span class="o">/</span><span class="mf">611.2</span><span class="p">))</span> <span class="o">+</span> <span class="mf">273.15</span></div>
+
+
+
+<div class="viewcode-block" id="vpd">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.vpd">[docs]</a>
+<span class="k">def</span> <span class="nf">vpd</span><span class="p">(</span><span class="n">rh</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate VPD - vapor pressure deficit from relative humidity and</span>
+<span class="sd">    temperature.</span>
+<span class="sd">    Code from:</span>
+<span class="sd">    https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rh, float/array of floats</span>
+<span class="sd">        Relative humidity in fraction (not percent)</span>
+<span class="sd">    T, float/array of floats</span>
+<span class="sd">        Absolute temperature in Kelvin</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vpd,</span>
+<span class="sd">        Vapor pressure deficit (in hPa/mb)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">e_sat</span> <span class="o">=</span> <span class="n">calc_es</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">vpd</span> <span class="o">=</span> <span class="p">(((</span><span class="mi">100</span> <span class="o">-</span> <span class="n">rh</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="n">e_sat</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">vpd</span></div>
+
+
+
+<div class="viewcode-block" id="calc_es">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.calc_es">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_es</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns saturation vapor pressure in hPa at temperature T (Kelvin)</span>
+<span class="sd">    Formula 2.17 in Rogers&amp;Yau</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Tc</span> <span class="o">=</span> <span class="n">T</span> <span class="o">-</span> <span class="mf">273.15</span>  <span class="c1"># Temperature in degrees Celcius</span>
+
+    <span class="k">return</span> <span class="mf">6.112</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">17.67</span> <span class="o">*</span> <span class="n">Tc</span> <span class="o">/</span> <span class="p">(</span><span class="n">Tc</span> <span class="o">+</span> <span class="mf">243.5</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ws">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.calc_ws">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_ws</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="mf">1013.25</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns saturation mixing ratio in kg/kg at temperature T (Kelvin) and</span>
+<span class="sd">    pressure P (hPa).</span>
+<span class="sd">    Formula in https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Saturation vapor pressure (in hPa)</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">calc_es</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># Saturation mixing ratio</span>
+    <span class="n">ws</span> <span class="o">=</span> <span class="mf">0.622</span><span class="o">*</span><span class="p">(</span><span class="n">es</span><span class="o">/</span><span class="p">(</span><span class="n">P</span><span class="o">-</span><span class="n">es</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ws</span></div>
+
+
+
+<div class="viewcode-block" id="calc_e_from_w">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.calc_e_from_w">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_e_from_w</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="mf">1013.25</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vapor pressure over liquid surface can be calculated from a variety of</span>
+<span class="sd">    different combinations of state variables.</span>
+<span class="sd">    Here, vapor pressure is calculated from mixing ratio w (kg/kg)</span>
+<span class="sd">    and pressure P. Formula is given in standard literature; e.g. eq. 2.18 in</span>
+<span class="sd">    Rogers&amp;Yau (Cloud physics) and eq. 4.1.2 in Emanuel (1994).</span>
+<span class="sd">    Reference:</span>
+<span class="sd">    * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:</span>
+<span class="sd">      Oxford University Press, 580 pp.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">w</span> <span class="o">*</span> <span class="n">P</span> <span class="o">/</span> <span class="p">(</span><span class="n">eps</span> <span class="o">+</span> <span class="n">w</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_e_from_sh">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.calc_e_from_sh">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_e_from_sh</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">P</span><span class="o">=</span><span class="mi">101325</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vapor pressure over liquid surface can be calculated from a variety of</span>
+<span class="sd">    different combinations of state variables.</span>
+<span class="sd">    Here, vapor pressure is calculated from specific humidity sh (kg/kg) and</span>
+<span class="sd">    pressure P (Pa).</span>
+<span class="sd">    Formula is given in standard literature; e.g. eq. 2.19 in Rogers &amp; Yau</span>
+<span class="sd">    (Cloud physics) and eq. 4.1.4 in Emanuel (1994).</span>
+<span class="sd">    Reference:</span>
+<span class="sd">    * Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:</span>
+<span class="sd">      Oxford University Press, 580 pp.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sh</span> <span class="o">*</span> <span class="n">P</span> <span class="o">/</span> <span class="p">(</span><span class="n">sh</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">eps</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="td">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.td">[docs]</a>
+<span class="k">def</span> <span class="nf">td</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns dew point temperature (C) at vapor pressure e (Pa)</span>
+<span class="sd">    Insert Td in 2.17 in Rogers&amp;Yau and solve for Td</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="mf">243.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">e</span><span class="o">/</span><span class="mf">611.2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">17.67</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">e</span><span class="o">/</span><span class="mf">611.2</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="wind2uv">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.wind2uv">[docs]</a>
+<span class="k">def</span> <span class="nf">wind2uv</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">wd</span><span class="p">,</span> <span class="n">dir_unit</span><span class="o">=</span><span class="s1">&#39;rad&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts wind speed and direction to u and v components.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ws, float/array of floats</span>
+<span class="sd">        Wind speed data</span>
+<span class="sd">    wd, float/array of floats</span>
+<span class="sd">        Wind direction data</span>
+<span class="sd">    dir_deg, string</span>
+<span class="sd">        Units of the wind direction data; &#39;rad&#39; (default) or &#39;deg&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (u, v), floats/arrays of floats</span>
+<span class="sd">        u and v wind components</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dir_unit</span> <span class="o">==</span> <span class="s1">&#39;deg&#39;</span><span class="p">:</span>
+        <span class="n">RperD</span> <span class="o">=</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">180</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">wd</span><span class="o">*</span><span class="n">RperD</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">wd</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="o">-</span><span class="n">ws</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="n">ws</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span></div>
+
+
+
+<div class="viewcode-block" id="uv2wind">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.uv2wind">[docs]</a>
+<span class="k">def</span> <span class="nf">uv2wind</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts u and v components to wind speed and direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    u, float/array of floats</span>
+<span class="sd">        east/west wind component</span>
+<span class="sd">    v, float/array of floats</span>
+<span class="sd">        north/south wind component</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (ws, wd), floats/arrays of floats</span>
+<span class="sd">        wind speed and wind direction respectively.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">pi</span>
+
+    <span class="n">DperR</span> <span class="o">=</span> <span class="mi">180</span><span class="o">/</span><span class="n">pi</span>
+
+    <span class="n">ws</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">u</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">wd</span> <span class="o">=</span> <span class="mi">270</span> <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">DperR</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ws</span><span class="p">,</span> <span class="n">wd</span></div>
+
+
+
+<div class="viewcode-block" id="lifted_condensation_temperature">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.lifted_condensation_temperature">[docs]</a>
+<span class="k">def</span> <span class="nf">lifted_condensation_temperature</span><span class="p">(</span><span class="n">tair</span><span class="p">,</span> <span class="n">tdew</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the lifted condensation temperature in units of Kelvin.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tair, float/array of floats</span>
+<span class="sd">        Air temperature (in units of Kelvin)</span>
+<span class="sd">    tdew, float/array of floats</span>
+<span class="sd">        Dew point temperature (in units of Kelvin)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tc, floats/arrays of floats</span>
+<span class="sd">        Lifted condensation temperature (in units of Kelvin)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tc</span> <span class="o">=</span> <span class="mi">56</span> <span class="o">+</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">tdew</span> <span class="o">-</span> <span class="mi">56</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tair</span> <span class="o">/</span> <span class="n">tdew</span><span class="p">)</span> <span class="o">/</span> <span class="mf">800.</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tc</span></div>
+
+
+
+<div class="viewcode-block" id="theta_equivalent">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.theta_equivalent">[docs]</a>
+<span class="k">def</span> <span class="nf">theta_equivalent</span><span class="p">(</span><span class="n">tair</span><span class="p">,</span> <span class="n">tdew</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">sh</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the equivalent potential temperature in units of Kelvin.</span>
+<span class="sd">    Based on approximative formula from Bolton, D. 1980</span>
+<span class="sd">    See also:</span>
+<span class="sd">    https://glossary.ametsoc.org/wiki/Equivalent_potential_temperature</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tair, float/array of floats</span>
+<span class="sd">        Air temperature (in units of Kelvin)</span>
+<span class="sd">    tdew, float/array of floats</span>
+<span class="sd">        Dew point temperature (in units of Kelvin)</span>
+<span class="sd">    p, float/array of floats</span>
+<span class="sd">        Pressure in units of hPa</span>
+<span class="sd">    sh, float/array of floats</span>
+<span class="sd">        Specific humidity in units of kg/kg</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    theta_e, floats/arrays of floats</span>
+<span class="sd">        Equivalent potential temperature (in units of Kelvin)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Saturation mixing ratio</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">calc_ws</span><span class="p">(</span><span class="n">tair</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># Vapor pressure (pressure in Pa)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">calc_e_from_sh</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">p</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="c1"># LCL temperature</span>
+    <span class="n">t_l</span> <span class="o">=</span> <span class="n">lifted_condensation_temperature</span><span class="p">(</span><span class="n">tair</span><span class="p">,</span> <span class="n">tdew</span><span class="p">)</span>
+
+    <span class="c1"># Potential temperature at LCL</span>
+    <span class="n">th_l</span> <span class="o">=</span> <span class="n">tair</span><span class="o">*</span><span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">0.2854</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.28</span><span class="o">*</span><span class="n">sh</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">tair</span><span class="o">/</span><span class="n">t_l</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">0.28</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span>
+
+    <span class="c1"># Equivalent potential temperature</span>
+    <span class="n">theta_e</span> <span class="o">=</span> <span class="n">th_l</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.448</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">3036.</span> <span class="o">/</span> <span class="n">t_l</span> <span class="o">-</span> <span class="mf">1.78</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">theta_e</span></div>
+
+
+
+<div class="viewcode-block" id="theta_pseudoequiv">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.theta_pseudoequiv">[docs]</a>
+<span class="k">def</span> <span class="nf">theta_pseudoequiv</span><span class="p">(</span><span class="n">tair</span><span class="p">,</span> <span class="n">tdew</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">sh</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the pseudo-equivalent potential temperature in units of Kelvin.</span>
+<span class="sd">    Based on approximative formula from Bolton, D. 1980</span>
+<span class="sd">    See also:</span>
+<span class="sd">    https://glossary.ametsoc.org/wiki/Pseudoequivalent_potential_temperature</span>
+
+<span class="sd">    Note that here the specific humidity is used instead of mixing ratio, which</span>
+<span class="sd">    are approximately the same (low water vapor mass in parcel compared to dry</span>
+<span class="sd">    mass).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tair, float/array of floats</span>
+<span class="sd">        Air temperature (in units of Kelvin)</span>
+<span class="sd">    tdew, float/array of floats</span>
+<span class="sd">        Dew point temperature (in units of Kelvin)</span>
+<span class="sd">    p, float/array of floats</span>
+<span class="sd">        Pressure in units of hPa</span>
+<span class="sd">    sh, float/array of floats</span>
+<span class="sd">        Specific humidity in units of kg/kg</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    theta_ep, floats/arrays of floats</span>
+<span class="sd">        Pseudo-equivalent potential temperature (in units of Kelvin)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tc</span> <span class="o">=</span> <span class="n">lifted_condensation_temperature</span><span class="p">(</span><span class="n">tair</span><span class="p">,</span> <span class="n">tdew</span><span class="p">)</span>
+    <span class="n">theta_ep</span> <span class="o">=</span> <span class="n">tair</span><span class="o">*</span><span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">0.2854</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.28</span><span class="o">*</span><span class="n">sh</span><span class="p">))</span> <span class="o">*</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sh</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mf">0.81</span><span class="o">*</span><span class="n">sh</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">3376</span><span class="o">/</span><span class="n">tc</span><span class="p">)</span><span class="o">-</span><span class="mf">2.54</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">theta_ep</span></div>
+
+
+
+<div class="viewcode-block" id="brunt_vaisala_frequency">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.atmosphys.brunt_vaisala_frequency">[docs]</a>
+<span class="k">def</span> <span class="nf">brunt_vaisala_frequency</span><span class="p">(</span><span class="n">ddict</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">lower_plevel</span><span class="p">,</span> <span class="n">upper_plevel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Brunt-Vaisala frequency in layer bounded by two pressure levels.</span>
+<span class="sd">    Pressure must be given in hPa, temperature (T) in Kelvin and specific</span>
+<span class="sd">    humidity (q) in kg/kg.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ddict: dictionary</span>
+<span class="sd">        Data dictionary</span>
+<span class="sd">    model: str</span>
+<span class="sd">        model data to use</span>
+<span class="sd">    lower_plevel: float</span>
+<span class="sd">        lower pressure surface</span>
+<span class="sd">    upper_plevel: float</span>
+<span class="sd">        upper pressure surface</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    N2: array with floats</span>
+<span class="sd">        The squared Brunt-Vaisala frequency</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">287</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="mi">1005</span>
+
+    <span class="c1"># Virtual theta at lower plevel</span>
+    <span class="n">p_lwr</span> <span class="o">=</span> <span class="n">lower_plevel</span>
+    <span class="n">q_lwr</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;hus</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_lwr</span><span class="p">)][</span><span class="n">model</span><span class="p">]</span>
+    <span class="n">T_lwr</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;ta</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_lwr</span><span class="p">)][</span><span class="n">model</span><span class="p">]</span>
+    <span class="n">theta_lwr</span> <span class="o">=</span> <span class="n">T_lwr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">p_lwr</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">cp</span><span class="p">)</span>
+    <span class="n">theta_v_lwr</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.61</span><span class="o">*</span><span class="n">q_lwr</span><span class="p">)</span> <span class="o">*</span> <span class="n">theta_lwr</span>
+
+    <span class="c1"># Virtual theta at upper plevel</span>
+    <span class="n">p_upr</span> <span class="o">=</span> <span class="n">lower_plevel</span>
+    <span class="n">q_upr</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;hus</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_upr</span><span class="p">)][</span><span class="n">model</span><span class="p">]</span>
+    <span class="n">T_upr</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;ta</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_upr</span><span class="p">)][</span><span class="n">model</span><span class="p">]</span>
+    <span class="n">theta_upr</span> <span class="o">=</span> <span class="n">T_upr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">p_upr</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="n">R</span><span class="o">/</span><span class="n">cp</span><span class="p">)</span>
+    <span class="n">theta_v_upr</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.61</span><span class="o">*</span><span class="n">q_upr</span><span class="p">)</span> <span class="o">*</span> <span class="n">theta_upr</span>
+
+    <span class="n">dz</span> <span class="o">=</span> <span class="p">(</span><span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;zg</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_upr</span><span class="p">)][</span><span class="n">model</span><span class="p">]</span> <span class="o">-</span>
+          <span class="n">ddict</span><span class="p">[</span><span class="s1">&#39;zg</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p_lwr</span><span class="p">)][</span><span class="n">model</span><span class="p">])</span><span class="o">/</span><span class="n">g</span>
+
+    <span class="n">N2</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">theta_v_upr</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">theta_v_lwr</span><span class="p">))</span> <span class="o">/</span> <span class="n">dz</span>
+
+    <span class="k">return</span> <span class="n">N2</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

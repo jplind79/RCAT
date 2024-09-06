@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RCAT Plots &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rcatool.runtime.RCAT_plots.plot_main" href="generated/rcatool.runtime.RCAT_plots.plot_main.html" />
+    <link rel="prev" title="Internal API" href="internal_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">API-reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="user_api.html">User API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="internal_api.html">Internal API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">RCAT Plots</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.plot_main.html">rcatool.runtime.RCAT_plots.plot_main</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.get_clevs.html">rcatool.runtime.RCAT_plots.get_clevs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.map_season.html">rcatool.runtime.RCAT_plots.map_season</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.map_ann_cycle.html">rcatool.runtime.RCAT_plots.map_ann_cycle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.line_ann_cycle.html">rcatool.runtime.RCAT_plots.line_ann_cycle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.map_pctls.html">rcatool.runtime.RCAT_plots.map_pctls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.map_diurnal_cycle.html">rcatool.runtime.RCAT_plots.map_diurnal_cycle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.line_diurnal_cycle.html">rcatool.runtime.RCAT_plots.line_diurnal_cycle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.pdf_plot.html">rcatool.runtime.RCAT_plots.pdf_plot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.map_asop.html">rcatool.runtime.RCAT_plots.map_asop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/rcatool.runtime.RCAT_plots.line_asop.html">rcatool.runtime.RCAT_plots.line_asop</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rcat_stats.html">RCAT Statistics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API-reference</a></li>
+          <li class="breadcrumb-item"><a href="internal_api.html">Internal API</a></li>
+      <li class="breadcrumb-item active">RCAT Plots</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rcat_plots.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcat-plots">
+<h1>RCAT Plots<a class="headerlink" href="#rcat-plots" title="Link to this heading"></a></h1>
+<p>Module script for plotting</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.plot_main" title="rcatool.runtime.RCAT_plots.plot_main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.plot_main</span></code></a>(...)</p></td>
+<td><p>Main function that controls the plotting procedure.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.get_clevs" title="rcatool.runtime.RCAT_plots.get_clevs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.get_clevs</span></code></a>(data[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.map_season" title="rcatool.runtime.RCAT_plots.map_season"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.map_season</span></code></a>(...)</p></td>
+<td><p>Plotting seasonal mean map plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.map_ann_cycle" title="rcatool.runtime.RCAT_plots.map_ann_cycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.map_ann_cycle</span></code></a>(...)</p></td>
+<td><p>Plotting annual cycle map plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.line_ann_cycle" title="rcatool.runtime.RCAT_plots.line_ann_cycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.line_ann_cycle</span></code></a>(...)</p></td>
+<td><p>Plotting annual cycle line plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.map_pctls" title="rcatool.runtime.RCAT_plots.map_pctls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.map_pctls</span></code></a>(...)</p></td>
+<td><p>Plotting percentile map plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.map_diurnal_cycle" title="rcatool.runtime.RCAT_plots.map_diurnal_cycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.map_diurnal_cycle</span></code></a>(...)</p></td>
+<td><p>Plotting diurnal cycle map plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.line_diurnal_cycle" title="rcatool.runtime.RCAT_plots.line_diurnal_cycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.line_diurnal_cycle</span></code></a>(...)</p></td>
+<td><p>Plotting annual cycle line plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.pdf_plot" title="rcatool.runtime.RCAT_plots.pdf_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.pdf_plot</span></code></a>(fm_list, ...)</p></td>
+<td><p>Plotting frequency-intensity-distribution plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.map_asop" title="rcatool.runtime.RCAT_plots.map_asop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.map_asop</span></code></a>(fm_list, ...)</p></td>
+<td><p>Plotting ASoP FC factor map plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.runtime.html#rcatool.runtime.RCAT_plots.line_asop" title="rcatool.runtime.RCAT_plots.line_asop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.runtime.RCAT_plots.line_asop</span></code></a>(...)</p></td>
+<td><p>Plotting ASoP line plot of C and FC factors</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="internal_api.html" class="btn btn-neutral float-left" title="Internal API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/rcatool.runtime.RCAT_plots.plot_main.html" class="btn btn-neutral float-right" title="rcatool.runtime.RCAT_plots.plot_main" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

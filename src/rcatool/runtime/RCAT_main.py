@@ -16,10 +16,10 @@ import numpy as np
 import re
 from dask.distributed import Client
 from dask.diagnostics import ProgressBar
-from rcat.utils import ini_reader
-from rcat.utils.polygons import mask_region
-import rcat.runtime.RCAT_stats as st
-import rcat.utils.grids as gr
+from rcatool.utils import ini_reader
+from rcatool.utils.polygons import mask_region
+import rcatool.runtime.RCAT_stats as st
+import rcatool.utils.grids as gr
 
 import dask
 dask.config.set(scheduler="single-threaded")
@@ -1423,7 +1423,7 @@ for stat in cdict['stats_conf']:
 
 if cdict['validation plot']:
     print('\n=== PLOTTING ===')
-    import rcat.runtime.RCAT_plots as rplot
+    import rcatool.runtime.RCAT_plots as rplot
     statnames = list(stats_dict.keys())
     for sn in statnames:
         for v in stats_dict[sn]:

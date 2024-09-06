@@ -1,11 +1,11 @@
 import sys
 import numpy as np
 import xarray as xa
-from rcat.stats import ASoP
-from rcat.stats import convolve
-from rcat.stats import event_duration as eda
-from rcat.stats import climateindex as ci
-from rcat.stats import precipitation_index as prix
+from rcatool.stats import ASoP
+from rcatool.stats import convolve
+from rcatool.stats import event_duration as eda
+from rcatool.stats import climateindex as ci
+from rcatool.stats import precipitation_index as prix
 from pandas import to_timedelta
 from copy import deepcopy
 
@@ -864,7 +864,7 @@ def Rxx(data, var, stat, stat_config):
 def cdd(data, var, stat, stat_config):
     """
     Calculate frequencies of consecutive dry days (CDD) periods.
-    See cdd function in rcat/stats/climateindex.py for more details and
+    See cdd function in rcatool/stats/climateindex.py for more details and
     options.
     """
     in_thr = stat_config[stat]['thr']

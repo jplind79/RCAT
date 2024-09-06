@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.stats.pdf &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcatool.stats.pdf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcatool.stats.pdf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Probability distributions</span>
+<span class="sd">-------------------------</span>
+
+<span class="sd">Authors: Petter Lind</span>
+<span class="sd">Created: Spring 2015</span>
+<span class="sd">Updates:</span>
+<span class="sd">        May 2020</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">.bootstrap</span> <span class="kn">import</span> <span class="n">block_bootstr</span><span class="p">,</span> <span class="n">_mproc_get_bootsamples</span>
+
+
+<div class="viewcode-block" id="freq_int_dist">
+<a class="viewcode-back" href="../../../rcatool.stats.html#rcatool.stats.pdf.freq_int_dist">[docs]</a>
+<span class="k">def</span> <span class="nf">freq_int_dist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bootstrap</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nmc</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                  <span class="n">block</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ci_level</span><span class="o">=</span><span class="mi">95</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate frequency - instensity distriutions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: array</span>
+<span class="sd">        2D or 1D array of data. All data points are collectively used in the</span>
+<span class="sd">        freq-instensity calculation unless &#39;keepdims&#39; is True. Then calculation</span>
+<span class="sd">        is performed along the dimension defined by axis argument (default 0).</span>
+<span class="sd">    keepdims: boolean</span>
+<span class="sd">        If data is 2d (time in third dimesion) and keepdims is set to True,</span>
+<span class="sd">        calculation is applied to the dimension defined by axis argument</span>
+<span class="sd">        (default 0) and returns a 2d array of freq-int dists. If set to False</span>
+<span class="sd">        (default) all values are collectively assembled before calculation.</span>
+<span class="sd">    axis: int</span>
+<span class="sd">        The axis over which to apply the calculation if keepdims is set to</span>
+<span class="sd">        True. Default is 0.</span>
+<span class="sd">    bins: int/list/array</span>
+<span class="sd">        If an int, it defines the number of equal-width bins in the given</span>
+<span class="sd">        range (10, by default). If a sequence, it defines the bin edges,</span>
+<span class="sd">        including the rightmost edge, allowing for non-uniform bin widths.</span>
+<span class="sd">        If bins is set to &#39;None&#39; they will be automatically calculated.</span>
+<span class="sd">    thr: float</span>
+<span class="sd">        Value of threshold if thresholding data. Default None.</span>
+<span class="sd">    density: boolean</span>
+<span class="sd">        If True (default) then the value of the probability density function at</span>
+<span class="sd">        each bin is returned, otherwise the number of samples per bin.</span>
+<span class="sd">    bootstrap: boolean</span>
+<span class="sd">        If to use block bootstrap to calculate confidence interval.</span>
+<span class="sd">    nmc: int/float</span>
+<span class="sd">        Number of bootstrap samples to use.</span>
+<span class="sd">    block: int/float</span>
+<span class="sd">        Size of block to use in block bootstrap</span>
+<span class="sd">    ci_level: int/float</span>
+<span class="sd">        The confidence interval level to use (eg 95, 99 representing 95%, 99%</span>
+<span class="sd">        levels)</span>
+<span class="sd">    nproc: int</span>
+<span class="sd">        Number of processes to use in bootstrap calculation. Default 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pdf: array</span>
+<span class="sd">        data array with size len(bins)-1 with counts/probabilities</span>
+<span class="sd">    ci: dict</span>
+<span class="sd">        data dictionary with confidence level for each bin; keys</span>
+<span class="sd">        &#39;min_levels&#39;/&#39;max_levels&#39; with corresponding values. If bootstrap is</span>
+<span class="sd">        False, then None values are returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">pdf_calc</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>
+        <span class="n">lbins</span> <span class="o">=</span> <span class="n">bins</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c1"># Flatten data to one dimension</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">):</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pdata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All data missing/masked!&quot;</span><span class="p">)</span>
+            <span class="c1"># hdata = np.repeat(np.nan, data1d.size)</span>
+            <span class="n">hdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">lbins</span><span class="p">)</span>
+            <span class="n">min_level</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">max_level</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)):</span>
+                <span class="n">data1d</span> <span class="o">=</span> <span class="n">data1d</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)]</span>
+
+            <span class="k">if</span> <span class="n">thr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">indata</span> <span class="o">=</span> <span class="n">data1d</span><span class="p">[</span><span class="n">data1d</span> <span class="o">&gt;=</span> <span class="n">thr</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indata</span> <span class="o">=</span> <span class="n">data1d</span>
+
+            <span class="n">hdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">indata</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                                 <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">bootstrap</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">pdata</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">keepdims</span><span class="p">:</span>
+                        <span class="n">nx</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">ny</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="n">iterlist</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pdata</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">ix</span><span class="p">],</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ix</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+                                    <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">)]</span>
+                        <span class="n">bs_hdata</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">bs</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nmc</span><span class="p">):</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating pdf for bootsample</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">bs</span><span class="p">))</span>
+                            <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">nproc</span><span class="p">)</span>
+                            <span class="n">comps</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap_async</span><span class="p">(</span><span class="n">_mproc_get_bootsamples</span><span class="p">,</span>
+                                                       <span class="n">iterlist</span><span class="p">)</span>
+                            <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                            <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+                            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">comps</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                            <span class="n">arr1d</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>\
+                                <span class="k">else</span> <span class="n">arr</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">thr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">indata</span> <span class="o">=</span> <span class="n">arr1d</span><span class="p">[</span><span class="n">arr1d</span> <span class="o">&gt;=</span> <span class="n">thr</span><span class="p">]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">indata</span> <span class="o">=</span> <span class="n">arr1d</span>
+                            <span class="n">bs_hdata</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">indata</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                                                         <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">bs_hdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bs_hdata</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">btsamples</span> <span class="o">=</span> <span class="n">block_bootstr</span><span class="p">(</span><span class="n">indata</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+                                                  <span class="n">nrep</span><span class="o">=</span><span class="n">nmc</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="n">nproc</span><span class="p">)</span>
+                        <span class="n">bs_hdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">btsamples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span>
+                                                          <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                                                          <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nmc</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">btsamples</span> <span class="o">=</span> <span class="n">block_bootstr</span><span class="p">(</span><span class="n">indata</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+                                              <span class="n">nrep</span><span class="o">=</span><span class="n">nmc</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="n">nproc</span><span class="p">)</span>
+                    <span class="n">bs_hdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">btsamples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span>
+                                                      <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+                                                      <span class="n">density</span><span class="o">=</span><span class="n">density</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nmc</span><span class="p">)])</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">ci_level</span>
+                <span class="n">min_level</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">bs_hdata</span><span class="p">[:,</span> <span class="n">x</span><span class="p">],</span> <span class="n">alpha</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bs_hdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="n">max_level</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">bs_hdata</span><span class="p">[:,</span> <span class="n">x</span><span class="p">],</span> <span class="mi">100</span><span class="o">-</span><span class="n">alpha</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bs_hdata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">min_level</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">max_level</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">ci</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;min_levels&#39;</span><span class="p">:</span> <span class="n">min_level</span><span class="p">,</span> <span class="s1">&#39;max_levels&#39;</span><span class="p">:</span> <span class="n">max_level</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">hdata</span><span class="p">,</span> <span class="n">ci</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">keepdims</span><span class="p">:</span>
+        <span class="n">hist_o</span><span class="p">,</span> <span class="n">ci_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">pdf_calc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">arr</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                                              <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+        <span class="n">hist</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">((</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]),</span>
+                      <span class="n">hist_o</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">hist_o</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                                              <span class="n">hist_o</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hist_o</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hist</span><span class="p">,</span> <span class="n">ci_data</span> <span class="o">=</span> <span class="n">pdf_calc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+
+    <span class="n">outdata</span> <span class="o">=</span> <span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">ci_data</span><span class="p">)</span> <span class="k">if</span> <span class="n">ci</span> <span class="k">else</span> <span class="n">hist</span>
+
+    <span class="k">return</span> <span class="n">outdata</span></div>
+
+
+
+<div class="viewcode-block" id="prob_of_exceed">
+<a class="viewcode-back" href="../../../rcatool.stats.html#rcatool.stats.pdf.prob_of_exceed">[docs]</a>
+<span class="k">def</span> <span class="nf">prob_of_exceed</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pctls_levels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates probability of exceedance distriutions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: array</span>
+<span class="sd">        2D or 1D array of data. All data points are collectively used in the</span>
+<span class="sd">        freq-instensity calculation unless &#39;keepdims&#39; is True. Then calculation</span>
+<span class="sd">        is performed along zeroth axis.</span>
+<span class="sd">    pctls_levels: &#39;default&#39;, None or array/list</span>
+<span class="sd">        If set to &#39;default&#39;, probability levels of exceedance are defined by a</span>
+<span class="sd">        set of percentiles ranging from 0-100 and calculated from input data.</span>
+<span class="sd">        If an array or list, these levels (between 0 and 100) will be used</span>
+<span class="sd">        instead.  Default is None in which case input data is merely ranked</span>
+<span class="sd">        from 0 to 1.</span>
+<span class="sd">    keepdims: boolean</span>
+<span class="sd">        If data is 2d (time in third dimesion) and keepdims is set to True,</span>
+<span class="sd">        calculation is applied to the zeroth axis (time) and returns a 2d array</span>
+<span class="sd">        of freq-int dists. If set to False (default) all values are</span>
+<span class="sd">        collectively assembled before calculation.</span>
+<span class="sd">    axis: int</span>
+<span class="sd">        The axis over which to apply the calculation if keepdims is set to</span>
+<span class="sd">        True. Default is 0.</span>
+<span class="sd">    thr: float</span>
+<span class="sd">        Value of threshold if thresholding data. Default None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eop: array</span>
+<span class="sd">        exceedance of probability array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+    <span class="k">def</span> <span class="nf">eop_calc</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="n">thr</span><span class="p">):</span>
+        <span class="c1"># Flatten data to one dimension</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">):</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pdata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="c1"># Check for missing values</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All data missing/masked!&quot;</span><span class="p">)</span>
+            <span class="n">odata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">data1d</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)):</span>
+                <span class="n">data1d</span> <span class="o">=</span> <span class="n">data1d</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)]</span>
+
+            <span class="c1"># Thresholding of data</span>
+            <span class="k">if</span> <span class="n">thr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">indata</span> <span class="o">=</span> <span class="n">data1d</span><span class="p">[</span><span class="n">data1d</span> <span class="o">&gt;=</span> <span class="n">thr</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indata</span> <span class="o">=</span> <span class="n">data1d</span>
+
+            <span class="c1"># Probability of exceedance calculation</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pctls_levels</span><span class="p">:</span>
+                <span class="n">cum_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">indata</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+                <span class="n">indata</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+                <span class="n">ser_cdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">cum_dist</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">indata</span><span class="p">)</span>
+                <span class="n">odata</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">ser_cdf</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pctls_levels</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+                    <span class="n">pctls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">99</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">99.9</span><span class="p">,</span> <span class="mf">99.99</span><span class="p">,</span> <span class="mi">10</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pctls</span> <span class="o">=</span> <span class="n">pctls_levels</span>
+                <span class="n">lvls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">indata</span><span class="p">,</span> <span class="n">pctls</span><span class="p">)</span>
+                <span class="n">ser_cdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">pctls</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">lvls</span><span class="p">)</span>
+                <span class="n">odata</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">ser_cdf</span>
+
+        <span class="k">return</span> <span class="n">odata</span>
+
+    <span class="k">if</span> <span class="n">keepdims</span><span class="p">:</span>
+        <span class="n">eop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">eop_calc</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">thr</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eop</span> <span class="o">=</span> <span class="n">eop_calc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="n">thr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eop</span></div>
+
+
+
+<div class="viewcode-block" id="perkins_skill_score">
+<a class="viewcode-back" href="../../../rcatool.stats.html#rcatool.stats.pdf.perkins_skill_score">[docs]</a>
+<span class="k">def</span> <span class="nf">perkins_skill_score</span><span class="p">(</span><span class="n">p_mod</span><span class="p">,</span> <span class="n">p_obs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Perkins Skill Score (PSS).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p_mod, p_obs: list/array</span>
+<span class="sd">        1d or 2d arrays with frequency of values (probability) in a given bin</span>
+<span class="sd">        from the model and observations respectively.</span>
+<span class="sd">        Make sure that the sum of probabilities over all the bins should be</span>
+<span class="sd">        equal to one. This depends on how the pdf was calculated. Bins with</span>
+<span class="sd">        unity width gives total prob of one.</span>
+<span class="sd">    axis: int</span>
+<span class="sd">        If data is 2d, the PSS will be calculated along this axis. Default</span>
+<span class="sd">        axis is zero.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pss: float/array</span>
+<span class="sd">        Returns Perkins Skill Score, single float or array with floats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">pss_calc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p_mod</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">p_mod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p_mod</span><span class="p">)</span>
+        <span class="n">p_obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p_obs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">p_mod</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">pss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">pss_calc</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">p_mod</span><span class="p">,</span> <span class="n">p_obs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pss</span> <span class="o">=</span> <span class="n">pss_calc</span><span class="p">(</span><span class="n">p_mod</span><span class="p">,</span> <span class="n">p_obs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pss</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

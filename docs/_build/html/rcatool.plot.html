@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.plot package &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">rcatool.plot package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rcatool.plot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcatool-plot-package">
+<h1>rcatool.plot package<a class="headerlink" href="#rcatool-plot-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rcatool.plot.colors">
+<span id="rcatool-plot-colors-module"></span><h2>rcatool.plot.colors module<a class="headerlink" href="#module-rcatool.plot.colors" title="Link to this heading"></a></h2>
+<p>This module provides access to predefined (Matplotlib) or self-produced
+colors and color maps.</p>
+<p>&#64;author Petter Lind
+&#64;date   2015-05-18</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.colors.getcolormap">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.colors.</span></span><span class="sig-name descname"><span class="pre">getcolormap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/colors.html#getcolormap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.colors.getcolormap" title="Link to this definition"></a></dt>
+<dd><p>Function to retrieve colormap, either customized (custom=True) or available
+through Matplotlib predefined colormaps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmap_name</strong> (<em>string</em>) – String, giving name of colormap to be retrieved.</p></li>
+<li><p><strong>custom</strong> (<em>Boolean</em>) – Logical indicating self-produced (custom=True) or Matplotlib
+colormap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>cmap</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Matplotlib colormap object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.colors.getsinglecolor">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.colors.</span></span><span class="sig-name descname"><span class="pre">getsinglecolor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/colors.html#getsinglecolor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.colors.getsinglecolor" title="Link to this definition"></a></dt>
+<dd><p>Function to retrieve single custom color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>color_name</strong> (<em>string</em>) – String, giving name of color to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>color</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Matplotlib color object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.colors.norm_colors">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.colors.</span></span><span class="sig-name descname"><span class="pre">norm_colors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncolors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/colors.html#norm_colors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.colors.norm_colors" title="Link to this definition"></a></dt>
+<dd><p>In addition to min and max of levels, this function takes as arguments
+boundaries between which data is to be mapped. The colors are then
+linearly distributed between these ‘bounds’.</p>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.plot.plots">
+<span id="rcatool-plot-plots-module"></span><h2>rcatool.plot.plots module<a class="headerlink" href="#module-rcatool.plot.plots" title="Link to this heading"></a></h2>
+<section id="graphics-module">
+<h3>Graphics module<a class="headerlink" href="#graphics-module" title="Link to this heading"></a></h3>
+<p>Functions for different plots such as scatterplots and mapplots,
+initiation and configuration of figure objects etc</p>
+<p>Created: Autumn 2016
+Authors: Petter Lind &amp; David Lindstedt</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.axes_settings">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">axes_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xtlabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ytlabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xx-large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_lbls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xx-large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xx-large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftitle_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'center'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#axes_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.axes_settings" title="Link to this definition"></a></dt>
+<dd><p>Configuration of axes; titles and labels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>axes object</em>) – Axes object assoicated with figure</p></li>
+<li><p><strong>figtitle</strong> (<em>string</em>) – The headtitle</p></li>
+<li><p><strong>xlabel</strong> (<em>strings</em>) – Labels of the axes</p></li>
+<li><p><strong>ylabel</strong> (<em>strings</em>) – Labels of the axes</p></li>
+<li><p><strong>xticks</strong> (<em>lists</em><em> or </em><em>arrays</em>) – If set, location of ticks</p></li>
+<li><p><strong>yticks</strong> (<em>lists</em><em> or </em><em>arrays</em>) – If set, location of ticks</p></li>
+<li><p><strong>xtlabels</strong> (<em>lists</em>) – Contains tick labels (corresponding to ticks location)</p></li>
+<li><p><strong>ytlabels</strong> (<em>lists</em>) – Contains tick labels (corresponding to ticks location)</p></li>
+<li><p><strong>xlim</strong> (<em>lists</em>) – Limits of the axes</p></li>
+<li><p><strong>ylim</strong> (<em>lists</em>) – Limits of the axes</p></li>
+<li><p><strong>color</strong> (<em>str</em>) – Color for the xtick labels</p></li>
+<li><p><strong>fontsize/fontsize_lbls/fontsize_title</strong> (<em>string</em><em> or </em><em>int</em>) – Size of font for axes labels, ticklabels, and figure title
+respectively</p></li>
+<li><p><strong>ftitle_location</strong> (<em>str</em>) – Horizontal alignment of figure title; center (default),
+right or left.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.custom_legend">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">custom_legend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linestyles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#custom_legend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.custom_legend" title="Link to this definition"></a></dt>
+<dd><p>Creates a list of matplotlib Patch objects that can be passed to
+the legend(…) function to create a custom legend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>colors</strong> (<em>list</em>) – A list of colors, one for each entry in the legend.
+You can also include a linestyle, for example: ‘k–’</p></li>
+<li><p><strong>labels</strong> (<em>list</em>) – A list of labels, one for each entry in the legend.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.define_map_object">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">define_map_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Stereographic'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">proj_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#define_map_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.define_map_object" title="Link to this definition"></a></dt>
+<dd><p>Create a Cartopy map object</p>
+<p>Available map projections and configurations:
+<a class="reference external" href="https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html">https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.fig_grid_setup">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">fig_grid_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">12)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fshape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'row'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes_pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">grid_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#fig_grid_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.fig_grid_setup" title="Link to this definition"></a></dt>
+<dd><p>Set up the plot axes using pyplot.subplots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Size of figure in inches; (width, height)</p></li>
+<li><p><strong>fshape</strong> (<em>tuple</em>) – setting the shape of figure (nrow, ncol)</p></li>
+<li><p><strong>direction</strong> (<em>string</em>) – ‘row’ or ‘col’; rowwise or columnwise order of axes instances</p></li>
+<li><p><strong>axes_pad</strong> (<em>tuple</em>) – padding (height,width) between edges of adjacent subplots</p></li>
+<li><p><strong>**grid_kwargs</strong> (<em>Additional keyword arguments</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fig</strong> (<em>Figure object</em>)</p></li>
+<li><p><strong>grid</strong> (<em>List with axes instances</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.figure_init">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">figure_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plottype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'line'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#figure_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.figure_init" title="Link to this definition"></a></dt>
+<dd><p>Setting up a figure object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plottype</strong> (<em>string</em>) – Type of plot to make</p></li>
+<li><p><strong>printtypes</strong> (<em>boolean</em>) – If available plottypes should be printed on screen</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.gen_clevels">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">gen_clevels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#gen_clevels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.gen_clevels" title="Link to this definition"></a></dt>
+<dd><p>Create contour levels based on min and max of input data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – data array</p></li>
+<li><p><strong>nsteps</strong> (<em>int</em>) – number of levels to be produced</p></li>
+<li><p><strong>robust</strong> (<em>None</em><em> or </em><em>string</em>) – If to soften the max/min limits due to extreme values;
+“top”/”bottom”/”both”, which end(s) to soften.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.get_nrow_ncol">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">get_nrow_ncol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npanels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#get_nrow_ncol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.get_nrow_ncol" title="Link to this definition"></a></dt>
+<dd><p>Return number of rows and columns from a given total number
+of panels for a grid</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.image_colorbar">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">image_colorbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbaxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labelspacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labelsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x-large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:.2f}'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">cbar_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#image_colorbar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.image_colorbar" title="Link to this definition"></a></dt>
+<dd><p>Add colobar to map plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cs</strong> (<em>Plot object</em>) – Such as an image (imshow) or a contour set (with contourf)</p></li>
+<li><p><strong>cbaxs</strong> (<em>cbar axis object/list</em>) – Colorbar axis object or list with axes objects for each
+plot in figure</p></li>
+<li><p><strong>title</strong> (<em>list</em>) – list of strings with colorbar titles</p></li>
+<li><p><strong>labelspacing</strong> (<em>int</em>) – Label spacing; the integer value represents the number of
+steps between each label. 1 show each label (default), 2 every
+second, etc.</p></li>
+<li><p><strong>labelsize</strong> (<em>str/int</em>) – Size of labels; integer value or a string (e.g. ‘large’)</p></li>
+<li><p><strong>**cbar_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.colobar
+See
+<a class="reference external" href="http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.colorbar">http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.colorbar</a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.image_grid_setup">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">image_grid_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">12)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fshape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">grid_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#image_grid_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.image_grid_setup" title="Link to this definition"></a></dt>
+<dd><p>Set up the plot axes using mpl_toolkits.axes_grid1.ImageGrid
+Used primarily when plotting maps or for image analysis
+For more information on available settings:
+<a class="reference external" href="https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html">https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figsize</strong> (<em>tuple</em>) – Size of figure in inches; (width, height)</p></li>
+<li><p><strong>fshape</strong> (<em>tuple</em>) – setting the shape of figure (nrow, ncol)</p></li>
+<li><p><strong>**grid_kwargs</strong> (<em>Additional keyword arguments</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fig</strong> (<em>Figure object</em>)</p></li>
+<li><p><strong>grid</strong> (<em>AxesGrid object</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Examples of <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> with default values:</dt><dd><p>direction=”row”,
+axes_pad=0.02,
+add_all=True,
+share_all=False,
+label_mode=”L”,
+aspect=True,
+cbar_mode=None,
+cbar_location=”right”,
+cbar_size=”5%”,
+cbar_pad=None,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.make_box_plot">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">make_box_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leg_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grouped</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">box_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#make_box_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.make_box_plot" title="Link to this definition"></a></dt>
+<dd><p>Create a box plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>AxesGrid object</em>) – returned from the ‘fig_grid_setup’ function</p></li>
+<li><p><strong>data</strong> (<em>List/Array</em>) – 1d array or list of 1d arrays with data for boxplot</p></li>
+<li><p><strong>labels</strong> (<em>str/list</em>) – String or a list of strings with xtick labels (for each box/group
+of boxes)</p></li>
+<li><p><strong>leg_labels</strong> (<em>str/list</em>) – String or a list of strings with legend labels (mostly used for
+grouped boxplots).</p></li>
+<li><p><strong>grouped</strong> (<em>boolean</em>) – Whether to plot grouped boxplot. If True, input data must be a
+dictionary. See _grouped_boxplot function for more info.</p></li>
+<li><p><strong>box_colors</strong> (<em>array/list</em>) – Optional list of colors to be used for the boxes.</p></li>
+<li><p><strong>**box_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.boxplot
+See matplotlib.org for more information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>axs</strong> (<em>list</em>) – Axes objects for each plot</p></li>
+<li><p><strong>bps</strong> (<em>list</em>) – Each item in list is a dictionary mapping each component of the
+boxplot to a list of the <cite>.Line2D</cite> instances created.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.make_line_plot">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">make_line_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbl_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x-large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">lp_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#make_line_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.make_line_plot" title="Link to this definition"></a></dt>
+<dd><p>Create a line plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>Axis object</em>) – returned from the ‘fig_grid_setup’ function</p></li>
+<li><p><strong>ydata</strong> (<em>array/list</em>) – Required. 1D array or list of 1D arrays with data for y axis</p></li>
+<li><p><strong>xdata</strong> (<em>array/list</em>) – Optional. 1D array or list of 1D arrays with data for x axis</p></li>
+<li><p><strong>labels</strong> (<em>string/list</em>) – String or list of strings with line labels</p></li>
+<li><p><strong>lbl_fontsize</strong> (<em>string/float</em>) – Fontsize for legend labels</p></li>
+<li><p><strong>axis_type</strong> (<em>str</em>) – Linear or log axes: ‘linear’ (defualt), ‘logx’/’logy’/’logxy’ (log
+x, y or both axes).</p></li>
+<li><p><strong>**lp_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.line
+See matplotlib.org for more information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>axs</strong> – The axes objects created for each plot</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Axes objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.make_map_plot">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">make_map_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clevs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">map_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#make_map_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.make_map_plot" title="Link to this definition"></a></dt>
+<dd><p>Producing  map plots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array/list/tuple</em>) – Array or list/tuple of 2D data array(s) to plot</p></li>
+<li><p><strong>grid</strong> (<em>AxesGrid object</em>) – Returned from the ‘map_setup’ function</p></li>
+<li><p><strong>lats</strong> (<em>arrays/list</em><em> of </em><em>arrays</em>) – Values of latitudes and longitudes needed for the map plotting.
+If different lats/lons should be used in the figure panels, these
+arrays should be provided in a list; [lons_1, lons_2, …].</p></li>
+<li><p><strong>lons</strong> (<em>arrays/list</em><em> of </em><em>arrays</em>) – Values of latitudes and longitudes needed for the map plotting.
+If different lats/lons should be used in the figure panels, these
+arrays should be provided in a list; [lons_1, lons_2, …].</p></li>
+<li><p><strong>mesh</strong> (<em>boolean</em>) – Whether to plot data as mesh. If false (default), contour plot is
+made.</p></li>
+<li><p><strong>filled</strong> (<em>boolean</em>) – Whether to color fill between contours or not. Defaults to True</p></li>
+<li><p><strong>cmap</strong> (<em>string/list</em>) – String or list with strings of predefined Matplotlib colormaps.
+For filled contour plots it defaults to ‘viridis’.</p></li>
+<li><p><strong>clevs</strong> (<em>Iterable data structure</em>) – Consisting of lists with defined contour levels; e.g.
+(np.arange(1,10,2), [0,2,4,6,8]), [np.arange(100,step=5)]*3</p></li>
+<li><p><strong>robust</strong> (<em>string</em>) – See gen_clevs function for info</p></li>
+<li><p><strong>norm</strong> (<em>BoundaryNorm object</em>) – Object generated from matplotlib.colors.BoundaryNorm function.
+Generate a colormap index based on discrete intervals.</p></li>
+<li><p><strong>**map_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.contour/f
+(if mesh=False) or pcolormesh (if mesh=True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mplots</strong> – List with map plot instances</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.make_raster_plot">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">make_raster_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clevs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">rs_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#make_raster_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.make_raster_plot" title="Link to this definition"></a></dt>
+<dd><p>Create a raster plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>AxesGrid object</em>) – returned from the ‘image_grid_setup’ function</p></li>
+<li><p><strong>data</strong> (<em>List</em>) – List with 2D array(s) of data</p></li>
+<li><p><strong>cmap</strong> (<em>string/list</em>) – String or list with strings of predefined Matplotlib colormaps.
+Defaults to ‘viridis’</p></li>
+<li><p><strong>clevs</strong> (<em>Iterable data structure</em>) – Consisting of lists with defined contour levels; e.g.
+(np.arange(1,10,2), [0,2,4,6,8]), [np.arange(100,step=5)]*3</p></li>
+<li><p><strong>norm</strong> (<em>BoundaryNorm object</em>) – Object generated from matplotlib.colors.BoundaryNorm function.
+Generate a colormap index based on discrete intervals.</p></li>
+<li><p><strong>**rs_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.imshow
+See matplotlib.org for more information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>axs</strong> (<em>Axes objects</em>) – The axes objects created for each plot</p></li>
+<li><p><strong>rasters</strong> (<em>Plot objects</em>) – The raster plot objects created for each plot</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.make_scatter_plot">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">make_scatter_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcolors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecolors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbl_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sc_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#make_scatter_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.make_scatter_plot" title="Link to this definition"></a></dt>
+<dd><p>Create a scatter plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>AxesGrid object</em>) – returned from the ‘fig_grid_setup’ function</p></li>
+<li><p><strong>xdata/ydata</strong> (<em>Array/list</em>) – 1D array or list of 1D arrays with data for x/y axis</p></li>
+<li><p><strong>fcolors</strong> (<em>array/list</em>) – List of colors to be used for each data set in input data. This is
+separate from ‘color’/’c’ option available from matplotlib.scatter
+call (and set in sc_kwargs) where all individual input data sets
+will have that specific color/s. If set, then
+ecolors need also be supplied.</p></li>
+<li><p><strong>ecolors</strong> (<em>array/list</em>) – List of edge colors to be used for each data set in input data.
+This is separate from ‘edgecolors’/’ec’ option available from
+matplotlib.scatter call (and set in sc_kwargs) where all individual
+input data sets will have that specific color/s. If set, then
+fcolors need also be supplied.</p></li>
+<li><p><strong>lbl_fontsize</strong> (<em>string/float</em>) – Fontsize for legend labels</p></li>
+<li><p><strong>axis_type</strong> (<em>str</em>) – Linear or log axes: ‘linear’ (defualt), ‘logx’/’logy’/’logxy’ (log
+x, y or both axes).</p></li>
+<li><p><strong>labels</strong> (<em>String/List</em>) – String or list of strings with legend labels</p></li>
+<li><p><strong>**sc_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.scatter
+See matplotlib.org for more information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>axs</strong> – The axes objects created for each plot</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Axes objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.map_axes_settings">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">map_axes_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x-large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_htitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xx-large'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#map_axes_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.map_axes_settings" title="Link to this definition"></a></dt>
+<dd><p>Settings for map plot axes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fig</strong> (<em>Object handle</em>) – Figure handle</p></li>
+<li><p><strong>axs</strong> (<em>Axes objects</em>) – Single object or list with axes from map plot</p></li>
+<li><p><strong>figtitle</strong> (<em>Strings</em>) – Single title or list of titles for each plot in figure</p></li>
+<li><p><strong>headtitle</strong> (<em>String</em>) – Head title of figure</p></li>
+<li><p><strong>time_mean</strong> (<em>string</em>) – If maps should be labeled according to time averages;
+‘season’/’month’/’hour’</p></li>
+<li><p><strong>time_units</strong> (<em>list/array</em>) – Optional. If time_mean is set, time_units is a list of seasons,
+months or hours to be used in the labeling.</p></li>
+<li><p><strong>fontsize</strong> (<em>string</em><em> or </em><em>int</em>) – Size of font for figure title</p></li>
+<li><p><strong>fontsize_htitle</strong> (<em>string</em><em> or </em><em>int</em>) – Size of font for suptitle</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.map_setup">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">map_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_proj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">12)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figshape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">grid_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#map_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.map_setup" title="Link to this definition"></a></dt>
+<dd><p>Create a Cartopy crs object to be used in the overlaying of 2d plots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>map_proj</strong> (<em>Cartopy map projection</em>) – Generated from the ‘define_map_object’ function</p></li>
+<li><p><strong>map_extent</strong> (<em>list/tuple</em>) – Longitude/latitude values for map extent;
+[lon_start, lon_end, lat_start, lat_end]</p></li>
+<li><p><strong>figsize</strong> (<em>tuple</em>) – The requested size of figure object</p></li>
+<li><p><strong>figshape</strong> (<em>tuple</em>) – The requested shape (rows, columns) of figure panels</p></li>
+<li><p><strong>grid_lines</strong> (<em>boolean</em>) – Whether to plot grid lines (lat/lon) with values along the
+left and bottom axes. Default False.</p></li>
+<li><p><strong>**grid_kwargs</strong> (<em>key word arguments</em>) – Additional arguments provided to AxesGrid (See below for
+more info).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>fig</em> – figure object</p></li>
+<li><p><strong>axgrid</strong> (<em>list</em>) – List with axes objects, with GeoAxes class, for each plot in figure</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>With AxesGrid and GeoAxes, a grid is created and corresponding axes are
+classified with GeoAxes. Read more about AxesGrid, and the available
+options, here:
+<a class="reference external" href="https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html">https://matplotlib.org/2.0.2/mpl_toolkits/axes_grid/users/overview.html</a></p>
+<dl class="simple">
+<dt>Examples of <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> with default values:</dt><dd><p>direction=”row”,
+axes_pad=0.02,
+add_all=True,
+share_all=False,
+label_mode=”L”,
+aspect=True,
+cbar_mode=None,
+cbar_location=”right”,
+cbar_size=”5%”,
+cbar_pad=None,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.plot_map">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">plot_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clevs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filled</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">map_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/plot/plots.html#plot_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.plot_map" title="Link to this definition"></a></dt>
+<dd><p>Producing a map plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>Axis object</em>) – Axis generated in ‘map_setup’ function</p></li>
+<li><p><strong>data</strong> (<em>numpy array</em>) – 2D data array to plot</p></li>
+<li><p><strong>x</strong> (<em>numpy arrays</em>) – Arrays of lat/lon coordinates</p></li>
+<li><p><strong>y</strong> (<em>numpy arrays</em>) – Arrays of lat/lon coordinates</p></li>
+<li><p><strong>clevs</strong> (<em>List/array</em>) – Contour levels</p></li>
+<li><p><strong>cmap</strong> (<em>string</em>) – Color map. See <a class="reference external" href="http://matplotlib.org/users/colormaps.html">http://matplotlib.org/users/colormaps.html</a> for more
+information.</p></li>
+<li><p><strong>norm</strong> (<em>Boundary norm object</em>) – Normalize data to [0,1] to use for mapping colors</p></li>
+<li><p><strong>mesh</strong> (<em>boolean</em>) – Whether to plot data as mesh. If false (default), contour plot is
+made.</p></li>
+<li><p><strong>filled</strong> (<em>Boolean</em>) – Whether to color fill between contours or not. Defaults to True</p></li>
+<li><p><strong>**map_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.contour/f
+(if mesh=False) or pcolormesh (if mesh=True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>cs</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Contour plot object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.plot">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rcatool.plot" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

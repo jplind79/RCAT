@@ -54,7 +54,7 @@ def rh2sh(rh, T, P=1013.25):
 
 def sh2rh(sh, T, P=1013.25):
     """
-    Convert relative humidity to specific humidity
+    Convert specific humidity to relative humidity
     Code from:
     https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R
 

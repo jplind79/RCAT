@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.stats.event_duration &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcatool.stats.event_duration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcatool.stats.event_duration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Event Duration Analysis (EDA) of Precipitation</span>
+<span class="sd">----------------------------------------------</span>
+
+<span class="sd">Author: Petter Lind</span>
+<span class="sd">Created: Fall 2020</span>
+<span class="sd">Updates:</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="eda">
+<a class="viewcode-back" href="../../../rcatool.stats.html#rcatool.stats.event_duration.eda">[docs]</a>
+<span class="k">def</span> <span class="nf">eda</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">thr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">duration_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_statistic</span><span class="o">=</span><span class="s1">&#39;amount&#39;</span><span class="p">,</span> <span class="n">statistic_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dry_events</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">dry_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate event duration statistics</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: array</span>
+<span class="sd">        2D or 1D array of data. All data points are collectively used in the</span>
+<span class="sd">        asop calculation unless &#39;keepdims&#39; is True. Then calculation</span>
+<span class="sd">        is performed along zeroth axis (expected time dimension).</span>
+<span class="sd">    keepdims: boolean</span>
+<span class="sd">        If data is 2d (time in third dimesion) and keepdims is set to True,</span>
+<span class="sd">        calculation is applied to the dimension defined by axis argument</span>
+<span class="sd">        (default 0) and returns a 2d array of asop components. If set to False</span>
+<span class="sd">        (default) all values are collectively assembled before calculation.</span>
+<span class="sd">    axis: int</span>
+<span class="sd">        The axis over which to apply the calculation if keepdims is set to</span>
+<span class="sd">        True. Default is 0.</span>
+<span class="sd">    event_statistic: str</span>
+<span class="sd">        The statistic to calculate for each event; choices are &#39;amount&#39;,</span>
+<span class="sd">        &#39;mean int&#39; or &#39;max int&#39;.</span>
+<span class="sd">    duration_bins: list/array</span>
+<span class="sd">        Defines the bin edges for event durations, including the rightmost</span>
+<span class="sd">        edge, allowing for non-uniform bin widths.</span>
+<span class="sd">    statistic_bins: list/array</span>
+<span class="sd">        Defines the bin edges for event statistic (amount/mean/max),</span>
+<span class="sd">        including the rightmost edge, allowing for non-uniform bin widths.</span>
+<span class="sd">    thr: float</span>
+<span class="sd">        Value of threshold to identify start/end of events. Default 0.1.</span>
+<span class="sd">    dry_events: bool</span>
+<span class="sd">        If set to True, duration of dry intervals will be calculated.</span>
+<span class="sd">        &#39;dry_bins&#39; must then be provided.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    eda_arr: array</span>
+<span class="sd">        data array with frequency of event statistic (amount, mean, max) per</span>
+<span class="sd">        duration bin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">eda_calc</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="n">inthr</span><span class="p">,</span> <span class="n">dur_bins</span><span class="p">,</span> <span class="n">stat</span><span class="p">,</span> <span class="n">stat_bins</span><span class="p">,</span> <span class="n">calc_dry</span><span class="p">,</span> <span class="n">dbins</span><span class="p">):</span>
+        <span class="c1"># Flatten data to one dimension</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">):</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pdata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data1d</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data1d</span><span class="p">)):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All data missing/masked!&quot;</span><span class="p">)</span>
+            <span class="n">eda_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dur_bins</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">stat_bins</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">eda_arr</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if any(np.isnan(data1d)):</span>
+            <span class="c1">#     data1d = data1d[~np.isnan(data1d)]</span>
+
+            <span class="c1"># When is data above threshold</span>
+            <span class="n">indata</span> <span class="o">=</span> <span class="n">data1d</span> <span class="o">&gt;=</span> <span class="n">inthr</span>
+
+            <span class="c1"># Make sure all events are well-bounded</span>
+            <span class="n">bounded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(([</span><span class="mi">0</span><span class="p">],</span> <span class="n">indata</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+            <span class="c1"># Identify start and end of events</span>
+            <span class="n">diffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">bounded</span><span class="p">)</span>
+            <span class="n">run_starts</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">run_ends</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># Calculate durations</span>
+            <span class="n">durations</span> <span class="o">=</span> <span class="n">run_ends</span> <span class="o">-</span> <span class="n">run_starts</span>
+
+            <span class="k">if</span> <span class="n">stat</span> <span class="o">==</span> <span class="s1">&#39;amount&#39;</span><span class="p">:</span>
+                <span class="n">stat_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">data1d</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">])</span>
+                                      <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">run_starts</span><span class="p">,</span> <span class="n">run_ends</span><span class="p">)])</span>
+            <span class="k">elif</span> <span class="n">stat</span> <span class="o">==</span> <span class="s1">&#39;mean int&#39;</span><span class="p">:</span>
+                <span class="n">stat_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data1d</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">])</span>
+                                      <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">run_starts</span><span class="p">,</span> <span class="n">run_ends</span><span class="p">)])</span>
+            <span class="k">elif</span> <span class="n">stat</span> <span class="o">==</span> <span class="s1">&#39;max int&#39;</span><span class="p">:</span>
+                <span class="n">stat_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data1d</span><span class="p">[</span><span class="n">s</span><span class="p">:</span><span class="n">e</span><span class="p">])</span>
+                                      <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">run_starts</span><span class="p">,</span> <span class="n">run_ends</span><span class="p">)])</span>
+            <span class="n">stat_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">bint</span><span class="p">:</span> <span class="n">stat_data</span><span class="p">[</span><span class="n">durations</span> <span class="o">==</span> <span class="n">bint</span><span class="p">]</span>
+                         <span class="k">if</span> <span class="n">bint</span> <span class="ow">in</span> <span class="n">durations</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                         <span class="k">for</span> <span class="n">bint</span> <span class="ow">in</span> <span class="n">dur_bins</span><span class="p">}</span>
+            <span class="n">eda_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">stat_bins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">stat_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">calc_dry</span><span class="p">:</span>
+                <span class="n">dry</span> <span class="o">=</span> <span class="o">~</span><span class="n">indata</span>
+                <span class="n">bounded_dry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(([</span><span class="mi">0</span><span class="p">],</span> <span class="n">dry</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="n">diffs_dry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">bounded_dry</span><span class="p">)</span>
+                <span class="n">run_starts_dry</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs_dry</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">run_ends_dry</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs_dry</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">dry_durations</span> <span class="o">=</span> <span class="n">run_ends_dry</span> <span class="o">-</span> <span class="n">run_starts_dry</span>
+                <span class="n">dry_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">dry_durations</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">dbins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">eda_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">dry_data</span><span class="p">,</span> <span class="n">eda_arr</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">eda_arr</span>
+
+    <span class="c1"># Bins</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t\n</span><span class="s2">&#39;N.B. &#39;duration_bins&#39; must be provided!&quot;</span>
+    <span class="k">assert</span> <span class="n">duration_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">msg</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t\n</span><span class="s2">&#39;N.B. &#39;statistic_bins&#39; must be provided!&quot;</span>
+    <span class="k">assert</span> <span class="n">statistic_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">msg</span>
+    <span class="k">if</span> <span class="n">dry_events</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t\n</span><span class="s2">&#39;dry_bins&#39; must be provided if &#39;dry_events&#39; is True!&quot;</span>
+        <span class="k">assert</span> <span class="n">dry_bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">msg</span>
+
+    <span class="k">if</span> <span class="n">keepdims</span><span class="p">:</span>
+        <span class="n">eda_comp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span>
+            <span class="n">eda_calc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">arr</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">inthr</span><span class="o">=</span><span class="n">thr</span><span class="p">,</span> <span class="n">dur_bins</span><span class="o">=</span><span class="n">duration_bins</span><span class="p">,</span>
+            <span class="n">stat</span><span class="o">=</span><span class="n">event_statistic</span><span class="p">,</span> <span class="n">stat_bins</span><span class="o">=</span><span class="n">statistic_bins</span><span class="p">,</span>
+            <span class="n">calc_dry</span><span class="o">=</span><span class="n">dry_events</span><span class="p">,</span> <span class="n">dbins</span><span class="o">=</span><span class="n">dry_bins</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eda_comp</span> <span class="o">=</span> <span class="n">eda_calc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">inthr</span><span class="o">=</span><span class="n">thr</span><span class="p">,</span> <span class="n">dur_bins</span><span class="o">=</span><span class="n">duration_bins</span><span class="p">,</span>
+                            <span class="n">stat</span><span class="o">=</span><span class="n">event_statistic</span><span class="p">,</span> <span class="n">stat_bins</span><span class="o">=</span><span class="n">statistic_bins</span><span class="p">,</span>
+                            <span class="n">calc_dry</span><span class="o">=</span><span class="n">dry_events</span><span class="p">,</span> <span class="n">dbins</span><span class="o">=</span><span class="n">dry_bins</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eda_comp</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

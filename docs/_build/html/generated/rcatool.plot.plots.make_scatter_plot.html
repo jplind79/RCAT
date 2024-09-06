@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.plot.plots.make_scatter_plot &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rcatool.plot.plots.make_raster_plot" href="rcatool.plot.plots.make_raster_plot.html" />
+    <link rel="prev" title="rcatool.plot.plots.map_axes_settings" href="rcatool.plot.plots.map_axes_settings.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API-reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../user_api.html">User API</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../plots.html">Visualization</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../plots.html#color-routines">Color routines</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../plots.html#graphic-routines">Graphic routines</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../stats.html">Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils.html">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../internal_api.html">Internal API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API-reference</a></li>
+          <li class="breadcrumb-item"><a href="../user_api.html">User API</a></li>
+          <li class="breadcrumb-item"><a href="../plots.html">Visualization</a></li>
+      <li class="breadcrumb-item active">rcatool.plot.plots.make_scatter_plot</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/rcatool.plot.plots.make_scatter_plot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcatool-plot-plots-make-scatter-plot">
+<h1>rcatool.plot.plots.make_scatter_plot<a class="headerlink" href="#rcatool-plot-plots-make-scatter-plot" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.plot.plots.make_scatter_plot">
+<span class="sig-prename descclassname"><span class="pre">rcatool.plot.plots.</span></span><span class="sig-name descname"><span class="pre">make_scatter_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ydata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcolors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecolors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbl_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'large'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">sc_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rcatool/plot/plots.html#make_scatter_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.plot.plots.make_scatter_plot" title="Link to this definition"></a></dt>
+<dd><p>Create a scatter plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>AxesGrid object</em>) – returned from the ‘fig_grid_setup’ function</p></li>
+<li><p><strong>xdata/ydata</strong> (<em>Array/list</em>) – 1D array or list of 1D arrays with data for x/y axis</p></li>
+<li><p><strong>fcolors</strong> (<em>array/list</em>) – List of colors to be used for each data set in input data. This is
+separate from ‘color’/’c’ option available from matplotlib.scatter
+call (and set in sc_kwargs) where all individual input data sets
+will have that specific color/s. If set, then
+ecolors need also be supplied.</p></li>
+<li><p><strong>ecolors</strong> (<em>array/list</em>) – List of edge colors to be used for each data set in input data.
+This is separate from ‘edgecolors’/’ec’ option available from
+matplotlib.scatter call (and set in sc_kwargs) where all individual
+input data sets will have that specific color/s. If set, then
+fcolors need also be supplied.</p></li>
+<li><p><strong>lbl_fontsize</strong> (<em>string/float</em>) – Fontsize for legend labels</p></li>
+<li><p><strong>axis_type</strong> (<em>str</em>) – Linear or log axes: ‘linear’ (defualt), ‘logx’/’logy’/’logxy’ (log
+x, y or both axes).</p></li>
+<li><p><strong>labels</strong> (<em>String/List</em>) – String or list of strings with legend labels</p></li>
+<li><p><strong>**sc_kwargs</strong> (<em>keyword arguments</em>) – arguments (key=value) that can be used in pyplot.scatter
+See matplotlib.org for more information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>axs</strong> – The axes objects created for each plot</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Axes objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rcatool.plot.plots.map_axes_settings.html" class="btn btn-neutral float-left" title="rcatool.plot.plots.map_axes_settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rcatool.plot.plots.make_raster_plot.html" class="btn btn-neutral float-right" title="rcatool.plot.plots.make_raster_plot" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

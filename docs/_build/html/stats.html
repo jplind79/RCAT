@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statistics &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rcatool.stats.arithmetics.run_mean" href="generated/rcatool.stats.arithmetics.run_mean.html" />
+    <link rel="prev" title="rcatool.plot.plots.image_colorbar" href="generated/rcatool.plot.plots.image_colorbar.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">API-reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="user_api.html">User API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plots.html">Visualization</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Statistics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#arithmetic-routines">Arithmetic routines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asop">ASoP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bootstrapping">Bootstrapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#climate-indices">Climate indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convolution">Convolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#probability-distributions">Probability distributions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sal-module">SAL module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="internal_api.html">Internal API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API-reference</a></li>
+          <li class="breadcrumb-item"><a href="user_api.html">User API</a></li>
+      <li class="breadcrumb-item active">Statistics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/stats.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="statistics">
+<span id="statistics-functions"></span><h1>Statistics<a class="headerlink" href="#statistics" title="Link to this heading"></a></h1>
+<section id="arithmetic-routines">
+<h2>Arithmetic routines<a class="headerlink" href="#arithmetic-routines" title="Link to this heading"></a></h2>
+<p>Functions for various arithmetic calculations.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.arithmetics.run_mean" title="rcatool.stats.arithmetics.run_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.arithmetics.run_mean</span></code></a>(x, N[, mode])</p></td>
+<td><p>Calculate running mean</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="asop">
+<h2>ASoP<a class="headerlink" href="#asop" title="Link to this heading"></a></h2>
+<p>Analyzing Scales of Precipitation.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.ASoP.asop" title="rcatool.stats.ASoP.asop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.ASoP.asop</span></code></a>(data[, keepdims, ...])</p></td>
+<td><p>Calculate ASoP parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.ASoP.bins_calc" title="rcatool.stats.ASoP.bins_calc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.ASoP.bins_calc</span></code></a>(n[, bintype])</p></td>
+<td><p>Calculates bins with edges according to Eq.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="bootstrapping">
+<h2>Bootstrapping<a class="headerlink" href="#bootstrapping" title="Link to this heading"></a></h2>
+<p>Routines for bootstrap calculations.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.bootstrap.block_bootstr" title="rcatool.stats.bootstrap.block_bootstr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.bootstrap.block_bootstr</span></code></a>(data)</p></td>
+<td><p>Calculate block bootstrap samples.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="climate-indices">
+<h2>Climate indices<a class="headerlink" href="#climate-indices" title="Link to this heading"></a></h2>
+<p>Routines for various climate index calculations.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.hotdays_calc" title="rcatool.stats.climateindex.hotdays_calc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.hotdays_calc</span></code></a>(...)</p></td>
+<td><p>Calculate number of hotdays.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.extr_hotdays_calc" title="rcatool.stats.climateindex.extr_hotdays_calc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.extr_hotdays_calc</span></code></a>(...)</p></td>
+<td><p>Calculate number of extreme hotdays.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.tropnights_calc" title="rcatool.stats.climateindex.tropnights_calc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.tropnights_calc</span></code></a>(data)</p></td>
+<td><p>Calculate number of tropical nights.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.ehi" title="rcatool.stats.climateindex.ehi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.ehi</span></code></a>(data, thr_95)</p></td>
+<td><p>Calculate Excessive Heat Index (EHI).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.cdd" title="rcatool.stats.climateindex.cdd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.cdd</span></code></a>(data[, thr, ...])</p></td>
+<td><p>Calculate the Consecutive Dry Days index (CDD).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.Rxx" title="rcatool.stats.climateindex.Rxx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.Rxx</span></code></a>(data[, thr, ...])</p></td>
+<td><p>Rxx mm, count of any time units (days, hours, etc) when precipitation ≥ xx mm: Let RRij be the precipitation amount on time unit i in period j.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.RRpX" title="rcatool.stats.climateindex.RRpX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.RRpX</span></code></a>(data, percentile)</p></td>
+<td><p>RRpX mm, total amount of precipitation above the percentile threshold pX; RR ≥ pX mm: Let RRij be the daily precipitation amount on day i in period j.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.RRtX" title="rcatool.stats.climateindex.RRtX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.RRtX</span></code></a>(data, thr[, ...])</p></td>
+<td><p>RRtX mm, total amount of precipitation above the threshold 'thr'.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.climateindex.SDII" title="rcatool.stats.climateindex.SDII"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.climateindex.SDII</span></code></a>(data[, thr, ...])</p></td>
+<td><p>SDII, Simple pricipitation intensity index: Let RRwj be the daily precipitation amount on wet days, w (RR ≥ 1mm) in period j.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="convolution">
+<h2>Convolution<a class="headerlink" href="#convolution" title="Link to this heading"></a></h2>
+<p>This module includes functions to perform convolution, for example image
+smoothing, using scipy’s convolution routines.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.convolve.kernel_gen" title="rcatool.stats.convolve.kernel_gen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.convolve.kernel_gen</span></code></a>(n[, ...])</p></td>
+<td><p>Function to create a kernel, i.e. a moving window (box or disk) with side/radius equal to 'n'.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.convolve.filtering" title="rcatool.stats.convolve.filtering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.convolve.filtering</span></code></a>(data, wgts)</p></td>
+<td><p>1D and 2D filtering procedures.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.convolve.fft_prep" title="rcatool.stats.convolve.fft_prep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.convolve.fft_prep</span></code></a>(array, ...)</p></td>
+<td><p>Prepare data array and kernel for fft computation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.convolve.convolve_fft" title="rcatool.stats.convolve.convolve_fft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.convolve.convolve_fft</span></code></a>(array, ...)</p></td>
+<td><p>Convolve an ndarray with an nd-kernel.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="probability-distributions">
+<h2>Probability distributions<a class="headerlink" href="#probability-distributions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.pdf.freq_int_dist" title="rcatool.stats.pdf.freq_int_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.pdf.freq_int_dist</span></code></a>(data[, ...])</p></td>
+<td><p>Calculate frequency - instensity distriutions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.pdf.prob_of_exceed" title="rcatool.stats.pdf.prob_of_exceed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.pdf.prob_of_exceed</span></code></a>(data[, ...])</p></td>
+<td><p>Calculates probability of exceedance distriutions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.pdf.perkins_skill_score" title="rcatool.stats.pdf.perkins_skill_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.pdf.perkins_skill_score</span></code></a>(p_mod, ...)</p></td>
+<td><p>Calculate the Perkins Skill Score (PSS).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sal-module">
+<h2>SAL module<a class="headerlink" href="#sal-module" title="Link to this heading"></a></h2>
+<p>Routines for calculation of SAL statistics.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.A_stat" title="rcatool.stats.sal.A_stat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.A_stat</span></code></a>(data, refdata)</p></td>
+<td><p>Calculate the amplitude component (A).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.S_stat" title="rcatool.stats.sal.S_stat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.S_stat</span></code></a>(data, data_label, ...)</p></td>
+<td><p>Function to calculate the structure component (S).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.L_stat" title="rcatool.stats.sal.L_stat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.L_stat</span></code></a>(data, data_label, ...)</p></td>
+<td><p>Function to determine the location component (L).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.threshold" title="rcatool.stats.sal.threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.threshold</span></code></a>(data, thr_type, ...)</p></td>
+<td><p>Function to calculate the threshold to be used to identify objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.distfunc" title="rcatool.stats.sal.distfunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.distfunc</span></code></a>(x)</p></td>
+<td><p>Calculate distances</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.remove_large_objects" title="rcatool.stats.sal.remove_large_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.remove_large_objects</span></code></a>(...)</p></td>
+<td><p>Remove large objects based on the maximum size limit defined by 'max_size'.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.sal_calc" title="rcatool.stats.sal.sal_calc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.sal_calc</span></code></a>(tstep, data, ...)</p></td>
+<td><p>Perform the SAL calculation using the S, A, L functions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.write_to_disk" title="rcatool.stats.sal.write_to_disk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.write_to_disk</span></code></a>(ddict, nt, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.stats.html#rcatool.stats.sal.run_sal_analysis" title="rcatool.stats.sal.run_sal_analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.stats.sal.run_sal_analysis</span></code></a>(data, ...)</p></td>
+<td><p>Run the SAL analysis on the two data sets 'data' and 'refdata', where the latter is supposed to represent the 'truth'.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="generated/rcatool.plot.plots.image_colorbar.html" class="btn btn-neutral float-left" title="rcatool.plot.plots.image_colorbar" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/rcatool.stats.arithmetics.run_mean.html" class="btn btn-neutral float-right" title="rcatool.stats.arithmetics.run_mean" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

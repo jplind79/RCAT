@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualization &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rcatool.plot.colors.getcolormap" href="generated/rcatool.plot.colors.getcolormap.html" />
+    <link rel="prev" title="User API" href="user_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">API-reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="user_api.html">User API</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Visualization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#color-routines">Color routines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#graphic-routines">Graphic routines</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="internal_api.html">Internal API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API-reference</a></li>
+          <li class="breadcrumb-item"><a href="user_api.html">User API</a></li>
+      <li class="breadcrumb-item active">Visualization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/plots.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="visualization">
+<h1>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h1>
+<section id="color-routines">
+<h2>Color routines<a class="headerlink" href="#color-routines" title="Link to this heading"></a></h2>
+<p>The routines below provides access to predefined (Matplotlib) or self-produced
+colors and color maps.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.colors.getcolormap" title="rcatool.plot.colors.getcolormap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.colors.getcolormap</span></code></a>(cmap_name[, ...])</p></td>
+<td><p>Function to retrieve colormap, either customized (custom=True) or available through Matplotlib predefined colormaps.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.colors.getsinglecolor" title="rcatool.plot.colors.getsinglecolor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.colors.getsinglecolor</span></code></a>(color_name)</p></td>
+<td><p>Function to retrieve single custom color.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.colors.norm_colors" title="rcatool.plot.colors.norm_colors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.colors.norm_colors</span></code></a>(bounds, ncolors)</p></td>
+<td><p>In addition to min and max of levels, this function takes as arguments boundaries between which data is to be mapped.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="graphic-routines">
+<h2>Graphic routines<a class="headerlink" href="#graphic-routines" title="Link to this heading"></a></h2>
+<p>Functions for different plots such as scatterplots and mapplots,initiation and
+configuration of figure objects etc</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.figure_init" title="rcatool.plot.plots.figure_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.figure_init</span></code></a>([plottype, ...])</p></td>
+<td><p>Setting up a figure object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.image_grid_setup" title="rcatool.plot.plots.image_grid_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.image_grid_setup</span></code></a>([...])</p></td>
+<td><p>Set up the plot axes using mpl_toolkits.axes_grid1.ImageGrid Used primarily when plotting maps or for image analysis For more information on available settings: <a class="reference external" href="https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html">https://doc.ebichu.cc/matplotlib/mpl_toolkits/axes_grid1/overview.html</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.get_nrow_ncol" title="rcatool.plot.plots.get_nrow_ncol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.get_nrow_ncol</span></code></a>(npanels)</p></td>
+<td><p>Return number of rows and columns from a given total number of panels for a grid</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.fig_grid_setup" title="rcatool.plot.plots.fig_grid_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.fig_grid_setup</span></code></a>([figsize, ...])</p></td>
+<td><p>Set up the plot axes using pyplot.subplots</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.axes_settings" title="rcatool.plot.plots.axes_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.axes_settings</span></code></a>(ax[, ...])</p></td>
+<td><p>Configuration of axes; titles and labels</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.map_axes_settings" title="rcatool.plot.plots.map_axes_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.map_axes_settings</span></code></a>(fig, axs)</p></td>
+<td><p>Settings for map plot axes</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.make_scatter_plot" title="rcatool.plot.plots.make_scatter_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.make_scatter_plot</span></code></a>(grid, ...)</p></td>
+<td><p>Create a scatter plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.make_raster_plot" title="rcatool.plot.plots.make_raster_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.make_raster_plot</span></code></a>(data[, ...])</p></td>
+<td><p>Create a raster plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.make_line_plot" title="rcatool.plot.plots.make_line_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.make_line_plot</span></code></a>(grid, ydata)</p></td>
+<td><p>Create a line plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.make_box_plot" title="rcatool.plot.plots.make_box_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.make_box_plot</span></code></a>(grid, data)</p></td>
+<td><p>Create a box plot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.custom_legend" title="rcatool.plot.plots.custom_legend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.custom_legend</span></code></a>(colors, labels)</p></td>
+<td><p>Creates a list of matplotlib Patch objects that can be passed to the legend(...) function to create a custom legend.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.gen_clevels" title="rcatool.plot.plots.gen_clevels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.gen_clevels</span></code></a>(data, nsteps)</p></td>
+<td><p>Create contour levels based on min and max of input data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.map_setup" title="rcatool.plot.plots.map_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.map_setup</span></code></a>(map_proj, ...)</p></td>
+<td><p>Create a Cartopy crs object to be used in the overlaying of 2d plots.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.make_map_plot" title="rcatool.plot.plots.make_map_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.make_map_plot</span></code></a>(data, grid, ...)</p></td>
+<td><p>Producing  map plots</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.plot_map" title="rcatool.plot.plots.plot_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.plot_map</span></code></a>(ax, x, y, data, ...)</p></td>
+<td><p>Producing a map plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.plot.html#rcatool.plot.plots.image_colorbar" title="rcatool.plot.plots.image_colorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.plot.plots.image_colorbar</span></code></a>(cs, cbaxs)</p></td>
+<td><p>Add colobar to map plot</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_api.html" class="btn btn-neutral float-left" title="User API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/rcatool.plot.colors.getcolormap.html" class="btn btn-neutral float-right" title="rcatool.plot.colors.getcolormap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
