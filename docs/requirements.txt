@@ -1,9 +1,11 @@
 sphinx
 sphinx_rtd_theme
 xarray
+xesmf
 netcdf4
 h5netcdf
-xesmf
+dask[complete]
 matplotlib
 cartopy
-dask[complete]
+palettable
+scikit-image
