@@ -8,8 +8,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import math
-import rcat.plot.plots as rpl
-from rcat.utils.polygons import mask_region
+import rcatool.plot.plots as rpl
+from rcatool.utils.polygons import mask_region
 from copy import deepcopy
 
 # Colors
@@ -38,6 +38,7 @@ def plot_main(pltdict, statistic):
     img_dir = pdict['img dir']
 
     grid_coords = pdict['grid coords']
+    moments_plot_conf = pdict['moments plot config']
     map_projection = pdict['map projection']
     map_config = pdict['map config']
     map_extent = pdict['map extent']
@@ -68,9 +69,9 @@ def plot_main(pltdict, statistic):
 
     _plots(statistic)(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                       ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                      img_dir, grid_coords, map_domain, map_projection,
-                      map_config, map_extent, map_gridlines, map_axes_conf,
-                      map_plot_conf, line_grid, line_sets)
+                      img_dir, grid_coords, moments_plot_conf, map_domain,
+                      map_projection, map_config, map_extent, map_gridlines,
+                      map_axes_conf, map_plot_conf, line_grid, line_sets)
 
 
 def _map_grid_setup(map_grid_set):
@@ -93,6 +94,7 @@ def _plots(stat):
         'percentile': map_pctls,
         'diurnal cycle': map_diurnal_cycle,
         'pdf': pdf_plot,
+        'moments': moments_plot,
         'asop': map_asop,
     }
     return p[stat]
@@ -944,6 +946,124 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
 
         ttl = fig.suptitle(headtitle, fontsize='xx-large')
         ttl.set_position((.5, 1.06))
+
+        plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
+
+
+def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
+                 ref_model, obs, var, tres, tstat, units, ytitle, regions,
+                 img_dir, grid_coords, moments_plot_conf, map_domain,
+                 map_projection, map_config, map_extent, map_gridlines,
+                 map_axes_conf, map_plot_conf, line_grid, line_sets):
+    """
+    Plotting higher-order moment statistics
+
+    Multiple plot types are available; timeseries, box plot and scatter plot.
+    The type shall be specified in the main RCAT configuration file (under the
+    'plotting' section). Default is timeseries.
+    """
+
+    type_of_plot = moments_plot_conf['plot type']
+    plot_dimension = moments_plot_conf['plot dimension']
+
+    ref_mnme = ref_model.upper()
+    othr_mod = models.copy()
+    othr_mod.remove(ref_model)
+
+    for reg in regions:
+
+        fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_listr[reg])}
+        mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
+                   for m in models}
+
+        if obs is not None:
+            obslist = [obs] if not isinstance(obs, list) else obs
+            ref_obs = obslist[0]
+            obslbl = "_".join(s for s in obslist)
+            fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
+                                                          fo_listr[reg])}
+            obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
+                       for o in obslist}
+            dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
+                     [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+
+            if len(obslist) > 1:
+                dlist[0] += [obs_ann[o] for o in obslist[1:]]
+                dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                             for o in obslist[1:]]
+                ll_nms = models + obslist[1:]
+            else:
+                ll_nms = models
+            lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
+                       ['{} - {}'.format(m.upper(), ref_obs) for m in ll_nms]]
+        else:
+            dlist = [[mod_ann[m] for m in models],
+                     [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+            lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
+                m.upper(), ref_mnme) for m in othr_mod]]
+
+        thr = fmod[ref_model].attrs['Description'].\
+            split('|')[1].split(':')[1].strip()
+        time_period = fmod[ref_model].attrs['Analysed time'].split('|')[1]
+        time_period = time_period.replace(' ', '')
+        regnm = reg.replace(' ', '_')
+
+        if thr != 'None':
+            headtitle = '{} |  Threshold: {}\n{} | {} | {}'.format(
+                var, thr, reg, ytitle, seas)
+            if obs is not None:
+                fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}_{}_{}.png'.format(
+                    var, thr, tres, regnm, obslbl,
+                    ytitle.replace(' ', '_'), seas)
+            else:
+                fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}_{}.png'.format(
+                    var, thr, tres, regnm, ytitle.replace(' ', '_'),
+                    time_period)
+        else:
+            headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle,
+                                                    time_period)
+            if obs is not None:
+                fn = 'timeseries_{}{}_moment_{}_model_{}_{}_{}.png'.format(
+                    var, tres, regnm, obslbl, ytitle.replace(' ', '_'),
+                    time_period)
+            else:
+                fn = 'timeseries_{}{}_moment_{}_model_{}_{}.png'.format(
+                    var, tres, regnm, ytitle.replace(' ', '_'), time_period)
+
+        # figure settings
+        figsize = (16, 10)
+        figshape = (2, 1)
+
+        ylabel = [f'{units}', 'Difference']
+        ylim = [None]*2
+        xlabel = ['']*2
+        xlim = [None]*2
+        xticks = None
+        xtlbls = None
+
+        rpl.figure_init(plottype='line')
+        fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
+                                        **line_grid)
+
+        axs = rpl.make_line_plot(lgrid, ydata=dlist, **line_sets)
+        [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(), abs_colors)]
+        [ln.set_color(lc) for ln, lc in zip(list(axs[1].get_lines())[:-1],
+                                            rel_colors)]
+        # Legend
+        legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
+                           for c, l in zip(abs_colors, lg_lbls[0])]
+        axs[0].legend(handles=legend_elements, fontsize='large')
+        legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
+                           for c, l in zip(rel_colors, lg_lbls[1])]
+        axs[1].legend(handles=legend_elements, fontsize='large')
+
+        [rpl.axes_settings(ax, xlabel=xlabel[a], xticks=xticks,
+                           ylabel=ylabel[a], xtlabels=xtlbls,
+                           xlim=xlim[a], ylim=ylim[a])
+         for a, ax in enumerate(axs)]
+
+        ttl = fig.suptitle(headtitle, fontsize='xx-large')
+        ttl.set_position((.5, 1.03))
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 

@@ -16,10 +16,10 @@ import numpy as np
 import re
 from dask.distributed import Client
 from dask.diagnostics import ProgressBar
-from rcat.utils import ini_reader
-from rcat.utils.polygons import mask_region
-import rcat.runtime.RCAT_stats as st
-import rcat.utils.grids as gr
+from rcatool.utils import ini_reader
+from rcatool.utils.polygons import mask_region
+import rcatool.runtime.RCAT_stats as st
+import rcatool.utils.grids as gr
 
 import dask
 dask.config.set(scheduler="single-threaded")
@@ -45,6 +45,7 @@ def get_config_settings(config_file):
         'requested_stats': conf_dict['STATISTICS']['stats'],
         'stats_conf': st.mod_stats_config(conf_dict['STATISTICS']['stats']),
         'validation plot': conf_dict['PLOTTING']['validation plot'],
+        'moments plot config': conf_dict['PLOTTING']['moments plot config'],
         'map projection': conf_dict['PLOTTING']['map projection'],
         'map extent': conf_dict['PLOTTING']['map extent'],
         'map gridlines': conf_dict['PLOTTING']['map gridlines'],
@@ -1153,6 +1154,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         'stat method': tstat,
         'units': vconf['units'],
         'grid coords': grid_coords,
+        'moments plot config': cdict['moments plot config'],
         'map projection': cdict['map projection'],
         'map extent': cdict['map extent'],
         'map gridlines': cdict['map gridlines'],
@@ -1423,7 +1425,7 @@ for stat in cdict['stats_conf']:
 
 if cdict['validation plot']:
     print('\n=== PLOTTING ===')
-    import rcat.runtime.RCAT_plots as rplot
+    import rcatool.runtime.RCAT_plots as rplot
     statnames = list(stats_dict.keys())
     for sn in statnames:
         for v in stats_dict[sn]:
