@@ -1,2 +1,9 @@
 sphinx
 sphinx_rtd_theme
+xarray
+netcdf4
+h5netcdf
+xesmf
+matplotlib
+cartopy
+dask[complete]
