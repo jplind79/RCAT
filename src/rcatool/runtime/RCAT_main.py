@@ -2,9 +2,9 @@
 # coding: utf-8
 
 # Modules
+import warnings
 import sys
 import os
-import warnings
 import glob
 import xarray as xa
 import xesmf as xe
@@ -14,16 +14,15 @@ import datetime as dt
 from itertools import product
 import numpy as np
 import re
+import dask
 from dask.distributed import Client
-from dask.diagnostics import ProgressBar
+# from dask.diagnostics import ProgressBar
 from rcatool.utils import ini_reader
 from rcatool.utils.polygons import mask_region
 import rcatool.runtime.RCAT_stats as st
 import rcatool.utils.grids as gr
 
-import dask
 dask.config.set(scheduler="single-threaded")
-
 warnings.filterwarnings("ignore")
 
 

@@ -10,6 +10,7 @@ from matplotlib.lines import Line2D
 import math
 import rcatool.plot.plots as rpl
 from rcatool.utils.polygons import mask_region
+from rcatool.stats.arithmetics import run_mean
 from copy import deepcopy
 
 # Colors
@@ -17,7 +18,7 @@ set1 = mpl.cm.Set1.colors
 set1_m = [[int(255*x) for x in triplet] for triplet in set1]
 rel_colors = ['#{:02x}{:02x}{:02x}'.format(s[0], s[1], s[2]) for s in set1_m]
 abs_colors = rel_colors[:]
-abs_colors.insert(0, 'k')
+abs_colors.insert(-1, 'k')
 
 
 def plot_main(pltdict, statistic):
@@ -963,8 +964,7 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     'plotting' section). Default is timeseries.
     """
 
-    type_of_plot = moments_plot_conf['plot type']
-    plot_dimension = moments_plot_conf['plot dimension']
+    # type_of_plot = moments_plot_conf['plot type']
 
     ref_mnme = ref_model.upper()
     othr_mod = models.copy()
@@ -976,6 +976,12 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
                    for m in models}
 
+        err_len_msg = ("\n\n\t*** Input data arrays for timeseries plot do not"
+                       " all have the same lengths. This is required for these"
+                       " plots. ***\n\n")
+        ts_len_md = [arr.size for m, arr in mod_ann.items()]
+        assert len(set(ts_len_md)) == 1, err_len_msg
+
         if obs is not None:
             obslist = [obs] if not isinstance(obs, list) else obs
             ref_obs = obslist[0]
@@ -984,6 +990,10 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                                                           fo_listr[reg])}
             obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
                        for o in obslist}
+
+            ts_len_all = ts_len_md + [arr.size for o, arr in obs_ann.items()]
+            assert len(set(ts_len_all)) == 1, err_len_msg
+
             dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
                      [mod_ann[m] - obs_ann[ref_obs] for m in models]]
 
@@ -1004,31 +1014,28 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[1].split(':')[1].strip()
-        time_period = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-        time_period = time_period.replace(' ', '')
+        season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
+        seas = season.replace(' ', '')
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
             headtitle = '{} |  Threshold: {}\n{} | {} | {}'.format(
                 var, thr, reg, ytitle, seas)
             if obs is not None:
-                fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}_{}_{}.png'.format(
-                    var, thr, tres, regnm, obslbl,
-                    ytitle.replace(' ', '_'), seas)
+                fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}_{}_{}.png'.\
+                        format(var, thr, tres, regnm, obslbl,
+                               ytitle.replace(' ', '_'), seas)
             else:
                 fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}_{}.png'.format(
-                    var, thr, tres, regnm, ytitle.replace(' ', '_'),
-                    time_period)
+                    var, thr, tres, regnm, ytitle.replace(' ', '_'), seas)
         else:
-            headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle,
-                                                    time_period)
+            headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle, seas)
             if obs is not None:
                 fn = 'timeseries_{}{}_moment_{}_model_{}_{}_{}.png'.format(
-                    var, tres, regnm, obslbl, ytitle.replace(' ', '_'),
-                    time_period)
+                    var, tres, regnm, obslbl, ytitle.replace(' ', '_'), seas)
             else:
                 fn = 'timeseries_{}{}_moment_{}_model_{}_{}.png'.format(
-                    var, tres, regnm, ytitle.replace(' ', '_'), time_period)
+                    var, tres, regnm, ytitle.replace(' ', '_'), seas)
 
         # figure settings
         figsize = (16, 10)
@@ -1049,11 +1056,44 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(), abs_colors)]
         [ln.set_color(lc) for ln, lc in zip(list(axs[1].get_lines())[:-1],
                                             rel_colors)]
+
+        # Trendlines
+        if moments_plot_conf['trendline']:
+            for ydata, lc in zip(dlist[0], abs_colors):
+                z = np.polyfit(np.arange(len(ydata)), ydata, 1)
+                p = np.poly1d(z)
+                rpl.make_line_plot([lgrid[0]], ydata=p(np.arange(len(ydata))),
+                                   color='k', lw=2, alpha=.6)
+                rpl.make_line_plot([lgrid[0]], ydata=p(np.arange(len(ydata))),
+                                   lw=0, marker='o', markersize=4.5, mec=lc,
+                                   mfc=lc, markevery=2, alpha=1)
+        # Running mean
+        if moments_plot_conf['running mean']:
+            window = moments_plot_conf['running mean']
+            for ydata, lc in zip(dlist[0], abs_colors):
+                rmn = run_mean(ydata, window, 'same')
+                rpl.make_line_plot(
+                    [lgrid[0]], ydata=rmn, color='k', lw=2, alpha=.6)
+                rpl.make_line_plot([lgrid[0]], ydata=rmn, lw=0, marker='o',
+                                   markersize=4, mec=lc, mfc=lc, alpha=1)
+
         # Legend
-        legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
+        legend_elements = [Line2D([0], [0], lw=3, color=c, label=l)
                            for c, l in zip(abs_colors, lg_lbls[0])]
-        axs[0].legend(handles=legend_elements, fontsize='large')
-        legend_elements = [Line2D([0], [0], lw=2, color=c, label=l)
+        if moments_plot_conf['trendline']:
+            legend_elements = legend_elements + [
+                Line2D([0], [0], lw=3, color='k', marker='o', mfc=c, mec=c,
+                       markersize=8, alpha=.6, label='lin. trend')
+                for c, _ in zip(abs_colors, lg_lbls[0])]
+        if moments_plot_conf['running mean']:
+            legend_elements = legend_elements + [
+                Line2D([0], [0], lw=3, color='k', marker='o', mfc=c, mec=c,
+                       markersize=8, alpha=.6,
+                       label=f'run. avg (window: {window})')
+                for c, _ in zip(abs_colors, lg_lbls[0])]
+
+        axs[0].legend(handles=legend_elements, ncol=2, fontsize='large')
+        legend_elements = [Line2D([0], [0], lw=3, color=c, label=l)
                            for c, l in zip(rel_colors, lg_lbls[1])]
         axs[1].legend(handles=legend_elements, fontsize='large')
 
