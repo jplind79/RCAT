@@ -260,6 +260,7 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         figsize = (20, 9)
 
     tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_ll.sort()
     tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod_msk[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
@@ -288,7 +289,11 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
     clevs_abs = get_clevs(np.array(dlist[0:4]), centered=False)
     clevs_rel = get_clevs(np.array(dlist[4:8]), centered=True)
+    fmt_abs = _get_colorbar_label_formatting(clevs_abs[::2])
+    fmt_rel = _get_colorbar_label_formatting(clevs_rel[::2])
+
     clevs = [clevs_abs]*4 + [clevs_rel]*ndata*4
+    fmt = [fmt_abs]*4 + [fmt_rel]*ndata*4
 
     # TBD: Try to find appropriate formatting for color bar
     # cb_fmt_abs = [str(f)[::-1].find('.') for f in clevs_abs]
@@ -308,7 +313,7 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Plot the maps
     mp = rpl.make_map_plot(
         dlist, axs_grid, lts, lns, cmap=cmap, clevs=clevs, **map_plot_conf)
-    rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter='{:.1f}')
+    rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
 
     # Add contour plot if mslp
     if var == 'psl':
@@ -397,6 +402,7 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         data_names = [ref_mnme] + [f"{m}-{ref_mnme}" for m in othr_mod]
 
     tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_ll.sort()
     tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod_msk[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
@@ -412,7 +418,11 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
     clevs_abs = get_clevs(np.array(dlist[0]), centered=False)
     clevs_rel = get_clevs(np.array(dlist[1]), centered=True)
+    fmt_abs = _get_colorbar_label_formatting(clevs_abs[::2])
+    fmt_rel = _get_colorbar_label_formatting(clevs_rel[::2])
+
     clevs = [clevs_abs] + [clevs_rel]*ndata
+    fmt = [fmt_abs] + [fmt_rel]*ndata
 
     lts = grid_coords['target grid'][var]['lat'][tgname]
     lns = grid_coords['target grid'][var]['lon'][tgname]
@@ -442,7 +452,7 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         mp = rpl.make_map_plot(
             dlist[p], axs_grid, lts, lns, cmap=cmap[p], clevs=clevs[p],
             **map_plot_conf)
-        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter='{:.1f}')
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
 
         # Add contour plot if mslp
         if var == 'psl':
@@ -507,6 +517,7 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
                 m.upper(), ref_mnme) for m in othr_mod]]
 
         tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_ll.sort()
         tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[2].split(':')[1].strip()
@@ -639,6 +650,7 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
              for m in othr_mod]
 
     tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_ll.sort()
     tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
@@ -709,7 +721,7 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         # Map settings
         rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
 
-        [ax.text(0.5, 1.07, ft.upper(), size='x-large',
+        [ax.text(0.5, 1.03, ft.upper(), size='large',
                  va='center', ha='center', transform=ax.transAxes)
          for ft, ax in zip(ftitles, axs_grid)]
 
@@ -805,6 +817,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         sys.exit()
 
     tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_ll.sort()
     tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
         split('|')[3].split(':')[1].strip()
@@ -822,7 +835,11 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
     clevs_abs = get_clevs(np.array(dlist[0]), centered=False)
     clevs_rel = get_clevs(np.array(dlist[1]), centered=True)
-    clevs = [clevs_abs]*1 + [clevs_rel]*ndata
+    fmt_abs = _get_colorbar_label_formatting(clevs_abs[::2])
+    fmt_rel = _get_colorbar_label_formatting(clevs_rel[::2])
+
+    clevs = [clevs_abs] + [clevs_rel]*ndata
+    fmt = [fmt_abs] + [fmt_rel]*ndata
 
     lts = grid_coords['target grid'][var]['lat'][tgname]
     lns = grid_coords['target grid'][var]['lon'][tgname]
@@ -852,13 +869,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         mp = rpl.make_map_plot(
             dlist[p], axs_grid, lts, lns, cmap=cmap[p], clevs=clevs[p],
             **map_plot_conf)
-
-        if var == 'pr':
-            rpl.image_colorbar(mp, axs_grid, labelspacing=2,
-                               formatter='{:.2f}')
-        else:
-            rpl.image_colorbar(mp, axs_grid, labelspacing=2,
-                               formatter='{:.1f}')
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
 
         # Map settings
         rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle,
@@ -930,6 +941,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             sys.exit()
 
         tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_ll.sort()
         tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[3].split(':')[1].strip()
@@ -1011,152 +1023,294 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     """
     Plotting higher-order moment statistics
 
-    Multiple plot types are available; timeseries, box plot and scatter plot.
+    Multiple plot types are available, e.g. timeseries and map plot.
     The type shall be specified in the main RCAT configuration file (under the
     'plotting' section). Default is timeseries.
     """
 
-    # type_of_plot = moments_plot_conf['plot type']
+    type_of_plot = moments_plot_conf['plot type']
 
     ref_mnme = ref_model.upper()
     othr_mod = models.copy()
     othr_mod.remove(ref_model)
 
-    for reg in regions:
+    if type_of_plot == 'timeseries':
 
-        fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_listr[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
-                   for m in models}
+        for reg in regions:
 
-        err_len_msg = ("\n\n\t*** Input data arrays for timeseries plot do not"
-                       " all have the same lengths. This is required for these"
-                       " plots. ***\n\n")
-        ts_len_md = [arr.size for m, arr in mod_ann.items()]
-        assert len(set(ts_len_md)) == 1, err_len_msg
+            fmod = {m: xa.open_dataset(f)
+                    for m, f in zip(models, fm_listr[reg])}
+            mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
+                       for m in models}
 
-        if obs is not None:
-            obslist = [obs] if not isinstance(obs, list) else obs
-            ref_obs = obslist[0]
+            err_len_msg = (
+                "\n\n\t*** Input data arrays for timeseries plot do not"
+                " all have the same lengths. This is required for these"
+                " plots. ***\n\n")
+            ts_len_md = [arr.size for m, arr in mod_ann.items()]
+            assert len(set(ts_len_md)) == 1, err_len_msg
+
+            if obs is not None:
+                obslist = [obs] if not isinstance(obs, list) else obs
+                ref_obs = obslist[0]
+                obslbl = "_".join(s for s in obslist)
+                fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
+                                                              fo_listr[reg])}
+                obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
+                           for o in obslist}
+
+                ts_len_all = ts_len_md + [v.size for o, v in obs_ann.items()]
+                assert len(set(ts_len_all)) == 1, err_len_msg
+
+                dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
+                         [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+
+                if len(obslist) > 1:
+                    dlist[0] += [obs_ann[o] for o in obslist[1:]]
+                    dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                                 for o in obslist[1:]]
+                    ll_nms = models + obslist[1:]
+                else:
+                    ll_nms = models
+                lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
+                           [f'{m.upper()} - {ref_obs}' for m in ll_nms]]
+            else:
+                dlist = [[mod_ann[m] for m in models],
+                         [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+                lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
+                    m.upper(), ref_mnme) for m in othr_mod]]
+
+            tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+            tsuffix_ll.sort()
+            tsuffix_fname = "_vs_".join(set(tsuffix_ll))
+            thr = fmod[ref_model].attrs['Description'].\
+                split('|')[1].split(':')[1].strip()
+            moment_stat = fmod[ref_model].attrs['Description'].split('|')[0].\
+                split(':')[1].replace(' ', '').lower()
+            regnm = reg.replace(' ', '_')
+
+            if thr != 'None':
+                headtitle = '{} | Threshold: {} | Stat: {}\n{} | {}'.format(
+                    var, thr, moment_stat, reg, tsuffix_fname)
+                if obs is not None:
+                    fn = 'timeseries_{}_thr{}{}_stat_{}_{}_model_{}_{}.png'.\
+                            format(var, thr, tres, moment_stat, regnm, obslbl,
+                                   tsuffix_fname)
+                else:
+                    fn = 'timeseries_{}_thr{}{}_stat_{}_{}_model_{}.png'.\
+                            format(var, thr, tres, moment_stat, regnm,
+                                   tsuffix_fname)
+            else:
+                headtitle = '{} | Stat: {} | {} | {}'.format(
+                    var, moment_stat, reg, tsuffix_fname)
+                if obs is not None:
+                    fn = 'timeseries_{}{}_stat_{}_{}_model_{}_{}.png'.format(
+                        var, tres, moment_stat, regnm, obslbl, tsuffix_fname)
+                else:
+                    fn = 'timeseries_{}{}_stat_{}_{}_model_{}.png'.format(
+                        var, tres, moment_stat, regnm, tsuffix_fname)
+
+            # figure settings
+            figsize = (16, 10)
+            figshape = (2, 1)
+
+            ylabel = [f'{units}', 'Difference']
+            ylim = [None]*2
+            xlabel = ['']*2
+            xlim = [None]*2
+            xticks = None
+            xtlbls = None
+
+            rpl.figure_init(plottype='line')
+            fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
+                                            **line_grid)
+
+            axs = rpl.make_line_plot(lgrid, ydata=dlist, **line_sets)
+            [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(),
+                                                abs_colors)]
+            [ln.set_color(lc) for ln, lc in zip(list(axs[1].get_lines())[:-1],
+                                                rel_colors)]
+
+            # Trendlines
+            if moments_plot_conf['trendline']:
+                for ydata, lc in zip(dlist[0], abs_colors):
+                    z = np.polyfit(np.arange(len(ydata)), ydata, 1)
+                    p = np.poly1d(z)
+                    rpl.make_line_plot(
+                        [lgrid[0]], ydata=p(np.arange(len(ydata))), color='k',
+                        lw=2, alpha=.6)
+                    rpl.make_line_plot(
+                        [lgrid[0]], ydata=p(np.arange(len(ydata))), lw=0,
+                        marker='o', markersize=4.5, mec=lc, mfc=lc,
+                        markevery=2, alpha=1)
+            # Running mean
+            if moments_plot_conf['running mean']:
+                window = moments_plot_conf['running mean']
+                for ydata, lc in zip(dlist[0], abs_colors):
+                    rmn = run_mean(ydata, window, 'same')
+                    rpl.make_line_plot(
+                        [lgrid[0]], ydata=rmn, color='k', lw=2, alpha=.6)
+                    rpl.make_line_plot([lgrid[0]], ydata=rmn, lw=0, marker='o',
+                                       markersize=4, mec=lc, mfc=lc, alpha=1)
+
+            # Legend
+            legend_elements = [Line2D([0], [0], lw=3, color=c, label=l)
+                               for c, l in zip(abs_colors, lg_lbls[0])]
+            if moments_plot_conf['trendline']:
+                legend_elements = legend_elements + [
+                    Line2D([0], [0], lw=3, color='k', marker='o', mfc=c, mec=c,
+                           markersize=8, alpha=.6, label='lin. trend')
+                    for c, _ in zip(abs_colors, lg_lbls[0])]
+            if moments_plot_conf['running mean']:
+                legend_elements = legend_elements + [
+                    Line2D([0], [0], lw=3, color='k', marker='o', mfc=c, mec=c,
+                           markersize=8, alpha=.6,
+                           label=f'run. avg (window: {window})')
+                    for c, _ in zip(abs_colors, lg_lbls[0])]
+
+            axs[0].legend(handles=legend_elements, ncol=2, fontsize='large')
+            legend_elements = [Line2D([0], [0], lw=3, color=c, label=l)
+                               for c, l in zip(rel_colors, lg_lbls[1])]
+            axs[1].legend(handles=legend_elements, fontsize='large')
+
+            [rpl.axes_settings(ax, xlabel=xlabel[a], xticks=xticks,
+                               ylabel=ylabel[a], xtlabels=xtlbls,
+                               xlim=xlim[a], ylim=ylim[a])
+             for a, ax in enumerate(axs)]
+
+            ttl = fig.suptitle(headtitle, fontsize='xx-large')
+            ttl.set_position((.5, 1.03))
+
+            plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
+
+    elif type_of_plot == 'map':
+
+        # Obs data list
+        obslist = [obs] if not isinstance(obs, list) else obs
+
+        # Map settings
+        target_grid_names = list(grid_coords['target grid'][var]['lon'].keys())
+        tgname = target_grid_names[0]
+        domain_model = map_domain if map_domain else ref_model
+        domain = grid_coords['meta data'][var][domain_model]['domain']
+        mask = mask_region(
+            grid_coords['target grid'][var]['lon'][tgname],
+            grid_coords['target grid'][var]['lat'][tgname], domain)
+
+        # Data
+        fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_list)}
+        fmod_msk = {m: _mask_data(ds, var, mask) for m, ds in fmod.items()}
+        if 'time' in fmod_msk[ref_model].dims:
+            fmod_msk = {m: ds.mean('time') for m, ds in fmod_msk.items()}
+
+        if obslist[0] is not None:
             obslbl = "_".join(s for s in obslist)
-            fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
-                                                          fo_listr[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
-                       for o in obslist}
+            ref_obs = obslist[0]
+            fobs = {o: xa.open_dataset(f) for o, f in zip(obslist, fo_list)}
+            fobs_msk = {o: _mask_data(ds, var, mask)
+                        for o, ds in fobs.items()}
+            if 'time' in fobs_msk[ref_obs].dims:
+                fobs_msk = {o: ds.mean('time') for o, ds in fobs_msk.items()}
 
-            ts_len_all = ts_len_md + [arr.size for o, arr in obs_ann.items()]
-            assert len(set(ts_len_all)) == 1, err_len_msg
-
-            dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
-                     [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+            dlist = [fobs_msk[ref_obs][var].values] +\
+                    [fmod_msk[m][var].values - fobs_msk[ref_obs][var].values
+                     for m in models]
 
             if len(obslist) > 1:
-                dlist[0] += [obs_ann[o] for o in obslist[1:]]
-                dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
-                             for o in obslist[1:]]
-                ll_nms = models + obslist[1:]
+                dlist += [fobs_msk[o][var].values -
+                          fobs_msk[ref_obs][var].values for o in obslist[1:]]
+                ndata = nmod + len(obslist[1:])
+                ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                    [(f"{m} {time_suffix_dd[m]} -\n "
+                      f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                     for m in models + obslist[1:]]
             else:
-                ll_nms = models
-            lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
-                       ['{} - {}'.format(m.upper(), ref_obs) for m in ll_nms]]
+                ndata = nmod
+                ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                    [(f"{m} {time_suffix_dd[m]} -\n "
+                      f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                     for m in models]
         else:
-            dlist = [[mod_ann[m] for m in models],
-                     [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
-            lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
-                m.upper(), ref_mnme) for m in othr_mod]]
+            dlist = [fmod_msk[ref_model][var].values] +\
+                    [fmod_msk[m][var].values - fmod_msk[ref_model][var].values
+                     for m in othr_mod]
+            ndata = nmod-1
+            ftitles = [f"{ref_mnme} {time_suffix_dd[ref_model]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_mnme} {time_suffix_dd[ref_model]}")
+                 for m in othr_mod]
 
         tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_ll.sort()
         tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[1].split(':')[1].strip()
-        # season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-        # seas = season.replace(' ', '')
-        regnm = reg.replace(' ', '_')
-
-        if thr != 'None':
-            headtitle = '{} |  Threshold: {}\n{} | {}'.format(
-                var, thr, reg, tsuffix_fname)
-            if obs is not None:
-                fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}_{}.png'.\
-                        format(var, thr, tres, regnm, obslbl, tsuffix_fname)
-            else:
-                fn = 'timeseries_{}_thr{}{}_moment_{}_model_{}.png'.format(
-                    var, thr, tres, regnm, tsuffix_fname)
-        else:
-            headtitle = '{} |  {} | {}'.format(var, reg, tsuffix_fname)
-            if obs is not None:
-                fn = 'timeseries_{}{}_moment_{}_model_{}_{}.png'.format(
-                    var, tres, regnm, obslbl, tsuffix_fname)
-            else:
-                fn = 'timeseries_{}{}_moment_{}_model_{}.png'.format(
-                    var, tres, regnm, tsuffix_fname)
+        moment_stat = fmod[ref_model].attrs['Description'].split('|')[0].\
+            split(':')[1].replace(' ', '').lower()
 
         # figure settings
-        figsize = (16, 10)
-        figshape = (2, 1)
+        if ndata + 1 < 3:
+            figsize = (18, 12)
+        else:
+            figsize = (20, 10)
+        figshape = (1, ndata+1)
 
-        ylabel = [f'{units}', 'Difference']
-        ylim = [None]*2
-        xlabel = ['']*2
-        xlim = [None]*2
-        xticks = None
-        xtlbls = None
+        if var == 'pr':
+            cmap = [mpl.cm.YlGnBu] + [mpl.cm.BrBG]*ndata
+        else:
+            cmap = [mpl.cm.Spectral_r] + [mpl.cm.RdBu_r]*ndata
 
-        rpl.figure_init(plottype='line')
-        fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
-                                        **line_grid)
+        lts = grid_coords['target grid'][var]['lat'][tgname]
+        lns = grid_coords['target grid'][var]['lon'][tgname]
 
-        axs = rpl.make_line_plot(lgrid, ydata=dlist, **line_sets)
-        [ln.set_color(lc) for ln, lc in zip(axs[0].get_lines(), abs_colors)]
-        [ln.set_color(lc) for ln, lc in zip(list(axs[1].get_lines())[:-1],
-                                            rel_colors)]
+        if thr != 'None':
+            headtitle =\
+                    '{} [{}] | Stat: {} | Threshold: {} | {}'.\
+                    format(var, units, moment_stat, thr, tsuffix_fname)
+            if obs is not None:
+                fn = '{}_thr{}{}_map_stat_{}_model_{}_{}.png'.\
+                    format(var, thr, tres, moment_stat, obslbl, tsuffix_fname)
+            else:
+                fn = '{}_thr{}{}_map_stat_{}_model_{}.png'.\
+                    format(var, thr, tres, moment_stat, tsuffix_fname)
+        else:
+            headtitle = '{} [{}] | Stat: {} | {}'.format(
+                var, units, moment_stat, tsuffix_fname)
+            if obs is not None:
+                fn = '{}{}_map_stat_{}_model_{}_{}.png'.format(
+                    var, tres, moment_stat, obslbl, tsuffix_fname)
+            else:
+                fn = '{}{}_map_stat_{}_model_{}.png'.format(
+                    var, tres, moment_stat, tsuffix_fname)
 
-        # Trendlines
-        if moments_plot_conf['trendline']:
-            for ydata, lc in zip(dlist[0], abs_colors):
-                z = np.polyfit(np.arange(len(ydata)), ydata, 1)
-                p = np.poly1d(z)
-                rpl.make_line_plot([lgrid[0]], ydata=p(np.arange(len(ydata))),
-                                   color='k', lw=2, alpha=.6)
-                rpl.make_line_plot([lgrid[0]], ydata=p(np.arange(len(ydata))),
-                                   lw=0, marker='o', markersize=4.5, mec=lc,
-                                   mfc=lc, markevery=2, alpha=1)
-        # Running mean
-        if moments_plot_conf['running mean']:
-            window = moments_plot_conf['running mean']
-            for ydata, lc in zip(dlist[0], abs_colors):
-                rmn = run_mean(ydata, window, 'same')
-                rpl.make_line_plot(
-                    [lgrid[0]], ydata=rmn, color='k', lw=2, alpha=.6)
-                rpl.make_line_plot([lgrid[0]], ydata=rmn, lw=0, marker='o',
-                                   markersize=4, mec=lc, mfc=lc, alpha=1)
+        rpl.figure_init(plottype='map')
 
-        # Legend
-        legend_elements = [Line2D([0], [0], lw=3, color=c, label=l)
-                           for c, l in zip(abs_colors, lg_lbls[0])]
-        if moments_plot_conf['trendline']:
-            legend_elements = legend_elements + [
-                Line2D([0], [0], lw=3, color='k', marker='o', mfc=c, mec=c,
-                       markersize=8, alpha=.6, label='lin. trend')
-                for c, _ in zip(abs_colors, lg_lbls[0])]
-        if moments_plot_conf['running mean']:
-            legend_elements = legend_elements + [
-                Line2D([0], [0], lw=3, color='k', marker='o', mfc=c, mec=c,
-                       markersize=8, alpha=.6,
-                       label=f'run. avg (window: {window})')
-                for c, _ in zip(abs_colors, lg_lbls[0])]
+        # Create map object and axes grid
+        map_proj = rpl.define_map_object(map_projection, **map_config)
+        fig, axs_grid = rpl.map_setup(
+            map_proj, map_extent, figsize, figshape, grid_lines=map_gridlines,
+            **map_axes_conf)
 
-        axs[0].legend(handles=legend_elements, ncol=2, fontsize='large')
-        legend_elements = [Line2D([0], [0], lw=3, color=c, label=l)
-                           for c, l in zip(rel_colors, lg_lbls[1])]
-        axs[1].legend(handles=legend_elements, fontsize='large')
+        clevs_abs = get_clevs(np.array(dlist[0]), centered=False)
+        clevs_rel = get_clevs(np.array(dlist[1]), centered=True)
 
-        [rpl.axes_settings(ax, xlabel=xlabel[a], xticks=xticks,
-                           ylabel=ylabel[a], xtlabels=xtlbls,
-                           xlim=xlim[a], ylim=ylim[a])
-         for a, ax in enumerate(axs)]
+        fmt_abs = _get_colorbar_label_formatting(clevs_abs[::2])
+        fmt_rel = _get_colorbar_label_formatting(clevs_rel[::2])
 
-        ttl = fig.suptitle(headtitle, fontsize='xx-large')
-        ttl.set_position((.5, 1.03))
+        clevs = [clevs_abs] + [clevs_rel]*ndata
+        fmt = [fmt_abs] + [fmt_rel]*ndata
+
+        # Plot the maps
+        mp = rpl.make_map_plot(dlist, axs_grid, lts, lns, cmap=cmap,
+                               clevs=clevs, **map_plot_conf)
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
+
+        # Map settings
+        rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
+
+        [ax.text(0.5, 1.03, ft.upper(), size='large',
+                 va='center', ha='center', transform=ax.transAxes)
+         for ft, ax in zip(ftitles, axs_grid)]
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
@@ -1209,6 +1363,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                 m.upper(), ref_mnme) for m in othr_mod]]
 
         tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_ll.sort()
         tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[1].split(':')[1].strip()
@@ -1335,6 +1490,7 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                    for m in othr_mod]
 
     tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_ll.sort()
     tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
         split('|')[1].split(':')[1].strip()
@@ -1444,6 +1600,7 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
 
         ylabels = [units, '%']
         tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_ll.sort()
         tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         for ff, fctr in enumerate(factors):
             sc = 100 if fctr == 'FC' else 1
