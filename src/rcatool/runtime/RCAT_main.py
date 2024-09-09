@@ -15,7 +15,7 @@ from itertools import product
 import numpy as np
 import re
 from dask.distributed import Client
-from dask.diagnostics import ProgressBar
+# from dask.diagnostics import ProgressBar
 from rcatool.utils import ini_reader
 from rcatool.utils.polygons import mask_region
 import rcatool.runtime.RCAT_stats as st
@@ -35,9 +35,13 @@ def get_config_settings(config_file):
     settings_dict = {
         'models': conf_dict['MODELS'],
         'obs metadata file': conf_dict['OBS']['metadata file'],
-        'obs start year': conf_dict['OBS']['start year'],
-        'obs end year': conf_dict['OBS']['end year'],
-        'obs months': conf_dict['OBS']['months'],
+        'obs time dict': {
+            'start year': conf_dict['OBS']['start year'],
+            'end year': conf_dict['OBS']['end year'],
+            'months': conf_dict['OBS']['months'],
+            'date interval start': conf_dict['OBS']['date interval start'],
+            'date interval end': conf_dict['OBS']['date interval end']
+        },
         'variables': conf_dict['SETTINGS']['variables'],
         'var modification': conf_dict['SETTINGS']['variable modification'],
         'regions': conf_dict['SETTINGS']['regions'],
@@ -190,11 +194,17 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
 
     print("\t-- Opening {} files\n".format(model.upper()))
 
-    start_year = mconf['start year']
-    end_year = mconf['end year']
-    months = mconf['months']
-    date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
-        range(start_year, end_year+1), months)]
+    if mconf['date interval start'] is not None:
+        start_date = mconf['date interval start']
+        end_date = mconf['date interval end']
+        date_list = pd.date_range(start_date, end_date, freq='MS').strftime(
+            "%Y%m").tolist()
+    else:
+        start_year = mconf['start year']
+        end_year = mconf['end year']
+        months = mconf['months']
+        date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
+            range(start_year, end_year+1), months)]
 
     # Variable name in filename/file
     if varnames is not None:
@@ -236,7 +246,6 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     ch_x = mconf['chunks_x']
     ch_y = mconf['chunks_y']
 
-    # breakpoint()
     # -- Opening files (possibly with de-accumulation preprocessing)
     if deacc:
         _mdata = xa.open_mfdataset(
@@ -273,10 +282,14 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
                               "units in file cannot be treated, change if "
                               "possible"))
 
-    # Extract years
-    mdata = _mdata.where(((_mdata.time.dt.year >= start_year) &
-                          (_mdata.time.dt.year <= end_year) &
-                          (np.isin(_mdata.time.dt.month, months))), drop=True)
+    # Extract years and months
+    if mconf['date interval start'] is not None:
+        mdata = _mdata.sel(time=slice(start_date, end_date))
+    else:
+        mdata = _mdata.where(((_mdata.time.dt.year >= start_year) &
+                              (_mdata.time.dt.year <= end_year) &
+                              (np.isin(_mdata.time.dt.month, months))),
+                             drop=True)
 
     # Rename variable if not consistent with name in configuration file
     if varnames is not None:
@@ -332,15 +345,25 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     return model_data
 
 
-def get_obs_data(metadata_file, obs, var, factor,
-                 start_year, end_year, months):
+def get_obs_data(metadata_file, obs, var, factor, time_dict):
     """Open observation data"""
 
     from importlib.machinery import SourceFileLoader
     obs_meta = SourceFileLoader("obs_meta", metadata_file).load_module()
 
-    start_date = '{}{:02d}'.format(start_year, np.min(months))
-    end_date = '{}{:02d}'.format(end_year, np.max(months))
+    if time_dict['date interval start'] is not None:
+        start_date = time_dict['date interval start']
+        end_date = time_dict['date interval end']
+        date_list = pd.date_range(start_date, end_date, freq='MS').strftime(
+            "%Y%m").tolist()
+    else:
+        start_year = time_dict['start year']
+        end_year = time_dict['end year']
+        months = time_dict['months']
+        start_date = '{}{:02d}'.format(start_year, np.min(months))
+        end_date = '{}{:02d}'.format(end_year, np.max(months))
+        date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
+            range(start_year, end_year+1), months)]
 
     print("\t-- Opening {} files\n".format(obs.upper()))
 
@@ -354,8 +377,6 @@ def get_obs_data(metadata_file, obs, var, factor,
         sys.exit()
 
     # Extract dates from listed file names
-    date_list = ["{}{:02d}".format(yy, mm) for yy, mm in product(
-        range(start_year, end_year+1), months)]
     _file_dates = [re.split('-|_', f.rsplit('.')[-2])[-2:] for f in obs_flist]
     file_dates = [(d[0][:6], d[1][:6]) for d in _file_dates]
 
@@ -369,11 +390,14 @@ def get_obs_data(metadata_file, obs, var, factor,
         flist, parallel=True, data_vars='minimal', coords='minimal',
         combine='by_coords').unify_chunks()
 
-    # Extract years
-    obs_data = f_obs.where(((f_obs.time.dt.year >= start_year) &
-                            (f_obs.time.dt.year <= end_year) &
-                            (np.isin(f_obs.time.dt.month, months))),
-                           drop=True)
+    # Extract years and months
+    if time_dict['date interval start'] is not None:
+        obs_data = f_obs.sel(time=slice(start_date, end_date))
+    else:
+        obs_data = f_obs.where(((f_obs.time.dt.year >= start_year) &
+                                (f_obs.time.dt.year <= end_year) &
+                                (np.isin(f_obs.time.dt.month, months))),
+                               drop=True)
     # Scale data
     if factor is not None:
         obs_data[var] *= factor
@@ -815,8 +839,9 @@ def calculate_statistics(ddict, varlist, stat, pool, chunk_dim,
     return stats_data
 
 
-def get_month_string(list_of_months):
-    """Return month string"""
+def get_time_suffix_string(date_type, years=None, months=None,
+                           date_start=None, date_end=None):
+    """Return time suffix string"""
 
     month_dict = {
         1: 'J', 2: 'F', 3: 'M', 4: 'A', 5: 'M', 6: 'J', 7: 'J',
@@ -825,16 +850,24 @@ def get_month_string(list_of_months):
         1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
         7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
 
-    if len(list_of_months) == 12:
-        mstring = 'ANN'
-    elif len(list_of_months) == 1:
-        mstring = month_dict_l[list_of_months[0]]
-    else:
-        if list_of_months in ([1, 2, 12], (1, 2, 12)):
-            list_of_months = (12, 1, 2)
-        mstring = ''.join(month_dict[m] for m in list_of_months)
+    if date_type == 'years months':
+        if len(months) == 12:
+            mstring = 'ANN'
+        elif len(months) == 1:
+            mstring = month_dict_l[months[0]]
+        else:
+            if months in ([1, 2, 12], (1, 2, 12)):
+                months = (12, 1, 2)
+            mstring = ''.join(month_dict[m] for m in months)
 
-    return mstring
+        tsuffix_string = f'{years[0]}-{years[1]}_{mstring}'
+
+    elif date_type == 'date interval':
+        ds = date_start.replace('-', '')
+        de = date_end.replace('-', '')
+        tsuffix_string = f'{ds}-{de}'
+
+    return tsuffix_string
 
 
 def _get_freq(tf):
@@ -908,8 +941,8 @@ def _coords_in_ascending_order(ds, xd, xc, yd, yc):
     return ds
 
 
-def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
-                 tsuffix, stat_dict, tres, thr='', regs=None, fulldomain=True):
+def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
+                 tres, thr='', regs=None, fulldomain=True):
     """Saving data to netcdf files"""
 
     # Encoding for time variable. EDIT 240826: Often not applicable
@@ -929,24 +962,21 @@ def save_to_disk(data, label, stat, odir, var, grid, start_year, end_year,
         for r in regs:
             rn = r.replace(' ', '_')
             data['regions'][r].attrs['Analysed time'] =\
-                "{}-{} | {}".format(start_year, end_year, tsuffix)
-            fname = '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
-                label, stat_fn, var, thr, tres, tstat, rn, grid,
-                start_year, end_year, tsuffix)
+                f"{time_suffix.replace('_', ' ')}"
+            fname = '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
+                label, stat_fn, var, thr, tres, tstat, rn, grid, time_suffix)
             data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname))
         if fulldomain:
-            fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-                label, stat_fn, var, thr, tres, tstat, grid,
-                start_year, end_year, tsuffix)
-            data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(
-                start_year, end_year, tsuffix)
+            fname = '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
+                label, stat_fn, var, thr, tres, tstat, grid, time_suffix)
+            data['domain'].attrs['Analysed time'] =\
+                f"{time_suffix.replace('_', ' ')}"
             data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
     else:
-        fname = '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-            label, stat_fn, var, thr, tres, tstat, grid,
-            start_year, end_year, tsuffix)
-        data['domain'].attrs['Analysed time'] = "{}-{} | {}".format(
-            start_year, end_year, tsuffix)
+        fname = '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
+            label, stat_fn, var, thr, tres, tstat, grid, time_suffix)
+        data['domain'].attrs['Analysed time'] =\
+            f"{time_suffix.replace('_', ' ')}"
         data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
 
 
@@ -1086,7 +1116,7 @@ def get_time_resolution_string(resample, cdict, v, mod, obs):
     return tres_dd
 
 
-def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
+def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
                   img_outdir, stat_outdir, stat):
     """
     Create a dictionary with settings for a validation plot procedure.
@@ -1114,33 +1144,20 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
 
     # Create dictionaries with list of files for models and obs
     _fm_list = {stat: [glob.glob(os.path.join(
-        stat_outdir, '{}'.format(st), '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
-            m, stnm, var, thrstr, tres[m], tstat, grdnme, yrs_d[m][0],
-            yrs_d[m][1], get_month_string(mon_d[m])))) for m in models]}
+        stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
+            m, stnm, var, thrstr, tres[m], tstat, grdnme, tsuffix_dict[m])))
+        for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
 
     obs_list = [obs] if not isinstance(obs, list) else obs
     if obs is not None:
         _fo_list = {stat: [glob.glob(os.path.join(
-            stat_outdir, '{}'.format(st),
-            '{}_{}_{}_{}{}{}_{}_{}-{}_{}.nc'.format(
+            stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
                 o, stnm, var, thrstr, tres[o], tstat, grdnme,
-                yrs_d[o][0], yrs_d[o][1], get_month_string(mon_d[o]))))
-            for o in obs_list]}
+                tsuffix_dict[o]))) for o in obs_list]}
         fo_list = {s: [y for x in ll for y in x] for s, ll in _fo_list.items()}
     else:
         fo_list = {stat: None}
-
-    # Start and end years
-    start_year = np.unique([n['start year']
-                            for m, n in cdict['models'].items()])
-    end_year = np.unique([n['end year']
-                          for m, n in cdict['models'].items()])
-    if start_year.size > 1:
-        years = {'T1': (start_year[0], end_year[0]),
-                 'T2': (start_year[1], end_year[1])}
-    else:
-        years = (start_year[0], end_year[0])
 
     # Create a dictionary with settings for plotting procedure
     plot_dict = {
@@ -1163,7 +1180,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
         'line grid setup': cdict['line grid setup'],
         'line kwargs': cdict['line kwargs'],
         'regions': cdict['regions'],
-        'years': years,
+        'time suffix dict': tsuffix_dict,
         'img dir': os.path.join(img_outdir, st)
     }
 
@@ -1171,20 +1188,17 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, yrs_d, mon_d, tres,
     # Then also update plot dictionary
     if cdict['regions'] is not None:
         _fm_listr = {stat: {r:  [glob.glob(os.path.join(
-            stat_outdir, '{}'.format(st),
-            '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
+            stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
                 m, stnm, var, thrstr, tres[m], tstat, r.replace(' ', '_'),
-                grdnme, yrs_d[m][0], yrs_d[m][1], get_month_string(mon_d[m]))))
+                grdnme, tsuffix_dict[m])))
             for m in models] for r in cdict['regions']}}
         fm_listr = {s: {r: [y for x in _fm_listr[s][r] for y in x]
                         for r in _fm_listr[s]} for s in _fm_listr}
         if obs is not None:
             _fo_listr = {stat: {r: [glob.glob(os.path.join(
-                stat_outdir, '{}'.format(st),
-                '{}_{}_{}_{}{}{}_{}_{}_{}-{}_{}.nc'.format(
+                stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
                     o, stnm, var, thrstr, tres[o], tstat, r.replace(' ', '_'),
-                    grdnme, yrs_d[o][0], yrs_d[o][1],
-                    get_month_string(mon_d[o])))) for o in obs_list]
+                    grdnme, tsuffix_dict[o]))) for o in obs_list]
                 for r in cdict['regions']}}
             fo_listr = {s: {r: [y for x in _fo_listr[s][r] for y in x]
                             for r in _fo_listr[s]} for s in _fo_listr}
@@ -1252,8 +1266,7 @@ grid_coords = {}
 grid_coords['meta data'] = {}
 grid_coords['target grid'] = {}
 data_dict = {}
-month_dd = {}
-year_dd = {}
+time_suffix_dict = {}
 
 print("\n=== READ & PRE-PROCESS DATA ===")
 
@@ -1261,6 +1274,7 @@ for var in cdict['variables']:
     data_dict[var] = {}
     grid_coords['meta data'][var] = {}
     grid_coords['target grid'][var] = {}
+    time_suffix_dict[var] = {}
 
     var_conf = get_variable_config(cdict['variables'][var])
 
@@ -1310,17 +1324,36 @@ for var in cdict['variables']:
         for obsname, cfactor in zip(obs_list, obs_scale_factors):
             obs_data = get_obs_data(
                 obs_metadata_file, obsname, var, cfactor,
-                cdict['obs start year'], cdict['obs end year'],
-                cdict['obs months'])
+                cdict['obs time dict'])
             data_dict[var][obsname] = obs_data
 
-    month_dd[var] = {m: cdict['models'][m]['months'] for m in mod_names}
-    year_dd[var] = {m: (cdict['models'][m]['start year'],
-                        cdict['models'][m]['end year']) for m in mod_names}
-    if obs_list is not None:
-        month_dd[var].update({o: cdict['obs months'] for o in obs_list})
-        year_dd[var].update({o: (cdict['obs start year'],
-                                 cdict['obs end year']) for o in obs_list})
+    # Time period suffix
+    for m in mod_names:
+        if cdict['models'][m]['date interval start'] is not None:
+            time_suffix_dict[var][m] = get_time_suffix_string(
+                'date interval',
+                date_start=cdict['models'][m]['date interval start'],
+                date_end=cdict['models'][m]['date interval end'])
+        else:
+            time_suffix_dict[var][m] = get_time_suffix_string(
+                'years months',
+                years=(cdict['models'][m]['start year'],
+                       cdict['models'][m]['end year']),
+                months=cdict['models'][m]['months'])
+    if obs_names is not None:
+        if cdict['obs time dict']['date interval start'] is not None:
+            time_suffix_dict[var].update({o: get_time_suffix_string(
+                'date interval',
+                date_start=cdict['obs time dict']['date interval start'],
+                date_end=cdict['obs time dict']['date interval end'])
+                for o in obs_list})
+        else:
+            time_suffix_dict[var].update({o: get_time_suffix_string(
+                'years months',
+                years=(cdict['obs time dict']['start year'],
+                       cdict['obs time dict']['end year']),
+                months=cdict['obs time dict']['months'])
+                for o in obs_list})
 
     ##################################
     #  1B REMAP DATA TO COMMON GRID  #
@@ -1342,8 +1375,8 @@ if cdict['var modification'] is not None:
         # Change parameters and dictionaries accordingly
         cdict['variables'][new_var] = \
             cdict['variables'][nv_dict['input'][arglist[0]]]
-        month_dd[new_var] = month_dd[nv_dict['input'][arglist[0]]]
-        year_dd[new_var] = year_dd[nv_dict['input'][arglist[0]]]
+        time_suffix_dict[new_var] = time_suffix_dict[
+            nv_dict['input'][arglist[0]]]
         grid_coords['target grid'][new_var] =\
             grid_coords['target grid'][nv_dict['input'][arglist[0]]]
         grid_coords['meta data'][new_var] =\
@@ -1407,12 +1440,10 @@ for stat in cdict['stats_conf']:
 
         for m in stats_dict[stat][v]:
             print(f"\n\twriting {m.upper()} - {v} - {stat} to disk ...")
-            time_suffix = get_month_string(month_dd[v][m])
             save_to_disk(stats_dict[stat][v][m], m, stat, stat_outdir, v,
-                         gridname, year_dd[v][m][0], year_dd[v][m][1],
-                         time_suffix, cdict['stats_conf'][stat],
-                         tres_str[stat][v][m], thrstr, cdict['regions'],
-                         cdict['full domain'])
+                         gridname, time_suffix_dict[v][m],
+                         cdict['stats_conf'][stat], tres_str[stat][v][m],
+                         thrstr, cdict['regions'], cdict['full domain'])
 
 
 ###############################################
@@ -1427,9 +1458,9 @@ if cdict['validation plot']:
     statnames = list(stats_dict.keys())
     for sn in statnames:
         for v in stats_dict[sn]:
-            plot_dict = get_plot_dict(cdict, v, grid_coords, mod_names,
-                                      cdict['variables'][v]['obs'], year_dd[v],
-                                      month_dd[v], tres_str[sn][v], img_outdir,
-                                      stat_outdir, sn)
+            plot_dict = get_plot_dict(
+                cdict, v, grid_coords, mod_names, cdict['variables'][v]['obs'],
+                time_suffix_dict[v], tres_str[sn][v], img_outdir,
+                stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
             rplot.plot_main(plot_dict, sn)

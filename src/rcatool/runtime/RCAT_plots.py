@@ -17,7 +17,7 @@ set1 = mpl.cm.Set1.colors
 set1_m = [[int(255*x) for x in triplet] for triplet in set1]
 rel_colors = ['#{:02x}{:02x}{:02x}'.format(s[0], s[1], s[2]) for s in set1_m]
 abs_colors = rel_colors[:]
-abs_colors.insert(0, 'k')
+abs_colors.insert(-1, 'k')
 
 
 def plot_main(pltdict, statistic):
@@ -33,7 +33,7 @@ def plot_main(pltdict, statistic):
     tres = pdict['time res']
     tstat = pdict['stat method']
     units = pdict['units']
-    years = pdict['years']
+    time_suffix_dd = pdict['time suffix dict']
     regions = pdict['regions']
     img_dir = pdict['img dir']
 
@@ -60,17 +60,11 @@ def plot_main(pltdict, statistic):
         fm_listr = None
         fo_listr = None
 
-    if isinstance(years, dict):
-        ytitle = "{}-{} vs {}-{}".format(years['T1'][0], years['T1'][1],
-                                         years['T2'][0], years['T2'][1])
-    else:
-        ytitle = "{}-{}".format(years[0], years[1])
-
     _plots(statistic)(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
-                      ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                      img_dir, grid_coords, map_domain, map_projection,
-                      map_config, map_extent, map_gridlines, map_axes_conf,
-                      map_plot_conf, line_grid, line_sets)
+                      ref_model, obs, var, tres, tstat, units, time_suffix_dd,
+                      regions, img_dir, grid_coords, map_domain,
+                      map_projection, map_config, map_extent, map_gridlines,
+                      map_axes_conf, map_plot_conf, line_grid, line_sets)
 
 
 def _map_grid_setup(map_grid_set):
@@ -176,8 +170,23 @@ def get_clevs(data, centered=False):
     return clevs
 
 
+def _get_colorbar_label_formatting(clevs):
+    decimals = [str(x).split('.')[1] for x in clevs]
+    number_of_decimals = [len(x) for x in decimals]
+    max_decimals = int(np.max(number_of_decimals))
+    if max_decimals > 1:
+        fmt = "".join(['{:.', f'{max_decimals}', 'f}'])
+    elif max_decimals == 1:
+        if np.all([x == '0' for x in decimals]):
+            fmt = '{:.0f}'
+        else:
+            fmt = '{:.1f}'
+
+    return fmt
+
+
 def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
-               obs, var, tres, tstat, units, ytitle, regions, img_dir,
+               obs, var, tres, tstat, units, time_suffix_dd, regions, img_dir,
                grid_coords, map_domain, map_projection, map_config,
                map_extent, map_gridlines, map_axes_conf, map_plot_conf,
                line_grid, line_sets):
@@ -219,20 +228,26 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                       fobs_msk[ref_obs][var].values[i, :]
                       for o in obslist[1:] for i in range(4)]
             ndata = nmod + len(obslist[1:])
-            ftitles = [ref_obs] + ["{} - {}".format(m, ref_obs)
-                                   for m in models + obslist[1:]]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models + obslist[1:]]
         else:
             ndata = nmod
-            ftitles = [ref_obs] + ["{} - {}".format(m, ref_obs)
-                                   for m in models]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models]
     else:
         dlist = [fmod_msk[ref_model][var].values[i, :] for i in range(4)] +\
                 [fmod_msk[m][var].values[i, :] -
                  fmod_msk[ref_model][var].values[i, :]
                  for m in othr_mod for i in range(4)]
         ndata = nmod-1
-        ftitles = [ref_mnme] + ["{} - {}".format(m, ref_mnme)
-                                for m in othr_mod]
+        ftitles = [f"{ref_mnme} {time_suffix_dd[ref_model]}"] +\
+            [(f"{m} {time_suffix_dd[m]} -\n "
+              f"{ref_mnme} {time_suffix_dd[ref_model]}")
+             for m in othr_mod]
 
     # figure settings
     figshape = (ndata + 1, 4)
@@ -241,25 +256,27 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     else:
         figsize = (20, 9)
 
+    tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod_msk[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
     if thr != 'None':
-        headtitle = '{} [{}] | Threshold: {}\n{}'.format(
-            var, units, thr, ytitle)
+        headtitle = '{} [{}] | Threshold: {}'.format(
+            var, units, thr)
         if obs is not None:
             fn = '{}_thr{}{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
-                var, thr, tres, tstat, obslbl, ytitle.replace(' ', '_'))
+                var, thr, tres, tstat, obslbl, tsuffix_fname)
         else:
             fn = '{}_thr{}{}{}_map_seasonal_cycle_model_{}.png'.format(
-                var, thr, tres, tstat, ytitle.replace(' ', '_'))
+                var, thr, tres, tstat, tsuffix_fname)
     else:
-        headtitle = '{} [{}] | {}'.format(var, units, ytitle)
+        headtitle = '{} [{}]'.format(var, units)
         if obs is not None:
             fn = '{}{}{}_map_seasonal_cycle_model_{}_{}.png'.format(
-                var, tres, tstat, obslbl, ytitle.replace(' ', '_'))
+                var, tres, tstat, obslbl, tsuffix_fname)
         else:
             fn = '{}{}{}_map_seasonal_cycle_model_{}.png'.format(
-                var, tres, tstat, ytitle.replace(' ', '_'))
+                var, tres, tstat, tsuffix_fname)
 
     if var == 'pr':
         cmap = [mpl.cm.YlGnBu]*4 + [mpl.cm.BrBG]*ndata*4
@@ -300,7 +317,7 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                           time_mean='season')
 
     # Annotate
-    [ax.text(-0.05, 0.5, ft.upper(), va='center', ha='center',
+    [ax.text(-0.08, 0.5, ft.upper(), va='center', ha='center',
              rotation=90, transform=ax.transAxes)
      for ft, ax in zip(ftitles, [axs_grid[i]
                                  for i in [p*4 for p in range(ndata+1)]])]
@@ -309,10 +326,10 @@ def map_season(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
 
 def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
-                  ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                  img_dir, grid_coords, map_domain, map_projection, map_config,
-                  map_extent, map_gridlines, map_axes_conf, map_plot_conf,
-                  line_grid, line_sets):
+                  ref_model, obs, var, tres, tstat, units, time_suffix_dd,
+                  regions, img_dir, grid_coords, map_domain, map_projection,
+                  map_config, map_extent, map_gridlines, map_axes_conf,
+                  map_plot_conf, line_grid, line_sets):
     """
     Plotting annual cycle map plot
     """
@@ -351,21 +368,33 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                        fobs_msk[ref_obs][var].values[i, :]
                       for i in range(12)] for o in obslist[1:]]
             ndata = nmod + len(obslist[1:])
-            ftitles = [ref_obs] + ['{} - {}'.format(m.upper(), ref_obs)
-                                   for m in models + obslist[1:]]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models + obslist[1:]]
+            data_names = [ref_obs] + [f"{m}-{ref_obs}"
+                                      for m in models + obslist[1:]]
         else:
             ndata = nmod
-            ftitles = [ref_obs] + ['{} - {}'.format(m.upper(), ref_obs)
-                                   for m in models]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models]
+            data_names = [ref_obs] + [f"{m}-{ref_obs}" for m in models]
     else:
         dlist = [[fmod_msk[ref_model][var].values[i, :] for i in range(12)]] +\
                 [[fmod_msk[m][var].values[i, :] -
                  fmod_msk[ref_model][var].values[i, :] for i in range(12)]
                  for m in othr_mod]
         ndata = nmod-1
-        ftitles = [ref_mnme] + ['{} - {}'.format(m.upper(), ref_mnme)
-                                for m in othr_mod]
+        ftitles = [f"{ref_mnme} {time_suffix_dd[ref_model]}"] +\
+            [(f"{m} {time_suffix_dd[m]} -\n "
+              f"{ref_mnme} {time_suffix_dd[ref_model]}")
+             for m in othr_mod]
+        data_names = [ref_mnme] + [f"{m}-{ref_mnme}" for m in othr_mod]
 
+    tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod_msk[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
 
@@ -380,24 +409,23 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
     clevs_abs = get_clevs(np.array(dlist[0]), centered=False)
     clevs_rel = get_clevs(np.array(dlist[1]), centered=True)
-    clevs = [clevs_abs]*1 + [clevs_rel]*ndata
+    clevs = [clevs_abs] + [clevs_rel]*ndata
 
     lts = grid_coords['target grid'][var]['lat'][tgname]
     lns = grid_coords['target grid'][var]['lon'][tgname]
 
     # Loop over data sets
-    for p in range(ndata + 1):
-        data_name = ftitles[p].replace(' ', '')
+    for p, data_name in zip(range(ndata + 1), data_names):
         if thr != 'None':
-            headtitle = '{} | {} [{}] | Threshold: {}\n{}'.format(
-                ftitles[p], var, units, thr, ytitle)
+            headtitle = '{} | {} [{}] | Threshold: {}'.format(
+                ftitles[p], var, units, thr)
             fn = '{}_thr{}{}{}_map_ann_cycle_{}_{}.png'.format(
-                var, thr, tres, tstat, data_name, ytitle.replace(' ', '_'))
+                var, thr, tres, tstat, data_name, tsuffix_fname)
         else:
-            headtitle = '{} | {} [{}] | {}'.format(
-                ftitles[p], var, units, ytitle)
+            headtitle = '{} | {} [{}]'.format(
+                ftitles[p], var, units)
             fn = '{}{}{}_map_ann_cycle_{}_{}.png'.format(
-                var, tres, tstat, data_name, ytitle.replace(' ', '_'))
+                var, tres, tstat, data_name, tsuffix_fname)
 
         rpl.figure_init(plottype='map')
 
@@ -429,12 +457,12 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     # Line plot annual cycle
     if fm_listr is not None:
         line_ann_cycle(fm_listr, fo_listr, models, nmod, ref_model, obs, var,
-                       tres, tstat, units, ytitle, regions, img_dir, line_grid,
-                       line_sets)
+                       tres, tstat, units, time_suffix_dd, regions, img_dir,
+                       line_grid, line_sets)
 
 
 def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
-                   tstat, units, ytitle, regions, img_dir, line_grid,
+                   tstat, units, time_suffix_dd, regions, img_dir, line_grid,
                    line_sets):
     """
     Plotting annual cycle line plot
@@ -475,30 +503,29 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
             lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                 m.upper(), ref_mnme) for m in othr_mod]]
 
+        tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[2].split(':')[1].strip()
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
-            headtitle = '{} | Threshold: {}\n{} {}'.format(
-                var, thr, reg, ytitle)
+            headtitle = '{} | Threshold: {} | {}'.format(var, thr, reg)
             if obs is not None:
                 fn = '{}_thr{}{}{}_lnplot_ann_cycle_{}_model_{}_{}.png'.\
                     format(var, thr, tres, tstat, regnm, obslbl,
-                           ytitle.replace(' ', '_'))
+                           tsuffix_fname)
             else:
                 fn = '{}_thr{}{}{}_lnplot_ann_cycle_{}_model_{}.png'.\
-                    format(var, thr, tres, tstat, regnm,
-                           ytitle.replace(' ', '_'))
+                    format(var, thr, tres, tstat, regnm, tsuffix_fname)
         else:
-            headtitle = '{} | {} {}'.format(var, reg, ytitle)
+            headtitle = '{} | {}'.format(var, reg)
             if obs is not None:
                 fn = '{}{}{}_lnplot_ann_cycle_{}_model_{}_{}.png'.\
-                    format(var, tres, tstat, regnm, obslbl,
-                           ytitle.replace(' ', '_'))
+                    format(var, tres, tstat, regnm, obslbl, tsuffix_fname)
             else:
                 fn = '{}{}{}_lnplot_ann_cycle_{}_model_{}.png'.\
-                    format(var, tres, tstat, regnm, ytitle.replace(' ', '_'))
+                    format(var, tres, tstat, regnm, tsuffix_fname)
 
         # figure settings
         figsize = (16, 7)
@@ -540,7 +567,7 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
 
 
 def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
-              ref_model, obs, var, tres, tstat, units, ytitle, regions,
+              ref_model, obs, var, tres, tstat, units, time_suffix_dd, regions,
               img_dir, grid_coords, map_domain, map_projection, map_config,
               map_extent, map_gridlines, map_axes_conf, map_plot_conf,
               line_grid, line_sets):
@@ -587,27 +614,39 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                              fobs_msk[ref_obs][var].values[i, :]
                              for o in obslist[1:]]
             ndata = nmod + len(obslist[1:])
-            ftitles = [ref_obs] + ['{} - {}'.format(m.upper(), ref_obs)
-                                   for m in models + obslist[1:]]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models + obslist[1:]]
         else:
             ndata = nmod
-            ftitles = [ref_obs] + ['{} - {}'.format(m.upper(), ref_obs)
-                                   for m in models]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models]
     else:
         dlist = [[fmod_msk[ref_model][var].values[i, :]] +
                  [fmod_msk[m][var].values[i, :] -
                   fmod_msk[ref_model][var].values[i, :]
                   for m in othr_mod] for i in range(npctl)]
         ndata = nmod-1
-        ftitles = [ref_mnme] + ['{} - {}'.format(m.upper(), ref_mnme)
-                                for m in othr_mod]
+        ftitles = [f"{ref_mnme} {time_suffix_dd[ref_model]}"] +\
+            [(f"{m} {time_suffix_dd[m]} -\n "
+              f"{ref_mnme} {time_suffix_dd[ref_model]}")
+             for m in othr_mod]
+
+    tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
         split('|')[2].split(':')[1].strip()
-    season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-    seas = season.replace(' ', '')
+    # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
+    # seas = season.replace(' ', '')
 
     # figure settings
-    figsize = (20, 10)
+    if ndata + 1 < 3:
+        figsize = (18, 12)
+    else:
+        figsize = (20, 10)
     figshape = (1, ndata+1)
 
     if var == 'pr':
@@ -622,26 +661,24 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     for p in range(npctl):
         if thr != 'None':
             headtitle =\
-                    '{} [{}] | p{} | Threshold: {} | {} {}'.\
-                    format(var, units, pctls[p], thr, seas, ytitle)
+                    '{} [{}] | p{} | Threshold: {} | {}'.\
+                    format(var, units, pctls[p], thr, tsuffix_fname)
             if obs is not None:
-                fn = '{}_thr{}{}_map_percentile_p{}_model_{}_{}_{}.png'.\
-                    format(var, thr, tres, pctls[p], obslbl,
-                           ytitle.replace(' ', '_'), seas)
-            else:
                 fn = '{}_thr{}{}_map_percentile_p{}_model_{}_{}.png'.\
-                    format(var, thr, tres, pctls[p],
-                           ytitle.replace(' ', '_'), seas)
-        else:
-            headtitle = '{} [{}] | p{} | {} {}'.format(
-                var, units, pctls[p], seas, ytitle)
-            if obs is not None:
-                fn = '{}{}_map_percentile_p{}_model_{}_{}_{}.png'.format(
-                    var, tres, pctls[p], obslbl, ytitle.replace(' ', '_'),
-                    seas)
+                    format(var, thr, tres, pctls[p], obslbl,
+                           tsuffix_fname)
             else:
+                fn = '{}_thr{}{}_map_percentile_p{}_model_{}.png'.\
+                    format(var, thr, tres, pctls[p], tsuffix_fname)
+        else:
+            headtitle = '{} [{}] | p{} | {}'.format(var, units, pctls[p],
+                                                    tsuffix_fname)
+            if obs is not None:
                 fn = '{}{}_map_percentile_p{}_model_{}_{}.png'.format(
-                    var, tres, pctls[p], ytitle.replace(' ', '_'), seas)
+                    var, tres, pctls[p], obslbl, tsuffix_fname)
+            else:
+                fn = '{}{}_map_percentile_p{}_model_{}.png'.format(
+                    var, tres, pctls[p], tsuffix_fname)
 
         rpl.figure_init(plottype='map')
 
@@ -653,28 +690,34 @@ def map_pctls(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
         clevs_abs = get_clevs(np.array(dlist[p][0]), centered=False)
         clevs_rel = get_clevs(np.array(dlist[p][1]), centered=True)
+
+        fmt_abs = _get_colorbar_label_formatting(clevs_abs[::2])
+        fmt_rel = _get_colorbar_label_formatting(clevs_rel[::2])
+
         clevs = [clevs_abs] + [clevs_rel]*ndata
+        fmt = [fmt_abs] + [fmt_rel]*ndata
 
         # Plot the maps
         mp = rpl.make_map_plot(
             dlist[p], axs_grid, lts, lns, cmap=cmap, clevs=clevs,
             **map_plot_conf)
-        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter='{:.1f}')
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
 
         # Map settings
         rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
 
-        [ax.text(0.5, 1.04, ft.upper(), size=21, va='center', ha='center',
-                 transform=ax.transAxes) for ft, ax in zip(ftitles, axs_grid)]
+        [ax.text(0.5, 1.07, ft.upper(), size='x-large',
+                 va='center', ha='center', transform=ax.transAxes)
+         for ft, ax in zip(ftitles, axs_grid)]
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
 
 def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
-                      ref_model, obs, var, tres, tstat, units, ytitle, regions,
-                      img_dir, grid_coords, map_domain, map_projection,
-                      map_config, map_extent, map_gridlines, map_axes_conf,
-                      map_plot_conf, line_grid, line_sets):
+                      ref_model, obs, var, tres, tstat, units, time_suffix_dd,
+                      regions, img_dir, grid_coords, map_domain,
+                      map_projection, map_config, map_extent, map_gridlines,
+                      map_axes_conf, map_plot_conf, line_grid, line_sets):
     """
     Plotting diurnal cycle map plot
     """
@@ -720,12 +763,19 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                        fobs_msk[ref_obs][var].values[i, :]
                        for i in range(nhour)] for o in obslist[1:]]
             ndata = nmod + len(obslist[1:])
-            ftitles = [ref_obs] + ['{} - {}'.format(m.upper(), ref_obs)
-                                   for m in models + obslist[1:]]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models + obslist[1:]]
+            data_names = [ref_obs] + [f"{m}-{ref_obs}"
+                                      for m in models + obslist[1:]]
         else:
             ndata = nmod
-            ftitles = [ref_obs] + ['{} - {}'.format(m.upper(), ref_obs)
-                                   for m in models]
+            ftitles = [f"{ref_obs} {time_suffix_dd[ref_obs]}"] +\
+                [(f"{m} {time_suffix_dd[m]} -\n "
+                  f"{ref_obs} {time_suffix_dd[ref_obs]}")
+                 for m in models]
+            data_names = [ref_obs] + [f"{m}-{ref_obs}" for m in models]
     else:
         dlist = [[fmod_msk[ref_model][var].values[i, :]
                   for i in range(nhour)]] +\
@@ -733,8 +783,10 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                   fmod_msk[ref_model][var].values[i, :]
                   for i in range(nhour)] for m in othr_mod]
         ndata = nmod-1
-        ftitles = [ref_mnme] + ['{} - {}'.format(m.upper(), ref_mnme)
+        ftitles = [ref_mnme] + [(f"{m} {time_suffix_dd[m]} -\n "
+                                 f"{ref_mnme} {time_suffix_dd[ref_model]}")
                                 for m in othr_mod]
+        data_names = [ref_mnme] + [f"{m}-{ref_mnme}" for m in othr_mod]
 
     dcycle_stat = fmod[ref_model].attrs['Description'].\
         split('|')[1].strip()
@@ -748,10 +800,12 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         print("\n\tUnknown diurnal cycle statistic, exiting...")
         sys.exit()
 
+    tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
         split('|')[3].split(':')[1].strip()
-    season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-    seas = season.replace(' ', '')
+    # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
+    # seas = season.replace(' ', '')
 
     # figure settings
     figsize = (22, 14)
@@ -770,20 +824,17 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     lns = grid_coords['target grid'][var]['lon'][tgname]
 
     # Loop over data sets
-    for p in range(ndata + 1):
-        data_name = ftitles[p].replace(' ', '')
+    for p, data_name in zip(range(ndata + 1), data_names):
         if thr != 'None':
-            headtitle = '{} | {} [{}] | Threshold: {}\n{} | {}'.format(
-                ftitles[p], var, dc_units, thr, ytitle, seas)
-            fn = '{}_thr{}{}{}_map_diurnal_cycle_{}_{}_{}_{}.png'.format(
-                var, thr, tres, tstat, fn_prfx, data_name,
-                ytitle.replace(' ', '_'), seas)
+            headtitle = '{} | {} [{}] | Threshold: {} | {}'.format(
+                ftitles[p], var, dc_units, thr, tsuffix_fname)
+            fn = '{}_thr{}{}{}_map_diurnal_cycle_{}_{}_{}.png'.format(
+                var, thr, tres, tstat, fn_prfx, data_name, tsuffix_fname)
         else:
-            headtitle = '{} | {} [{}] | {} | {}'.format(
-                ftitles[p], var, dc_units, ytitle, seas)
-            fn = '{}{}{}_map_diurnal_cycle_{}_{}_{}_{}.png'.format(
-                var, tres, tstat, fn_prfx, data_name,
-                ytitle.replace(' ', '_'), seas)
+            headtitle = '{} | {} [{}] | {}'.format(
+                ftitles[p], var, dc_units, tsuffix_fname)
+            fn = '{}{}{}_map_diurnal_cycle_{}_{}_{}.png'.format(
+                var, tres, tstat, fn_prfx, data_name, tsuffix_fname)
 
         rpl.figure_init(plottype='map')
 
@@ -814,13 +865,13 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
     # Line plot diurnal cycle
     if fm_listr is not None:
         line_diurnal_cycle(fm_listr, fo_listr, models, nmod, ref_model, obs,
-                           var, tres, tstat, dc_units, ytitle, regions,
+                           var, tres, tstat, dc_units, time_suffix_dd, regions,
                            img_dir, line_grid, line_sets)
 
 
 def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
-                       tres, tstat, units, ytitle, regions, img_dir, line_grid,
-                       line_sets):
+                       tres, tstat, units, time_suffix_dd, regions, img_dir,
+                       line_grid, line_sets):
     """
     Plotting annual cycle line plot
     """
@@ -874,36 +925,36 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             print("\n\tUnknown diurnal cycle statistic, exiting...")
             sys.exit()
 
+        tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[3].split(':')[1].strip()
-        season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-        seas = season.replace(' ', '')
+        # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
+        # seas = season.replace(' ', '')
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
-            headtitle = '{} ({}) |  Threshold: {}\n{} | {} | {}'.format(
-                var, dcycle_stat, thr, reg, ytitle, seas)
+            headtitle = '{} ({}) |  Threshold: {}\n{} | {}'.format(
+                var, dcycle_stat, thr, reg, tsuffix_fname)
             if obs is not None:
-                fn = ("{}_thr{}{}{}_lnplot_diurnal_cycle_{}_{}_model_"
-                      "{}_{}_{}.png").format(
-                          var, thr, tres, tstat, fn_prfx, regnm, obslbl,
-                          ytitle.replace(' ', '_'), seas)
-            else:
                 fn = ("{}_thr{}{}{}_lnplot_diurnal_cycle_{}_{}_model_"
                       "{}_{}.png").format(
-                          var, thr, tres, tstat, fn_prfx, regnm,
-                          ytitle.replace(' ', '_'), seas)
-        else:
-            headtitle = '{} ({}) |  {} | {} | {}'.format(var, dcycle_stat,
-                                                         reg, ytitle, seas)
-            if obs is not None:
-                fn = '{}{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}_{}.png'.\
-                    format(var, tres, tstat, fn_prfx, regnm, obslbl,
-                           ytitle.replace(' ', '_'), seas)
+                          var, thr, tres, tstat, fn_prfx, regnm, obslbl,
+                          tsuffix_fname)
             else:
+                fn = ("{}_thr{}{}{}_lnplot_diurnal_cycle_{}_{}_model_"
+                      "{}.png").format(var, thr, tres, tstat, fn_prfx,
+                                       regnm, tsuffix_fname)
+        else:
+            headtitle = '{} ({}) |  {} | {}'.format(var, dcycle_stat,
+                                                    reg, tsuffix_fname)
+            if obs is not None:
                 fn = '{}{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}.png'.\
-                    format(var, tres, tstat, fn_prfx, regnm,
-                           ytitle.replace(' ', '_'), seas)
+                    format(var, tres, tstat, fn_prfx, regnm, obslbl,
+                           tsuffix_fname)
+            else:
+                fn = '{}{}{}_lnplot_diurnal_cycle_{}_{}_model_{}.png'.\
+                    format(var, tres, tstat, fn_prfx, regnm, tsuffix_fname)
 
         # figure settings
         figsize = (14, 12)
@@ -949,7 +1000,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
 
 
 def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
-             obs, var, tres, tstat, units, ytitle, regions, img_dir,
+             obs, var, tres, tstat, units, time_suffix_dd, regions, img_dir,
              grid_coords, map_domain, map_conf, map_grid, map_sets, line_grid,
              line_sets):
     """
@@ -994,30 +1045,31 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                 m.upper(), ref_mnme) for m in othr_mod]]
 
+        tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         thr = fmod[ref_model].attrs['Description'].\
             split('|')[1].split(':')[1].strip()
-        season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-        seas = season.replace(' ', '')
+        # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
+        # seas = season.replace(' ', '')
         regnm = reg.replace(' ', '_')
 
         if thr != 'None':
-            headtitle = '{} |  Threshold: {}\n{} | {} | {}'.format(
-                var, thr, reg, ytitle, seas)
+            headtitle = '{} |  Threshold: {}\n{} | {}'.format(
+                var, thr, reg, tsuffix_fname)
             if obs is not None:
-                fn = '{}_thr{}{}_pdf_{}_model_{}_{}_{}.png'.format(
-                    var, thr, tres, regnm, obslbl,
-                    ytitle.replace(' ', '_'), seas)
-            else:
                 fn = '{}_thr{}{}_pdf_{}_model_{}_{}.png'.format(
-                    var, thr, tres, regnm, ytitle.replace(' ', '_'), seas)
-        else:
-            headtitle = '{} |  {} | {} | {}'.format(var, reg, ytitle, seas)
-            if obs is not None:
-                fn = '{}{}_pdf_{}_model_{}_{}_{}.png'.format(
-                    var, tres, regnm, obslbl, ytitle.replace(' ', '_'), seas)
+                    var, thr, tres, regnm, obslbl, tsuffix_fname)
             else:
+                fn = '{}_thr{}{}_pdf_{}_model_{}.png'.format(
+                    var, thr, tres, regnm, tsuffix_fname)
+        else:
+            headtitle = '{} |  {} | {}'.format(var, reg, tsuffix_fname)
+            if obs is not None:
                 fn = '{}{}_pdf_{}_model_{}_{}.png'.format(
-                    var, tres, regnm, ytitle.replace(' ', '_'), seas)
+                    var, tres, regnm, obslbl, tsuffix_fname)
+            else:
+                fn = '{}{}_pdf_{}_model_{}.png'.format(
+                    var, tres, regnm, tsuffix_fname)
 
         # figure settings
         figsize = (23, 7)
@@ -1062,7 +1114,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
 
 
 def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
-             obs, var, tres, tstat, units, ytitle, regions, img_dir,
+             obs, var, tres, tstat, units, time_suffix_dd, regions, img_dir,
              grid_coords, map_domain, map_projection, map_config,
              map_extent, map_gridlines, map_axes_conf, map_plot_conf,
              line_grid, line_sets):
@@ -1100,11 +1152,13 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                         fobs[ref_obs][var].values[1, :]), axis=0)
                       for o in obslist[1:]]
             ndata = nmod + len(obslist[1:])
-            ftitles = ['{} - {}'.format(m.upper(), ref_obs)
+            ftitles = [(f"{m} {time_suffix_dd[m]} -\n "
+                        f"{ref_obs} {time_suffix_dd[ref_obs]}")
                        for m in models + obslist[1:]]
         else:
             ndata = nmod
-            ftitles = ['{} - {}'.format(m.upper(), ref_obs)
+            ftitles = [(f"{m} {time_suffix_dd[m]} -\n "
+                        f"{ref_obs} {time_suffix_dd[ref_obs]}")
                        for m in models]
     else:
         FCI = {m: np.nansum(
@@ -1113,34 +1167,37 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                for m in othr_mod}
         dlist = [FCI[m] for m in othr_mod]
         ndata = nmod-1
-        ftitles = ['{} - {}'.format(m.upper(), ref_mnme) for m in othr_mod]
+        ftitles = [(f"{m} {time_suffix_dd[m]} -\n "
+                    f"{ref_mnme} {time_suffix_dd[ref_model]}")
+                   for m in othr_mod]
 
+    tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+    tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
         split('|')[1].split(':')[1].strip()
-    season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-    seas = season.replace(' ', '')
+    # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
+    # seas = season.replace(' ', '')
 
     # figure settings
     figsize = (20, 8)
     figshape = (1, ndata)
 
     if thr != 'None':
-        headtitle = 'ASoP FC Index | Thr: {}\n{} | {}'.format(
-            thr, ytitle, seas)
+        headtitle = 'ASoP FC Index | Thr: {} | {}'.format(
+            thr, tsuffix_fname)
         if obs is not None:
-            fn = 'asop_FC_thr{}{}_map_model_{}_{}_{}.png'.\
-                format(thr, tres, obslbl, ytitle.replace(' ', '_'), seas)
-        else:
             fn = 'asop_FC_thr{}{}_map_model_{}_{}.png'.\
-                format(thr, tres, ytitle.replace(' ', '_'), seas)
-    else:
-        headtitle = 'ASoP FC Index | {} | {}'.format(ytitle, seas)
-        if obs is not None:
-            fn = 'asop_FC{}_map_model_{}_{}_{}.png'.\
-                format(tres, obslbl, ytitle.replace(' ', '_'), seas)
+                format(thr, tres, obslbl, tsuffix_fname)
         else:
+            fn = 'asop_FC_thr{}{}_map_model_{}.png'.format(
+                thr, tres, tsuffix_fname)
+    else:
+        headtitle = 'ASoP FC Index | {}'.format(tsuffix_fname)
+        if obs is not None:
             fn = 'asop_FC{}_map_model_{}_{}.png'.\
-                format(tres, ytitle.replace(' ', '_'), seas)
+                format(tres, obslbl, tsuffix_fname)
+        else:
+            fn = 'asop_FC{}_map_model_{}.png'.format(tres, tsuffix_fname)
 
     rpl.figure_init(plottype='map')
 
@@ -1164,7 +1221,7 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Map settings
     rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
 
-    [ax.text(0.5, 1.02, ft.upper(), size=21, va='center', ha='center',
+    [ax.text(0.5, 1.05, ft.upper(), size=21, va='center', ha='center',
              transform=ax.transAxes) for ft, ax in zip(ftitles, axs_grid)]
 
     plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
@@ -1172,12 +1229,13 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Line plot asop
     if fm_listr is not None:
         line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
-                  tstat, units, ytitle, regions, img_dir, line_grid,
+                  tstat, units, time_suffix_dd, regions, img_dir, line_grid,
                   line_sets)
 
 
 def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
-              tstat, units, ytitle, regions, img_dir, line_grid, line_sets):
+              tstat, units, time_suffix_dd, regions, img_dir, line_grid,
+              line_sets):
     """
     Plotting ASoP line plot of C and FC factors
     """
@@ -1222,6 +1280,8 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
                 m.upper(), ref_mnme) for m in othr_mod]]
 
         ylabels = [units, '%']
+        tsuffix_ll = [val for key, val in time_suffix_dd.items()]
+        tsuffix_fname = "_vs_".join(set(tsuffix_ll))
         for ff, fctr in enumerate(factors):
             sc = 100 if fctr == 'FC' else 1
             dlist_ff = [[arr[ff, :]*sc for arr in dlist[0]],
@@ -1230,31 +1290,28 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
 
             thr = fmod[ref_model].attrs['Description'].\
                 split('|')[1].split(':')[1].strip()
-            season = fmod[ref_model].attrs['Analysed time'].split('|')[1]
-            seas = season.replace(' ', '')
+            # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
+            # seas = season.replace(' ', '')
             regnm = reg.replace(' ', '_')
 
             if thr != 'None':
-                headtitle = 'ASoP ({}) |  Thr: {}\n{} | {} | {}'.format(
-                    fctr, thr, reg, ytitle, seas)
+                headtitle = 'ASoP ({}) |  Thr: {}\n{} | {}'.format(
+                    fctr, thr, reg, tsuffix_fname)
                 if obs is not None:
-                    fn = '{}_thr{}{}_asop_{}_{}_model_{}_{}_{}.png'.format(
-                        var, thr, tres, fctr, regnm, obslbl,
-                        ytitle.replace(' ', '_'), seas)
-                else:
                     fn = '{}_thr{}{}_asop_{}_{}_model_{}_{}.png'.format(
-                        var, thr, tres, fctr, regnm,
-                        ytitle.replace(' ', '_'), seas)
-            else:
-                headtitle = 'ASoP ({}) |  {} | {} | {}'.format(
-                    fctr, reg, ytitle, seas)
-                if obs is not None:
-                    fn = '{}{}_asop_{}_{}_model_{}_{}_{}.png'.format(
-                        var, tres, fctr, regnm, obslbl,
-                        ytitle.replace(' ', '_'), seas)
+                        var, thr, tres, fctr, regnm, obslbl, tsuffix_fname)
                 else:
+                    fn = '{}_thr{}{}_asop_{}_{}_model_{}.png'.format(
+                        var, thr, tres, fctr, regnm, tsuffix_fname)
+            else:
+                headtitle = 'ASoP ({}) |  {} | {}'.format(
+                    fctr, reg, tsuffix_fname)
+                if obs is not None:
                     fn = '{}{}_asop_{}_{}_model_{}_{}.png'.format(
-                        var, tres, fctr, regnm, ytitle.replace(' ', '_'), seas)
+                        var, tres, fctr, regnm, obslbl, tsuffix_fname)
+                else:
+                    fn = '{}{}_asop_{}_{}_model_{}.png'.format(
+                        var, tres, fctr, regnm, tsuffix_fname)
 
             # figure settings
             figsize = (13, 10)

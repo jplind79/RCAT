@@ -86,9 +86,9 @@ def fnCellCorners(rgrLon, rgrLat):
         rgrLon = np.broadcast_to(rgrLon, (rgLatSize[0], rgLonSize[0]))
     rgiSize = np.array(rgrLon).shape
     rgrLonBND = np.empty((rgiSize[0]+1, rgiSize[1]+1,))
-    rgrLonBND[:] = np.NAN
+    rgrLonBND[:] = np.nan
     rgrLatBND = np.empty((rgiSize[0]+1, rgiSize[1]+1,))
-    rgrLatBND[:] = np.NAN
+    rgrLatBND[:] = np.nan
 
     for lo in range(rgiSize[0]+1):
         for la in range(rgiSize[1]+1):
