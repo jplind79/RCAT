@@ -2,9 +2,9 @@
 # coding: utf-8
 
 # Modules
+import warnings
 import sys
 import os
-import warnings
 import glob
 import xarray as xa
 import xesmf as xe
@@ -14,6 +14,7 @@ import datetime as dt
 from itertools import product
 import numpy as np
 import re
+import dask
 from dask.distributed import Client
 # from dask.diagnostics import ProgressBar
 from rcatool.utils import ini_reader
@@ -21,9 +22,7 @@ from rcatool.utils.polygons import mask_region
 import rcatool.runtime.RCAT_stats as st
 import rcatool.utils.grids as gr
 
-import dask
 dask.config.set(scheduler="single-threaded")
-
 warnings.filterwarnings("ignore")
 
 
@@ -49,6 +48,7 @@ def get_config_settings(config_file):
         'requested_stats': conf_dict['STATISTICS']['stats'],
         'stats_conf': st.mod_stats_config(conf_dict['STATISTICS']['stats']),
         'validation plot': conf_dict['PLOTTING']['validation plot'],
+        'moments plot config': conf_dict['PLOTTING']['moments plot config'],
         'map projection': conf_dict['PLOTTING']['map projection'],
         'map extent': conf_dict['PLOTTING']['map extent'],
         'map gridlines': conf_dict['PLOTTING']['map gridlines'],
@@ -1170,6 +1170,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
         'stat method': tstat,
         'units': vconf['units'],
         'grid coords': grid_coords,
+        'moments plot config': cdict['moments plot config'],
         'map projection': cdict['map projection'],
         'map extent': cdict['map extent'],
         'map gridlines': cdict['map gridlines'],
