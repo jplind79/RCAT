@@ -488,22 +488,22 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
     for reg in regions:
 
         fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_list[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
-                   for m in models}
+        mod_data = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
+                    for m in models}
         if obs is not None:
             obslist = [obs] if not isinstance(obs, list) else obs
             ref_obs = obslist[0]
             obslbl = "_".join(s for s in obslist)
             fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                           fo_list[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
-                       for o in obslist}
-            dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
-                     [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+            obs_data = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
+                        for o in obslist}
+            dlist = [[obs_data[ref_obs]] + [mod_data[m] for m in models],
+                     [mod_data[m] - obs_data[ref_obs] for m in models]]
 
             if len(obslist) > 1:
-                dlist[0] += [obs_ann[o] for o in obslist[1:]]
-                dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                dlist[0] += [obs_data[o] for o in obslist[1:]]
+                dlist[1] += [obs_data[o] - obs_data[ref_obs]
                              for o in obslist[1:]]
                 ll_nms = models + obslist[1:]
             else:
@@ -511,8 +511,8 @@ def line_ann_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var, tres,
             lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
                        ['{} - {}'.format(m.upper(), ref_obs) for m in ll_nms]]
         else:
-            dlist = [[mod_ann[m] for m in models],
-                     [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+            dlist = [[mod_data[m] for m in models],
+                     [mod_data[m] - mod_data[ref_model] for m in othr_mod]]
             lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                 m.upper(), ref_mnme) for m in othr_mod]]
 
@@ -898,8 +898,8 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
     for reg in regions:
 
         fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_list[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
-                   for m in models}
+        mod_data = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
+                    for m in models}
         hours = fmod[ref_model].hour.values
 
         if obs is not None:
@@ -908,14 +908,14 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             obslbl = "_".join(s for s in obslist)
             fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                           fo_list[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
-                       for o in obslist}
-            dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
-                     [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+            obs_data = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
+                        for o in obslist}
+            dlist = [[obs_data[ref_obs]] + [mod_data[m] for m in models],
+                     [mod_data[m] - obs_data[ref_obs] for m in models]]
 
             if len(obslist) > 1:
-                dlist[0] += [obs_ann[o] for o in obslist[1:]]
-                dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                dlist[0] += [obs_data[o] for o in obslist[1:]]
+                dlist[1] += [obs_data[o] - obs_data[ref_obs]
                              for o in obslist[1:]]
                 ll_nms = models + obslist[1:]
             else:
@@ -923,8 +923,8 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
             lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
                        ['{} - {}'.format(m.upper(), ref_obs) for m in ll_nms]]
         else:
-            dlist = [[mod_ann[m] for m in models],
-                     [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+            dlist = [[mod_data[m] for m in models],
+                     [mod_data[m] - mod_data[ref_model] for m in othr_mod]]
             lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                 m.upper(), ref_mnme) for m in othr_mod]]
 
@@ -1040,14 +1040,14 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
 
             fmod = {m: xa.open_dataset(f)
                     for m, f in zip(models, fm_listr[reg])}
-            mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
-                       for m in models}
+            mod_data = {m: np.nanmean(fmod[m][var].values, axis=(1, 2))
+                        for m in models}
 
             err_len_msg = (
                 "\n\n\t*** Input data arrays for timeseries plot do not"
                 " all have the same lengths. This is required for these"
                 " plots. ***\n\n")
-            ts_len_md = [arr.size for m, arr in mod_ann.items()]
+            ts_len_md = [arr.size for m, arr in mod_data.items()]
             assert len(set(ts_len_md)) == 1, err_len_msg
 
             if obs is not None:
@@ -1056,18 +1056,18 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                 obslbl = "_".join(s for s in obslist)
                 fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                               fo_listr[reg])}
-                obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
-                           for o in obslist}
+                obs_data = {o: np.nanmean(fobs[o][var].values, axis=(1, 2))
+                            for o in obslist}
 
-                ts_len_all = ts_len_md + [v.size for o, v in obs_ann.items()]
+                ts_len_all = ts_len_md + [v.size for o, v in obs_data.items()]
                 assert len(set(ts_len_all)) == 1, err_len_msg
 
-                dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
-                         [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+                dlist = [[obs_data[ref_obs]] + [mod_data[m] for m in models],
+                         [mod_data[m] - obs_data[ref_obs] for m in models]]
 
                 if len(obslist) > 1:
-                    dlist[0] += [obs_ann[o] for o in obslist[1:]]
-                    dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                    dlist[0] += [obs_data[o] for o in obslist[1:]]
+                    dlist[1] += [obs_data[o] - obs_data[ref_obs]
                                  for o in obslist[1:]]
                     ll_nms = models + obslist[1:]
                 else:
@@ -1075,8 +1075,8 @@ def moments_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
                 lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
                            [f'{m.upper()} - {ref_obs}' for m in ll_nms]]
             else:
-                dlist = [[mod_ann[m] for m in models],
-                         [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+                dlist = [[mod_data[m] for m in models],
+                         [mod_data[m] - mod_data[ref_model] for m in othr_mod]]
                 lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                     m.upper(), ref_mnme) for m in othr_mod]]
 
@@ -1331,8 +1331,8 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     for reg in regions:
 
         fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_listr[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values*100, axis=(1, 2))
-                   for m in models}
+        mod_data = {m: np.nanmean(fmod[m][var].values*100, axis=(1, 2))
+                    for m in models}
         bins = fmod[ref_model].bin_edges.values[1:]
         nbins = bins.size
 
@@ -1342,14 +1342,14 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             obslbl = "_".join(s for s in obslist)
             fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                           fo_listr[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values*100, axis=(1, 2))
-                       for o in obslist}
-            dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
-                     [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+            obs_data = {o: np.nanmean(fobs[o][var].values*100, axis=(1, 2))
+                        for o in obslist}
+            dlist = [[obs_data[ref_obs]] + [mod_data[m] for m in models],
+                     [mod_data[m] - obs_data[ref_obs] for m in models]]
 
             if len(obslist) > 1:
-                dlist[0] += [obs_ann[o] for o in obslist[1:]]
-                dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                dlist[0] += [obs_data[o] for o in obslist[1:]]
+                dlist[1] += [obs_data[o] - obs_data[ref_obs]
                              for o in obslist[1:]]
                 ll_nms = models + obslist[1:]
             else:
@@ -1357,8 +1357,8 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
                        ['{} - {}'.format(m.upper(), ref_obs) for m in ll_nms]]
         else:
-            dlist = [[mod_ann[m] for m in models],
-                     [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+            dlist = [[mod_data[m] for m in models],
+                     [mod_data[m] - mod_data[ref_model] for m in othr_mod]]
             lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                 m.upper(), ref_mnme) for m in othr_mod]]
 
@@ -1566,8 +1566,8 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
     for reg in regions:
 
         fmod = {m: xa.open_dataset(f) for m, f in zip(models, fm_listr[reg])}
-        mod_ann = {m: np.nanmean(fmod[m][var].values, axis=(2, 3))
-                   for m in models}
+        mod_data = {m: np.nanmean(fmod[m][var].values, axis=(2, 3))
+                    for m in models}
 
         bins = fmod[ref_model].bin_edges.values
         factors = fmod[ref_model].factors.values
@@ -1578,14 +1578,14 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
             obslbl = "_".join(s for s in obslist)
             fobs = {o: xa.open_dataset(f) for o, f in zip(obslist,
                                                           fo_listr[reg])}
-            obs_ann = {o: np.nanmean(fobs[o][var].values, axis=(2, 3))
-                       for o in obslist}
-            dlist = [[obs_ann[ref_obs]] + [mod_ann[m] for m in models],
-                     [mod_ann[m] - obs_ann[ref_obs] for m in models]]
+            obs_data = {o: np.nanmean(fobs[o][var].values, axis=(2, 3))
+                        for o in obslist}
+            dlist = [[obs_data[ref_obs]] + [mod_data[m] for m in models],
+                     [mod_data[m] - obs_data[ref_obs] for m in models]]
 
             if len(obslist) > 1:
-                dlist[0] += [obs_ann[o] for o in obslist[1:]]
-                dlist[1] += [obs_ann[o] - obs_ann[ref_obs]
+                dlist[0] += [obs_data[o] for o in obslist[1:]]
+                dlist[1] += [obs_data[o] - obs_data[ref_obs]
                              for o in obslist[1:]]
                 ll_nms = models + obslist[1:]
             else:
@@ -1593,8 +1593,8 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
             lg_lbls = [[ref_obs] + [m.upper() for m in ll_nms],
                        ['{} - {}'.format(m.upper(), ref_obs) for m in ll_nms]]
         else:
-            dlist = [[mod_ann[m] for m in models],
-                     [mod_ann[m] - mod_ann[ref_model] for m in othr_mod]]
+            dlist = [[mod_data[m] for m in models],
+                     [mod_data[m] - mod_data[ref_model] for m in othr_mod]]
             lg_lbls = [[m.upper() for m in models], ['{} - {}'.format(
                 m.upper(), ref_mnme) for m in othr_mod]]
 
