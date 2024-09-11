@@ -617,13 +617,13 @@ def data_resampling(data, resample_conf):
                     f".{resample_conf[1]}('time').dropna('time', how='all')")
         if nsec != sec_resample:
             resampled_data = eval(expr)
-            time_comp = (np.unique(resampled_data['time.month']) ==
-                         np.unique(data['time.month']))
-            if not np.all(time_comp):
-                print("\t\t** The resampling added months - removing these **")
-                resampled_data = resampled_data.isel(
-                    time=np.isin(resampled_data['time.month'],
-                                 np.unique(data['time.month'])))
+            # time_comp = (np.unique(resampled_data['time.month']) ==
+            #              np.unique(data['time.month']))
+            # if not np.all(time_comp):
+            #     print("\t\t** The resampling added months - removing these **")
+            #     resampled_data = resampled_data.isel(
+            #         time=np.isin(resampled_data['time.month'],
+            #                      np.unique(data['time.month'])))
             if sec_resample < 24*3600:
                 data = eval(
                     f"data.resample(time='{resample_conf[0]}', "

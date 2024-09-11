@@ -408,8 +408,8 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         split('|')[2].split(':')[1].strip()
 
     # figure settings
-    figsize = (16, 18)
-    figshape = (4, 3)
+    figsize = (18, 15)
+    figshape = (3, 4)
 
     if var == 'pr':
         cmap = [mpl.cm.YlGnBu] + [mpl.cm.BrBG]*ndata
@@ -452,7 +452,7 @@ def map_ann_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         mp = rpl.make_map_plot(
             dlist[p], axs_grid, lts, lns, cmap=cmap[p], clevs=clevs[p],
             **map_plot_conf)
-        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt[p])
 
         # Add contour plot if mslp
         if var == 'psl':
@@ -869,7 +869,7 @@ def map_diurnal_cycle(fm_list, fo_list, fm_listr, fo_listr, models, nmod,
         mp = rpl.make_map_plot(
             dlist[p], axs_grid, lts, lns, cmap=cmap[p], clevs=clevs[p],
             **map_plot_conf)
-        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt)
+        rpl.image_colorbar(mp, axs_grid, labelspacing=2, formatter=fmt[p])
 
         # Map settings
         rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle,
@@ -962,7 +962,7 @@ def line_diurnal_cycle(fm_list, fo_list, models, nmod, ref_model, obs, var,
                       "{}.png").format(var, thr, tres, tstat, fn_prfx,
                                        regnm, tsuffix_fname)
         else:
-            headtitle = '{} ({}) |  {} | {}'.format(var, dcycle_stat,
+            headtitle = '{} ({})\n{} | {}'.format(var, dcycle_stat,
                                                     reg, tsuffix_fname)
             if obs is not None:
                 fn = '{}{}{}_lnplot_diurnal_cycle_{}_{}_model_{}_{}.png'.\
@@ -1390,7 +1390,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
                     var, tres, regnm, tsuffix_fname)
 
         # figure settings
-        figsize = (23, 7)
+        figsize = (19, 8)
         figshape = (1, 2)
 
         ylabel = ['Frequency (%)',
@@ -1401,7 +1401,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
         xticks = range(nbins)[::6]
         xtlbls = bins[::6]
 
-        rpl.figure_init(plottype='line')
+        rpl.figure_init(plottype='scatter')
         fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
                                         **line_grid)
 
@@ -1426,7 +1426,7 @@ def pdf_plot(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
          for a, ax in enumerate(axs)]
 
         ttl = fig.suptitle(headtitle, fontsize='xx-large')
-        ttl.set_position((.5, 1.06))
+        ttl.set_position((.5, 1.05))
 
         plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
 
@@ -1493,17 +1493,19 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     tsuffix_ll.sort()
     tsuffix_fname = "_vs_".join(set(tsuffix_ll))
     thr = fmod[ref_model].attrs['Description'].\
-        split('|')[1].split(':')[1].strip()
+        split('|')[2].split(':')[1].strip()
     # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
     # seas = season.replace(' ', '')
 
     # figure settings
-    figsize = (20, 8)
     figshape = (1, ndata)
+    if ndata < 3:
+        figsize = (16, 12)
+    else:
+        figsize = (20, 9)
 
     if thr != 'None':
-        headtitle = 'ASoP FC Index | Thr: {} | {}'.format(
-            thr, tsuffix_fname)
+        headtitle = 'ASoP FC Index | Thr: {}'.format(thr)
         if obs is not None:
             fn = 'asop_FC_thr{}{}_map_model_{}_{}.png'.\
                 format(thr, tres, obslbl, tsuffix_fname)
@@ -1511,7 +1513,7 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
             fn = 'asop_FC_thr{}{}_map_model_{}.png'.format(
                 thr, tres, tsuffix_fname)
     else:
-        headtitle = 'ASoP FC Index | {}'.format(tsuffix_fname)
+        headtitle = 'ASoP FC Index'
         if obs is not None:
             fn = 'asop_FC{}_map_model_{}_{}.png'.\
                 format(tres, obslbl, tsuffix_fname)
@@ -1540,7 +1542,7 @@ def map_asop(fm_list, fo_list, fm_listr, fo_listr, models, nmod, ref_model,
     # Map settings
     rpl.map_axes_settings(fig, axs_grid, headtitle=headtitle)
 
-    [ax.text(0.5, 1.05, ft.upper(), size=21, va='center', ha='center',
+    [ax.text(0.5, 1.03, ft.upper(), size='large', va='center', ha='center',
              transform=ax.transAxes) for ft, ax in zip(ftitles, axs_grid)]
 
     plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
@@ -1609,9 +1611,7 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
             xdata = [[bins[:-1]]*len(dlist[0]), [bins[:-1]]*len(dlist[1])]
 
             thr = fmod[ref_model].attrs['Description'].\
-                split('|')[1].split(':')[1].strip()
-            # season = fmod[ref_model].attrs['Analysed time'].split(' ')[1]
-            # seas = season.replace(' ', '')
+                split('|')[2].split(':')[1].strip()
             regnm = reg.replace(' ', '_')
 
             if thr != 'None':
@@ -1624,7 +1624,7 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
                     fn = '{}_thr{}{}_asop_{}_{}_model_{}.png'.format(
                         var, thr, tres, fctr, regnm, tsuffix_fname)
             else:
-                headtitle = 'ASoP ({}) |  {} | {}'.format(
+                headtitle = 'ASoP ({}) |  {}\n{}'.format(
                     fctr, reg, tsuffix_fname)
                 if obs is not None:
                     fn = '{}{}_asop_{}_{}_model_{}_{}.png'.format(
@@ -1666,12 +1666,11 @@ def line_asop(fm_listr, fo_listr, models, nmod, ref_model, obs, var, tres,
                                for c, l in zip(rel_colors, lg_lbls[1])]
             axs[1].legend(handles=legend_elements, fontsize='large')
 
-            [rpl.axes_settings(ax, xlabel=xlabel[a],  # xticks=xticks,
-                               ylabel=ylabel[a],  # xtlabels=xtlbls,
+            [rpl.axes_settings(ax, xlabel=xlabel[a], ylabel=ylabel[a],
                                xlim=xlim[a], ylim=ylim[a])
              for a, ax in enumerate(axs)]
 
-            ttl = fig.suptitle(headtitle, fontsize='xx-large')
+            ttl = fig.suptitle(headtitle, fontsize='x-large')
             ttl.set_position((.5, 1.06))
 
             plt.savefig(os.path.join(img_dir, fn), bbox_inches='tight')
