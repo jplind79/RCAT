@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.utils package &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">rcatool.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rcatool.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcatool-utils-package">
+<h1>rcatool.utils package<a class="headerlink" href="#rcatool-utils-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rcatool.utils.atmosphys">
+<span id="rcatool-utils-atmosphys-module"></span><h2>rcatool.utils.atmosphys module<a class="headerlink" href="#module-rcatool.utils.atmosphys" title="Link to this heading"></a></h2>
+<section id="atmospheric-function-module">
+<h3>Atmospheric Function Module<a class="headerlink" href="#atmospheric-function-module" title="Link to this heading"></a></h3>
+<p>Functions for calculations of various physical properties</p>
+<p>Created: Autumn 2017
+Authors: Petter Lind &amp; David Lindstedt</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.brunt_vaisala_frequency">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">brunt_vaisala_frequency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ddict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_plevel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_plevel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#brunt_vaisala_frequency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.brunt_vaisala_frequency" title="Link to this definition"></a></dt>
+<dd><p>Calculate Brunt-Vaisala frequency in layer bounded by two pressure levels.
+Pressure must be given in hPa, temperature (T) in Kelvin and specific
+humidity (q) in kg/kg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ddict</strong> (<em>dictionary</em>) – Data dictionary</p></li>
+<li><p><strong>model</strong> (<em>str</em>) – model data to use</p></li>
+<li><p><strong>lower_plevel</strong> (<em>float</em>) – lower pressure surface</p></li>
+<li><p><strong>upper_plevel</strong> (<em>float</em>) – upper pressure surface</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>N2</strong> – The squared Brunt-Vaisala frequency</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array with floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.calc_e_from_sh">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">calc_e_from_sh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101325</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#calc_e_from_sh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.calc_e_from_sh" title="Link to this definition"></a></dt>
+<dd><p>Vapor pressure over liquid surface can be calculated from a variety of
+different combinations of state variables.
+Here, vapor pressure is calculated from specific humidity sh (kg/kg) and
+pressure P (Pa).
+Formula is given in standard literature; e.g. eq. 2.19 in Rogers &amp; Yau
+(Cloud physics) and eq. 4.1.4 in Emanuel (1994).
+Reference:
+* Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:</p>
+<blockquote>
+<div><p>Oxford University Press, 580 pp.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.calc_e_from_w">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">calc_e_from_w</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1013.25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#calc_e_from_w"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.calc_e_from_w" title="Link to this definition"></a></dt>
+<dd><p>Vapor pressure over liquid surface can be calculated from a variety of
+different combinations of state variables.
+Here, vapor pressure is calculated from mixing ratio w (kg/kg)
+and pressure P. Formula is given in standard literature; e.g. eq. 2.18 in
+Rogers&amp;Yau (Cloud physics) and eq. 4.1.2 in Emanuel (1994).
+Reference:
+* Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:</p>
+<blockquote>
+<div><p>Oxford University Press, 580 pp.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.calc_es">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">calc_es</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#calc_es"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.calc_es" title="Link to this definition"></a></dt>
+<dd><p>Returns saturation vapor pressure in hPa at temperature T (Kelvin)
+Formula 2.17 in Rogers&amp;Yau</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.calc_ws">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">calc_ws</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1013.25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#calc_ws"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.calc_ws" title="Link to this definition"></a></dt>
+<dd><p>Returns saturation mixing ratio in kg/kg at temperature T (Kelvin) and
+pressure P (hPa).
+Formula in <a class="reference external" href="https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf">https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.lifted_condensation_temperature">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">lifted_condensation_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tair</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdew</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#lifted_condensation_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.lifted_condensation_temperature" title="Link to this definition"></a></dt>
+<dd><p>Returns the lifted condensation temperature in units of Kelvin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tair</strong> – Air temperature (in units of Kelvin)</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Air temperature (in units of Kelvin)</p></li>
+<li><p><strong>tdew</strong> – Dew point temperature (in units of Kelvin)</p></li>
+<li><p><strong>floats</strong> – Dew point temperature (in units of Kelvin)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lifted condensation temperature (in units of Kelvin)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tc, floats/arrays of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.rh2sh">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">rh2sh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1013.25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#rh2sh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.rh2sh" title="Link to this definition"></a></dt>
+<dd><p>Convert relative humidity to specific humidity
+Code from:
+<a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a>
+Equation for sh from standard literature, e.g. K. Emanuel (1994; eq. 4.1.4)
+Reference:
+* Emanuel, K. A. (1994):  Atmospheric Convection.  New York, NY:</p>
+<blockquote>
+<div><p>Oxford University Press, 580 pp.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rh</strong> – Relative humidity in proportion, not percent</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Relative humidity in proportion, not percent</p></li>
+<li><p><strong>T</strong> – Absolute temperature in Kelvin</p></li>
+<li><p><strong>floats</strong> – Absolute temperature in Kelvin</p></li>
+<li><p><strong>P</strong> – Pressure in hPa (mb)</p></li>
+<li><p><strong>floats</strong> – Pressure in hPa (mb)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Specific humidity in kg/kg</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sh,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.sh2rh">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">sh2rh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1013.25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#sh2rh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.sh2rh" title="Link to this definition"></a></dt>
+<dd><p>Convert specific humidity to relative humidity
+Code from:
+<a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sh</strong> – Specific humidity in kg/kg</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Specific humidity in kg/kg</p></li>
+<li><p><strong>T</strong> – Absolute temperature in Kelvin</p></li>
+<li><p><strong>floats</strong> – Absolute temperature in Kelvin</p></li>
+<li><p><strong>P</strong> – Pressure in hPa (mb)</p></li>
+<li><p><strong>floats</strong> – Pressure in hPa (mb)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Relative humidity in fraction (not percent)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rh,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.sh2td">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">sh2td</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#sh2td"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.sh2td" title="Link to this definition"></a></dt>
+<dd><p>Returns dew point temperature (K) at mixing ratio sh (kg/kg) and
+pressure p (Pa). Insert Td in 2.17 in Rogers&amp;Yau and solve for Td</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.td">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">td</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#td"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.td" title="Link to this definition"></a></dt>
+<dd><p>Returns dew point temperature (C) at vapor pressure e (Pa)
+Insert Td in 2.17 in Rogers&amp;Yau and solve for Td</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.td2sh">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">td2sh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Td</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#td2sh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.td2sh" title="Link to this definition"></a></dt>
+<dd><p>Convert dew point temperature to specific humidity
+<a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Td</strong> – Absolute dew point temperature in Kelvin</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Absolute dew point temperature in Kelvin</p></li>
+<li><p><strong>P</strong> – Pressure in mb</p></li>
+<li><p><strong>floats</strong> – Pressure in mb</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Specific humidity in g/kg</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>p, float/array of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.theta_equivalent">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">theta_equivalent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tair</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#theta_equivalent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.theta_equivalent" title="Link to this definition"></a></dt>
+<dd><p>Returns the equivalent potential temperature in units of Kelvin.
+Based on approximative formula from Bolton, D. 1980
+See also:
+<a class="reference external" href="https://glossary.ametsoc.org/wiki/Equivalent_potential_temperature">https://glossary.ametsoc.org/wiki/Equivalent_potential_temperature</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tair</strong> – Air temperature (in units of Kelvin)</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Air temperature (in units of Kelvin)</p></li>
+<li><p><strong>tdew</strong> – Dew point temperature (in units of Kelvin)</p></li>
+<li><p><strong>floats</strong> – Dew point temperature (in units of Kelvin)</p></li>
+<li><p><strong>p</strong> – Pressure in units of hPa</p></li>
+<li><p><strong>floats</strong> – Pressure in units of hPa</p></li>
+<li><p><strong>sh</strong> – Specific humidity in units of kg/kg</p></li>
+<li><p><strong>floats</strong> – Specific humidity in units of kg/kg</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Equivalent potential temperature (in units of Kelvin)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>theta_e, floats/arrays of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.theta_pseudoequiv">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">theta_pseudoequiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tair</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#theta_pseudoequiv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.theta_pseudoequiv" title="Link to this definition"></a></dt>
+<dd><p>Returns the pseudo-equivalent potential temperature in units of Kelvin.
+Based on approximative formula from Bolton, D. 1980
+See also:
+<a class="reference external" href="https://glossary.ametsoc.org/wiki/Pseudoequivalent_potential_temperature">https://glossary.ametsoc.org/wiki/Pseudoequivalent_potential_temperature</a></p>
+<p>Note that here the specific humidity is used instead of mixing ratio, which
+are approximately the same (low water vapor mass in parcel compared to dry
+mass).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tair</strong> – Air temperature (in units of Kelvin)</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Air temperature (in units of Kelvin)</p></li>
+<li><p><strong>tdew</strong> – Dew point temperature (in units of Kelvin)</p></li>
+<li><p><strong>floats</strong> – Dew point temperature (in units of Kelvin)</p></li>
+<li><p><strong>p</strong> – Pressure in units of hPa</p></li>
+<li><p><strong>floats</strong> – Pressure in units of hPa</p></li>
+<li><p><strong>sh</strong> – Specific humidity in units of kg/kg</p></li>
+<li><p><strong>floats</strong> – Specific humidity in units of kg/kg</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pseudo-equivalent potential temperature (in units of Kelvin)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>theta_ep, floats/arrays of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.uv2wind">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">uv2wind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#uv2wind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.uv2wind" title="Link to this definition"></a></dt>
+<dd><p>Converts u and v components to wind speed and direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – east/west wind component</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – east/west wind component</p></li>
+<li><p><strong>v</strong> – north/south wind component</p></li>
+<li><p><strong>floats</strong> – north/south wind component</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>wind speed and wind direction respectively.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(ws, wd), floats/arrays of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.vpd">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">vpd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#vpd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.vpd" title="Link to this definition"></a></dt>
+<dd><p>Calculate VPD - vapor pressure deficit from relative humidity and
+temperature.
+Code from:
+<a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rh</strong> – Relative humidity in fraction (not percent)</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Relative humidity in fraction (not percent)</p></li>
+<li><p><strong>T</strong> – Absolute temperature in Kelvin</p></li>
+<li><p><strong>floats</strong> – Absolute temperature in Kelvin</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vapor pressure deficit (in hPa/mb)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>vpd,</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.atmosphys.wind2uv">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.atmosphys.</span></span><span class="sig-name descname"><span class="pre">wind2uv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rad'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/atmosphys.html#wind2uv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.atmosphys.wind2uv" title="Link to this definition"></a></dt>
+<dd><p>Converts wind speed and direction to u and v components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ws</strong> – Wind speed data</p></li>
+<li><p><strong>floats</strong> (<em>float/array of</em>) – Wind speed data</p></li>
+<li><p><strong>wd</strong> – Wind direction data</p></li>
+<li><p><strong>floats</strong> – Wind direction data</p></li>
+<li><p><strong>dir_deg</strong> – Units of the wind direction data; ‘rad’ (default) or ‘deg’.</p></li>
+<li><p><strong>string</strong> – Units of the wind direction data; ‘rad’ (default) or ‘deg’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>u and v wind components</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(u, v), floats/arrays of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.utils.draw_polygon">
+<span id="rcatool-utils-draw-polygon-module"></span><h2>rcatool.utils.draw_polygon module<a class="headerlink" href="#module-rcatool.utils.draw_polygon" title="Link to this heading"></a></h2>
+<p>draw_polygon.py</p>
+<p>Draw a simple polygon using matplotlib with mouse event handling</p>
+<p>Copyright (C) 2013 Greg von Winckel</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<p>Created: Sat Oct 26 22:04:59 MDT 2013</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rcatool.utils.draw_polygon.Canvas">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rcatool.utils.draw_polygon.</span></span><span class="sig-name descname"><span class="pre">Canvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/draw_polygon.html#Canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.draw_polygon.Canvas" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rcatool.utils.draw_polygon.Canvas.set_location">
+<span class="sig-name descname"><span class="pre">set_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/draw_polygon.html#Canvas.set_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.draw_polygon.Canvas.set_location" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rcatool.utils.draw_polygon.Canvas.update_path">
+<span class="sig-name descname"><span class="pre">update_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/draw_polygon.html#Canvas.update_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.draw_polygon.Canvas.update_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rcatool.utils.file_io">
+<span id="rcatool-utils-file-io-module"></span><h2>rcatool.utils.file_io module<a class="headerlink" href="#module-rcatool.utils.file_io" title="Link to this heading"></a></h2>
+<p>This module provides functions representing tools to read and write
+NetCDF files.</p>
+<p>&#64;author Petter Lind
+&#64;date   2014-10-20</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.file_io.fracday2datetime">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.file_io.</span></span><span class="sig-name descname"><span class="pre">fracday2datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/file_io.html#fracday2datetime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.file_io.fracday2datetime" title="Link to this definition"></a></dt>
+<dd><p>Takes an array of dates given in %Y%m%d.%f format and returns a
+corresponding datetime object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.file_io.getDimensions">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.file_io.</span></span><span class="sig-name descname"><span class="pre">getDimensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/file_io.html#getDimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.file_io.getDimensions" title="Link to this definition"></a></dt>
+<dd><p>Function to retrieve the dimensions of a netcdf file
+nc: Netcdf object opened with function “openFile”
+close: set True if you want the file to be closed after retrieval.
+Returns lons and lats, time as well as gridsize Nx,Ny</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.file_io.getParams">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.file_io.</span></span><span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/file_io.html#getParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.file_io.getParams" title="Link to this definition"></a></dt>
+<dd><p>Function to retrieve variables from a netcdf file
+nc: Netcdf object opened with function “openFile”
+params: A list of strings with the parameters to be retrieved
+close: set True if you want the file to be closed after retrieval.
+Returns a list with the given parameters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.file_io.ncdump">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.file_io.</span></span><span class="sig-name descname"><span class="pre">ncdump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nc_fid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/file_io.html#ncdump"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.file_io.ncdump" title="Link to this definition"></a></dt>
+<dd><p>ncdump outputs dimensions, variables and their attribute information.
+The information is similar to that of NCAR’s ncdump utility.
+ncdump requires a valid instance of Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nc_fid</strong> (<em>netCDF4.Dataset</em>) – A netCDF4 dateset object</p></li>
+<li><p><strong>verb</strong> (<em>Boolean</em>) – whether or not nc_attrs, nc_dims, and nc_vars are printed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>nc_attrs</strong> (<em>list</em>) – A Python list of the NetCDF file global attributes</p></li>
+<li><p><strong>nc_dims</strong> (<em>list</em>) – A Python list of the NetCDF file dimensions</p></li>
+<li><p><strong>nc_vars</strong> (<em>list</em>) – A Python list of the NetCDF file variables</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.file_io.openFile">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.file_io.</span></span><span class="sig-name descname"><span class="pre">openFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/file_io.html#openFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.file_io.openFile" title="Link to this definition"></a></dt>
+<dd><p>Function to open netcdf file.
+filename:  string with full path to file</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.file_io.write2netcdf">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.file_io.</span></span><span class="sig-name descname"><span class="pre">write2netcdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filedir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nc_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NETCDF4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/file_io.html#write2netcdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.file_io.write2netcdf" title="Link to this definition"></a></dt>
+<dd><p>Opens a new NetCDF file to write the input data to. For nc_format,
+you can choose from ‘NETCDF3_CLASSIC’, ‘NETCDF3_64BIT’,
+‘NETCDF4_CLASSIC’, and ‘NETCDF4’ (default)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – name of netcdf file to write to</p></li>
+<li><p><strong>filedir</strong> (<em>str</em>) – directory path to put the file</p></li>
+<li><p><strong>dim</strong> (<em>dict</em>) – dimensions to be used</p></li>
+<li><p><strong>variables</strong> (<em>dict</em>) – variables with their values and attributes</p></li>
+<li><p><strong>global_attr</strong> (<em>dict</em>) – global attributes (optional)</p></li>
+<li><p><strong>nc_format</strong> (<em>str</em>) – Specify netCDF format</p></li>
+<li><p><strong>compress</strong> (<em>boolean</em>) – Whether to compress (using ‘zlib=True’ in the write call).</p></li>
+<li><p><strong>complevel</strong> (<em>int</em>) – An integer between 1-9 representing the degree of compression to be
+used.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The dictionaries should be structured as described by the examples
+below:</p>
+<p>dims_dict = {}
+dims_dict[‘x’] = 154
+dims_dict[‘y’] = 192
+dims_dict[‘nv’] = 4
+dims_dict[‘time’] = None</p>
+<p>vars_dict = {}
+vars_dict = {‘lon’: {‘values’: lons, ‘dims’: (‘y’, ‘x’),</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="simple">
+<dt>‘attributes’: {‘long_name’: ‘longitude’,</dt><dd><p>‘standard_name’: ‘longitude’,
+‘units’: ‘degrees_east’,
+‘_CoordinateAxisType’: ‘Lon’}},</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>‘lat’: {‘values’: lats, ‘dims’: (‘y’, ‘x’),</dt><dd><dl class="simple">
+<dt>‘attributes’: {‘long_name’: ‘latitude’,</dt><dd><p>‘standard_name’: ‘latitude’,
+‘units’: ‘degrees_north’,
+‘_CoordinateAxisType’: ‘Lat’}},</p>
+</dd>
+</dl>
+</dd>
+<dt>‘pr’: {‘values’: pr, ‘dims’: (‘time’, ‘y’, ‘x’),</dt><dd><dl class="simple">
+<dt>‘attributes’: {‘long_name’: ‘precipitation’,</dt><dd><dl class="simple">
+<dt>‘standard_name’: ‘precipitation flux’,</dt><dd><p>‘units’: ‘kg m-2 s-1’,
+‘coordinates’: ‘lon lat’,
+‘_FillValue’: -9999.}}}</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>glob_attr = {‘description’: ‘some description of file’,</dt><dd><p>‘history’: ‘Created ‘ + time.ctime(time.time()),
+‘experiment’: ‘Fractions Skill Score analysis’,
+‘contact’: <a class="reference external" href="mailto:'petter&#46;lind&#37;&#52;&#48;smhi&#46;se">‘petter<span>&#46;</span>lind<span>&#64;</span>smhi<span>&#46;</span>se</a>’,
+‘references’: ‘<a class="reference external" href="http://journals.ametsoc.org/doi/abs/">http://journals.ametsoc.org/doi/abs/</a>                         10.1175/2007MWR2123.1’}</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.utils.grids">
+<span id="rcatool-utils-grids-module"></span><h2>rcatool.utils.grids module<a class="headerlink" href="#module-rcatool.utils.grids" title="Link to this heading"></a></h2>
+<section id="grid-applications">
+<h3>Grid applications<a class="headerlink" href="#grid-applications" title="Link to this heading"></a></h3>
+<p>Functions to remap data given source and target grids
+Some utilities use python tool xESMF.</p>
+<p>Author: Petter Lind (contributions from A. Prein)
+Date: Jan 2019</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.grids.add_matrix_NaNs">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.grids.</span></span><span class="sig-name descname"><span class="pre">add_matrix_NaNs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regridder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/grids.html#add_matrix_NaNs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.grids.add_matrix_NaNs" title="Link to this definition"></a></dt>
+<dd><p>Replace zero values of cells in the new grid that are outside
+the old grid’s domain with NaN’s.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>regridder</strong> (<em>Object from xESMF Regridder function</em>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Modified regridder where zero valued cells (outside source grid)
+has been replaced with NaN’s.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>regridder</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.grids.calc_vertices">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.grids.</span></span><span class="sig-name descname"><span class="pre">calc_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/grids.html#calc_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.grids.calc_vertices" title="Link to this definition"></a></dt>
+<dd><p>Estimate the cell boundaries from the cell location of regular grids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lons</strong> (<em>arrays</em>) – Longitude and latitude values</p></li>
+<li><p><strong>lats</strong> (<em>arrays</em>) – Longitude and latitude values</p></li>
+<li><p><strong>write_to_file</strong> (<em>bool</em>) – If True lat/lon information, including vertices, is written to file
+following the structure given by cdo commmand ‘griddes’</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Name of text file for the grid information. Only used if write_to_file
+is True. If not provided, a default name will be used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>lon_bnds, lat_bnds</strong> – Arrays of dimension [4, nlat, nlon] containing cell boundaries of each
+gridcell in lons and lats</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.grids.fnCellCorners">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.grids.</span></span><span class="sig-name descname"><span class="pre">fnCellCorners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrLon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/grids.html#fnCellCorners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.grids.fnCellCorners" title="Link to this definition"></a></dt>
+<dd><p>File name: fnCellBoundaries
+Author: Andreas Prein
+E-mail: <a class="reference external" href="mailto:prein&#37;&#52;&#48;ucar&#46;edu">prein<span>&#64;</span>ucar<span>&#46;</span>edu</a>
+Date created: 20.03.2015
+Date last modified: 20.03.2015</p>
+<p>Estimate the cell boundaries from the cell location of regular grids</p>
+<p>returns: rgrLonBND &amp; rgrLatBND –&gt; arrays of dimension [nlon,nlat]
+containing the cell boundaries of each gridcell in rgrlon and rgrlat</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.grids.fnRemapCon">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.grids.</span></span><span class="sig-name descname"><span class="pre">fnRemapCon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrLonS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLatS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLonT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLatT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grOperator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrData</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/grids.html#fnRemapCon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.grids.fnRemapCon" title="Link to this definition"></a></dt>
+<dd><p>File name: fnRemapCon
+Author: Andreas Prein
+E-mail: <a class="reference external" href="mailto:prein&#37;&#52;&#48;ucar&#46;edu">prein<span>&#64;</span>ucar<span>&#46;</span>edu</a>
+Date created: 13.06.2017
+Date last modified: 13.06.2017</p>
+<p>Uses the remap operator generated by the function fnRemapConOperator to
+remap data to a target grid conservatively</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rgrLonS</strong> (<em>arrays</em>) – Source grid longitude and latitude values</p></li>
+<li><p><strong>rgrLatS</strong> (<em>arrays</em>) – Source grid longitude and latitude values</p></li>
+<li><p><strong>rgrLonT</strong> (<em>arrays</em>) – Target grid longitude and latitude values</p></li>
+<li><p><strong>rgrLatT</strong> (<em>arrays</em>) – Target grid longitude and latitude values</p></li>
+<li><p><strong>grOperator</strong> (<em>dictionary</em>) – Remapping operator returned from fnRemapConOperator.</p></li>
+<li><p><strong>rgrData</strong> (<em>3D/4D array</em>) – Data to be regridded, structured as (time, lat, lon) or (time,
+variables, lat, lon).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rgrTarData</strong> – Remapped data matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.grids.fnRemapConOperator">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.grids.</span></span><span class="sig-name descname"><span class="pre">fnRemapConOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgrLonS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLatS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLonT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLatT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLonSBNDS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLatSBNDS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLonTBNDS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rgrLatTBNDS</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/grids.html#fnRemapConOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.grids.fnRemapConOperator" title="Link to this definition"></a></dt>
+<dd><p>File name: fnRemapConOperator
+Author: Andreas Prein
+E-mail: <a class="reference external" href="mailto:prein&#37;&#52;&#48;ucar&#46;edu">prein<span>&#64;</span>ucar<span>&#46;</span>edu</a>
+Date created: 26.05.2017
+Date last modified: 26.05.2017</p>
+<p>Generates an opperator to coservatively remapp data from a source
+rectangular grid to an target rectangular grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rgrLonS</strong> (<em>arrays</em>) – Source grid longitude and latitude values</p></li>
+<li><p><strong>rgrLatS</strong> (<em>arrays</em>) – Source grid longitude and latitude values</p></li>
+<li><p><strong>rgrLonT</strong> (<em>arrays</em>) – Target grid longitude and latitude values</p></li>
+<li><p><strong>rgrLatT</strong> (<em>arrays</em>) – Target grid longitude and latitude values</p></li>
+<li><p><strong>rgrLonSBNDS</strong> (<em>arrays</em>) – Source grid longitude and latitude grid point boundaries (corners).
+These must be given in the structure (lat, lon, vertices) where
+vertices are the four corners of each grid point. If not provided
+(default) then corners are calculated using fnCellCorners.</p></li>
+<li><p><strong>rgrLatSBNDS</strong> (<em>arrays</em>) – Source grid longitude and latitude grid point boundaries (corners).
+These must be given in the structure (lat, lon, vertices) where
+vertices are the four corners of each grid point. If not provided
+(default) then corners are calculated using fnCellCorners.</p></li>
+<li><p><strong>rgrLonTBNDS</strong> (<em>arrays</em>) – Target grid longitude and latitude grid point boundaries (corners).
+See above for more info.</p></li>
+<li><p><strong>rgrLatTBNDS</strong> (<em>arrays</em>) – Target grid longitude and latitude grid point boundaries (corners).
+See above for more info.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>grConRemapOp</strong> – opperator that contains the grid cells and their wheights of the
+source grid for each target grid cell</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.grids.rotated_grid_transform">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.grids.</span></span><span class="sig-name descname"><span class="pre">rotated_grid_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pole_lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pole_lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot2reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/grids.html#rotated_grid_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.grids.rotated_grid_transform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rcatool.utils.ini_reader">
+<span id="rcatool-utils-ini-reader-module"></span><h2>rcatool.utils.ini_reader module<a class="headerlink" href="#module-rcatool.utils.ini_reader" title="Link to this heading"></a></h2>
+<section id="config-reader-module">
+<h3>Config reader module<a class="headerlink" href="#config-reader-module" title="Link to this heading"></a></h3>
+<p>Creates and return a dictionary built from a config file.</p>
+<p>Created: Autumn 2016
+Authors: David Lindstedt &amp; Petter Lind</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.ini_reader.get_config_dict">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.ini_reader.</span></span><span class="sig-name descname"><span class="pre">get_config_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ini_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/ini_reader.html#get_config_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.ini_reader.get_config_dict" title="Link to this definition"></a></dt>
+<dd><p>Create a dictionary from then input config file.
+PARAMETERS: config (.ini) file
+RETURNS   : Dictionary</p>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.utils.polygons">
+<span id="rcatool-utils-polygons-module"></span><h2>rcatool.utils.polygons module<a class="headerlink" href="#module-rcatool.utils.polygons" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.polygons.create_polygon">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.polygons.</span></span><span class="sig-name descname"><span class="pre">create_polygon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/polygons.html#create_polygon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.polygons.create_polygon" title="Link to this definition"></a></dt>
+<dd><p>Retrieve polygon arbitrarily drawn interactively on a map
+by mouse clicking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>print_zoom_areas</strong> (<em>Boolean</em>) – Prints available zoom regions for polygon selection.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>poly</strong> – List with tuples of lat/lon coordinates for drawn polygon</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.polygons.find_geo_indices">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.polygons.</span></span><span class="sig-name descname"><span class="pre">find_geo_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/polygons.html#find_geo_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.polygons.find_geo_indices" title="Link to this definition"></a></dt>
+<dd><p>Search for nearest decimal degree in an array of decimal degrees and
+return the index.
+np.argmin returns the indices of minimum value along an axis.
+Subtract dd from all values in dd_array, take absolute value and find index
+of minimum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lons/lats</strong> (<em>1D/2D numpy array</em>) – Latitude and longitude values defining the grid.</p></li>
+<li><p><strong>x</strong> (<em>int/float</em>) – Coordinates of searched for data point</p></li>
+<li><p><strong>y</strong> (<em>int/float</em>) – Coordinates of searched for data point</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>lat_idx/lon_idx</strong> – The latitude and longitude indices where closest to searched
+data point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.polygons.mask_region">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.polygons.</span></span><span class="sig-name descname"><span class="pre">mask_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_3d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/polygons.html#mask_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.polygons.mask_region" title="Link to this definition"></a></dt>
+<dd><p>Routine to mask grid points outside a specified polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xp</strong> (<em>numpy arrays</em>) – eastward and northward grid points respectively, normally lon/lat
+arrays.</p></li>
+<li><p><strong>yp</strong> (<em>numpy arrays</em>) – eastward and northward grid points respectively, normally lon/lat
+arrays.</p></li>
+<li><p><strong>area</strong> (<em>string</em><em> or </em><em>list with tuples</em>) – Either name of predefined region to extract (see reg_dict function for
+more info.), or a list with tuples defining a polygon;
+e.g. [(lon1, lat1), (lon2, lat2),…,(lonN, latN), (lon1, lat1)].
+NB! First and last tuple must be the same, closing the polygon.</p></li>
+<li><p><strong>data</strong> (<em>2D/3D numpy array</em><em>, </em><em>optional</em>) – data matrix</p></li>
+<li><p><strong>iter_3d</strong> (<em>int</em><em>, </em><em>optional</em>) – If set, masking is performed along the zeroth dimension of array. Thus
+array must be 3D and have shape [iter_3d, y, x].</p></li>
+<li><p><strong>cut_data</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If True, the data will be cut to a box that covers the input area,
+leaving one extra (masked) grid point beyond each limiting
+north/south/east/west grid point. This option will
+return not only masked and cut data but also cut lon/lat data as well
+as the box edges (as indices) in the x,y plane.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>mask_out</strong> (<em>boolean array</em>) – A 2D mask with True inside region of interest, False outside. Returned
+if data is None.</p></li>
+<li><p><strong>masked_data</strong> (<em>2D/3D numpy array</em>) – If data is passed to function, this is the returned masked data.</p></li>
+<li><p><strong>xp_cut/yp_cut</strong> (<em>numpy arrays</em>) – If cut_data is True, these arrays are the cut xp/yp arrays</p></li>
+<li><p><strong>reg_x_edges, reg_y_edges</strong> (<em>tuples</em>) – If cut_data is True, the tuples contain index of the edges of cropped
+region in x and y directions respectively.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.polygons.plot_polygon">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.polygons.</span></span><span class="sig-name descname"><span class="pre">plot_polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/polygons.html#plot_polygon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.polygons.plot_polygon" title="Link to this definition"></a></dt>
+<dd><p>Plot polygon on map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polygon</strong> (<em>string</em><em> or </em><em>list</em>) – Name of polygon as defined by poly_dict dictionary in ‘polygons’
+function, or list with polygon coordinates [[lon1, lat1], [lon2, lat2],
+…, [lon1, lat1]].</p></li>
+<li><p><strong>savefig</strong> (<em>boolean</em>) – If True, figure is saved to ‘figpath’ location (‘figpath’ must be set).
+If false, figure is displayed on screen.</p></li>
+<li><p><strong>figpath</strong> (<em>string</em>) – Path to folder for saved polygon figure.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.polygons.polygons">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.polygons.</span></span><span class="sig-name descname"><span class="pre">polygons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poly_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/polygons.html#polygons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.polygons.polygons" title="Link to this definition"></a></dt>
+<dd><p>See available polygons and retrieve path to polygon files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>area</strong> (<em>string</em>) – name of polygon to be extracted</p></li>
+<li><p><strong>poly_print</strong> (<em>boolean</em>) – if available polygons should be printed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>area_file</strong> – path to the text file with polygon data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.utils.polygons.topo_mask">
+<span class="sig-prename descclassname"><span class="pre">rcatool.utils.polygons.</span></span><span class="sig-name descname"><span class="pre">topo_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orog_int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/utils/polygons.html#topo_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.utils.polygons.topo_mask" title="Link to this definition"></a></dt>
+<dd><p>Rotuine to mask grid points outside a specified height interval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>2D numpy array</em>) – the data matrix</p></li>
+<li><p><strong>orog</strong> (<em>2D numpy array</em>) – array containing topographical heights (same resolution as data)</p></li>
+<li><p><strong>orog_int</strong> (<em>1D array</em><em>,</em><em>list</em><em>,</em><em>tuple</em>) – the height interval outside which data should be masked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>masked_data</strong> – the masked data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rcatool.utils" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

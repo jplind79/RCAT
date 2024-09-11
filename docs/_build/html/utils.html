@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utilities &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rcatool.utils.atmosphys.rh2sh" href="generated/rcatool.utils.atmosphys.rh2sh.html" />
+    <link rel="prev" title="rcatool.stats.sal.run_sal_analysis" href="generated/rcatool.stats.sal.run_sal_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api.html">API-reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="user_api.html">User API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plots.html">Visualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.html">Statistics</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Utilities</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#atmospheric-physics">Atmospheric physics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#io-handling">IO handling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grid-applications">Grid applications</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config-reader-module">Config reader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#polygons">Polygons</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="internal_api.html">Internal API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API-reference</a></li>
+          <li class="breadcrumb-item"><a href="user_api.html">User API</a></li>
+      <li class="breadcrumb-item active">Utilities</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Link to this heading"></a></h1>
+<section id="atmospheric-physics">
+<h2>Atmospheric physics<a class="headerlink" href="#atmospheric-physics" title="Link to this heading"></a></h2>
+<p>Routines for calculations of various physical properties</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.rh2sh" title="rcatool.utils.atmosphys.rh2sh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.rh2sh</span></code></a>(rh, T[, P])</p></td>
+<td><p>Convert relative humidity to specific humidity Code from: <a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a> Equation for sh from standard literature, e.g. K. Emanuel (1994; eq. 4.1.4) Reference: * Emanuel, K. A. (1994):  Atmospheric Convection. New York, NY:   Oxford University Press, 580 pp.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.sh2rh" title="rcatool.utils.atmosphys.sh2rh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.sh2rh</span></code></a>(sh, T[, P])</p></td>
+<td><p>Convert specific humidity to relative humidity Code from: <a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.td2sh" title="rcatool.utils.atmosphys.td2sh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.td2sh</span></code></a>(Td, P)</p></td>
+<td><p>Convert dew point temperature to specific humidity <a class="reference external" href="https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R">https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R</a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.sh2td" title="rcatool.utils.atmosphys.sh2td"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.sh2td</span></code></a>(sh, p)</p></td>
+<td><p>Returns dew point temperature (K) at mixing ratio sh (kg/kg) and pressure p (Pa).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.calc_e_from_w" title="rcatool.utils.atmosphys.calc_e_from_w"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.calc_e_from_w</span></code></a>(w[, P])</p></td>
+<td><p>Vapor pressure over liquid surface can be calculated from a variety of different combinations of state variables. Here, vapor pressure is calculated from mixing ratio w (kg/kg) and pressure P. Formula is given in standard literature; e.g. eq. 2.18 in Rogers&amp;Yau (Cloud physics) and eq. 4.1.2 in Emanuel (1994). Reference: * Emanuel, K. A. (1994):  Atmospheric Convection. New York, NY:   Oxford University Press, 580 pp.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.calc_e_from_sh" title="rcatool.utils.atmosphys.calc_e_from_sh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.calc_e_from_sh</span></code></a>(sh[, P])</p></td>
+<td><p>Vapor pressure over liquid surface can be calculated from a variety of different combinations of state variables. Here, vapor pressure is calculated from specific humidity sh (kg/kg) and pressure P (Pa). Formula is given in standard literature; e.g. eq. 2.19 in Rogers &amp; Yau (Cloud physics) and eq. 4.1.4 in Emanuel (1994). Reference: * Emanuel, K. A. (1994):  Atmospheric Convection. New York, NY:   Oxford University Press, 580 pp.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.calc_es" title="rcatool.utils.atmosphys.calc_es"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.calc_es</span></code></a>(T)</p></td>
+<td><p>Returns saturation vapor pressure in hPa at temperature T (Kelvin) Formula 2.17 in Rogers&amp;Yau</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.calc_ws" title="rcatool.utils.atmosphys.calc_ws"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.calc_ws</span></code></a>(T[, P])</p></td>
+<td><p>Returns saturation mixing ratio in kg/kg at temperature T (Kelvin) and pressure P (hPa).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.td" title="rcatool.utils.atmosphys.td"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.td</span></code></a>(e)</p></td>
+<td><p>Returns dew point temperature (C) at vapor pressure e (Pa) Insert Td in 2.17 in Rogers&amp;Yau and solve for Td</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.wind2uv" title="rcatool.utils.atmosphys.wind2uv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.wind2uv</span></code></a>(ws, wd[, ...])</p></td>
+<td><p>Converts wind speed and direction to u and v components.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.uv2wind" title="rcatool.utils.atmosphys.uv2wind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.uv2wind</span></code></a>(u, v)</p></td>
+<td><p>Converts u and v components to wind speed and direction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.brunt_vaisala_frequency" title="rcatool.utils.atmosphys.brunt_vaisala_frequency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.brunt_vaisala_frequency</span></code></a>(...)</p></td>
+<td><p>Calculate Brunt-Vaisala frequency in layer bounded by two pressure levels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.lifted_condensation_temperature" title="rcatool.utils.atmosphys.lifted_condensation_temperature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.lifted_condensation_temperature</span></code></a>(...)</p></td>
+<td><p>Returns the lifted condensation temperature in units of Kelvin.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.theta_equivalent" title="rcatool.utils.atmosphys.theta_equivalent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.theta_equivalent</span></code></a>(...)</p></td>
+<td><p>Returns the equivalent potential temperature in units of Kelvin.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.atmosphys.theta_pseudoequiv" title="rcatool.utils.atmosphys.theta_pseudoequiv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.atmosphys.theta_pseudoequiv</span></code></a>(...)</p></td>
+<td><p>Returns the pseudo-equivalent potential temperature in units of Kelvin.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="io-handling">
+<h2>IO handling<a class="headerlink" href="#io-handling" title="Link to this heading"></a></h2>
+<p>This module provides routines representing tools to read and write NetCDF
+files.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.file_io.ncdump" title="rcatool.utils.file_io.ncdump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.file_io.ncdump</span></code></a>(nc_fid[, verb])</p></td>
+<td><p>ncdump outputs dimensions, variables and their attribute information.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.file_io.openFile" title="rcatool.utils.file_io.openFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.file_io.openFile</span></code></a>(filename)</p></td>
+<td><p>Function to open netcdf file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.file_io.getDimensions" title="rcatool.utils.file_io.getDimensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.file_io.getDimensions</span></code></a>(nc[, close])</p></td>
+<td><p>Function to retrieve the dimensions of a netcdf file nc: Netcdf object opened with function &quot;openFile&quot; close: set True if you want the file to be closed after retrieval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.file_io.getParams" title="rcatool.utils.file_io.getParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.file_io.getParams</span></code></a>(nc, params)</p></td>
+<td><p>Function to retrieve variables from a netcdf file nc: Netcdf object opened with function &quot;openFile&quot; params: A list of strings with the parameters to be retrieved close: set True if you want the file to be closed after retrieval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.file_io.fracday2datetime" title="rcatool.utils.file_io.fracday2datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.file_io.fracday2datetime</span></code></a>(tdata)</p></td>
+<td><p>Takes an array of dates given in %Y%m%d.%f format and returns a corresponding datetime object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.file_io.write2netcdf" title="rcatool.utils.file_io.write2netcdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.file_io.write2netcdf</span></code></a>(filename, ...)</p></td>
+<td><p>Opens a new NetCDF file to write the input data to.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="grid-applications">
+<h2>Grid applications<a class="headerlink" href="#grid-applications" title="Link to this heading"></a></h2>
+<p>Routines to remap data given source and target grids.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.grids.fnCellCorners" title="rcatool.utils.grids.fnCellCorners"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.grids.fnCellCorners</span></code></a>(rgrLon, rgrLat)</p></td>
+<td><p>File name: fnCellBoundaries Author: Andreas Prein E-mail: <a class="reference external" href="mailto:prein&#37;&#52;&#48;ucar&#46;edu">prein<span>&#64;</span>ucar<span>&#46;</span>edu</a> Date created: 20.03.2015 Date last modified: 20.03.2015</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.grids.calc_vertices" title="rcatool.utils.grids.calc_vertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.grids.calc_vertices</span></code></a>(lons, lats)</p></td>
+<td><p>Estimate the cell boundaries from the cell location of regular grids</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.grids.fnRemapConOperator" title="rcatool.utils.grids.fnRemapConOperator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.grids.fnRemapConOperator</span></code></a>(...)</p></td>
+<td><p>File name: fnRemapConOperator Author: Andreas Prein E-mail: <a class="reference external" href="mailto:prein&#37;&#52;&#48;ucar&#46;edu">prein<span>&#64;</span>ucar<span>&#46;</span>edu</a> Date created: 26.05.2017 Date last modified: 26.05.2017</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.grids.fnRemapCon" title="rcatool.utils.grids.fnRemapCon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.grids.fnRemapCon</span></code></a>(rgrLonS, ...)</p></td>
+<td><p>File name: fnRemapCon Author: Andreas Prein E-mail: <a class="reference external" href="mailto:prein&#37;&#52;&#48;ucar&#46;edu">prein<span>&#64;</span>ucar<span>&#46;</span>edu</a> Date created: 13.06.2017 Date last modified: 13.06.2017</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.grids.add_matrix_NaNs" title="rcatool.utils.grids.add_matrix_NaNs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.grids.add_matrix_NaNs</span></code></a>(regridder)</p></td>
+<td><p>Replace zero values of cells in the new grid that are outside the old grid's domain with NaN's.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="config-reader-module">
+<h2>Config reader module<a class="headerlink" href="#config-reader-module" title="Link to this heading"></a></h2>
+<p>Creates and return a dictionary built from a config file.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.ini_reader.get_config_dict" title="rcatool.utils.ini_reader.get_config_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.ini_reader.get_config_dict</span></code></a>(...)</p></td>
+<td><p>Create a dictionary from then input config file.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="polygons">
+<span id="id1"></span><h2>Polygons<a class="headerlink" href="#polygons" title="Link to this heading"></a></h2>
+<section id="mask-polygons">
+<h3>Mask polygons<a class="headerlink" href="#mask-polygons" title="Link to this heading"></a></h3>
+<p>Routine for Masking Data with Polygons.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.polygons.polygons" title="rcatool.utils.polygons.polygons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.polygons.polygons</span></code></a>([area, ...])</p></td>
+<td><p>See available polygons and retrieve path to polygon files.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.polygons.mask_region" title="rcatool.utils.polygons.mask_region"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.polygons.mask_region</span></code></a>(xp, yp, area)</p></td>
+<td><p>Routine to mask grid points outside a specified polygon.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.polygons.create_polygon" title="rcatool.utils.polygons.create_polygon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.polygons.create_polygon</span></code></a>()</p></td>
+<td><p>Retrieve polygon arbitrarily drawn interactively on a map by mouse clicking.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.polygons.plot_polygon" title="rcatool.utils.polygons.plot_polygon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.polygons.plot_polygon</span></code></a>(polygon)</p></td>
+<td><p>Plot polygon on map.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.polygons.topo_mask" title="rcatool.utils.polygons.topo_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.polygons.topo_mask</span></code></a>(data, orog, ...)</p></td>
+<td><p>Rotuine to mask grid points outside a specified height interval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.polygons.find_geo_indices" title="rcatool.utils.polygons.find_geo_indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.polygons.find_geo_indices</span></code></a>(...)</p></td>
+<td><p>Search for nearest decimal degree in an array of decimal degrees and return the index.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="draw-polygon">
+<h3>Draw polygon<a class="headerlink" href="#draw-polygon" title="Link to this heading"></a></h3>
+<p>Draw a simple polygon using matplotlib with mouse event handling.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.draw_polygon.Canvas.set_location" title="rcatool.utils.draw_polygon.Canvas.set_location"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.draw_polygon.Canvas.set_location</span></code></a>(event)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rcatool.utils.html#rcatool.utils.draw_polygon.Canvas.update_path" title="rcatool.utils.draw_polygon.Canvas.update_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rcatool.utils.draw_polygon.Canvas.update_path</span></code></a>(event)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="generated/rcatool.stats.sal.run_sal_analysis.html" class="btn btn-neutral float-left" title="rcatool.stats.sal.run_sal_analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/rcatool.utils.atmosphys.rh2sh.html" class="btn btn-neutral float-right" title="rcatool.utils.atmosphys.rh2sh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

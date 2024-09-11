@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.stats package &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">rcatool.stats package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rcatool.stats.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcatool-stats-package">
+<h1>rcatool.stats package<a class="headerlink" href="#rcatool-stats-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rcatool.stats.ASoP">
+<span id="rcatool-stats-asop-module"></span><h2>rcatool.stats.ASoP module<a class="headerlink" href="#module-rcatool.stats.ASoP" title="Link to this heading"></a></h2>
+<section id="asop-analyzing-scales-of-precipitation">
+<h3>ASoP - Analyzing Scales of Precipitation<a class="headerlink" href="#asop-analyzing-scales-of-precipitation" title="Link to this heading"></a></h3>
+<p>Reference: Klingaman et al (2017)
+<a class="reference external" href="https://www.geosci-model-dev.net/10/57/2017/">https://www.geosci-model-dev.net/10/57/2017/</a></p>
+<p>Authors: Petter Lind
+Created: Spring 2019
+Updates:</p>
+<blockquote>
+<div><p>May 2020</p>
+</div></blockquote>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.ASoP.asop">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.ASoP.</span></span><span class="sig-name descname"><span class="pre">asop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/ASoP.html#asop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.ASoP.asop" title="Link to this definition"></a></dt>
+<dd><p>Calculate ASoP parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 2D or 1D array of data. All data points are collectively used in the
+asop calculation unless ‘keepdims’ is True. Then calculation
+is performed along zeroth axis (expected time dimension).</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the dimension defined by axis argument
+(default 0) and returns a 2d array of asop components. If set to False
+(default) all values are collectively assembled before calculation.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis over which to apply the calculation if keepdims is set to
+True. Default is 0.</p></li>
+<li><p><strong>bins</strong> (<em>list/array</em>) – Defines the bin edges, including the rightmost edge, allowing for
+non-uniform bin widths. If bins is set to ‘None’ they will be
+automatically calculated using Klingaman bins; function bins_calc in
+this module.</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – Value of threshold if thresholding data. Default None.</p></li>
+<li><p><strong>return_bins</strong> (<em>boolean</em>) – If set to True (default False), bins that have been used in the
+calculation are returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Cfactor</strong> (<em>array</em>) – data array with relative contribution per bin to the total mean.</p></li>
+<li><p><strong>FCfactor</strong> (<em>array</em>) – data array with relative contribution per bin independent
+of the total mean.</p></li>
+<li><p><strong>bins_ret</strong> (<em>array</em>) – If return_bins is True, the array of bin edges is returned.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.ASoP.bins_calc">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.ASoP.</span></span><span class="sig-name descname"><span class="pre">bins_calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bintype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Klingaman'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/ASoP.html#bins_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.ASoP.bins_calc" title="Link to this definition"></a></dt>
+<dd><p>Calculates bins with edges according to Eq. 1 in Klingaman et al. (2017);
+<a class="reference external" href="https://www.geosci-model-dev.net/10/57/2017/">https://www.geosci-model-dev.net/10/57/2017/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>array/list</em>) – 1D array or list with bin numbers</p></li>
+<li><p><strong>bintype</strong> (<em>str</em>) – The type of bins to be calculated; ‘Klingaman’ (see reference) or
+‘exponential’ for exponential bins.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bn</strong> – 1D array of bin edges</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.arithmetics">
+<span id="rcatool-stats-arithmetics-module"></span><h2>rcatool.stats.arithmetics module<a class="headerlink" href="#module-rcatool.stats.arithmetics" title="Link to this heading"></a></h2>
+<p>Functions for various arithmetic calculations.</p>
+<p>Created: Autumn 2016
+Authors: Petter Lind &amp; David Lindstedt</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.arithmetics.run_mean">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.arithmetics.</span></span><span class="sig-name descname"><span class="pre">run_mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'valid'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/arithmetics.html#run_mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.arithmetics.run_mean" title="Link to this definition"></a></dt>
+<dd><p>Calculate running mean</p>
+<p>Return running mean of data vector x where
+N is the window size.
+mode key word argument describes how the edges should be handled.
+See numpy.convolve for more information.</p>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.bootstrap">
+<span id="rcatool-stats-bootstrap-module"></span><h2>rcatool.stats.bootstrap module<a class="headerlink" href="#module-rcatool.stats.bootstrap" title="Link to this heading"></a></h2>
+<section id="bootstrapping">
+<h3>Bootstrapping<a class="headerlink" href="#bootstrapping" title="Link to this heading"></a></h3>
+<p>Functions for bootstrap calculations.</p>
+<p>Authors: Petter Lind
+Created: Autumn 2016
+Updates:</p>
+<blockquote>
+<div><p>May 2020</p>
+</div></blockquote>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.bootstrap.block_bootstr">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.bootstrap.</span></span><span class="sig-name descname"><span class="pre">block_bootstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/bootstrap.html#block_bootstr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.bootstrap.block_bootstr" title="Link to this definition"></a></dt>
+<dd><p>Calculate block bootstrap samples.</p>
+<p>This is a block boostrap function, converted from R into python, based on:
+<a class="reference external" href="http://stat.wharton.upenn.edu/~buja/STAT-541/time-series-bootstrap.R">http://stat.wharton.upenn.edu/~buja/STAT-541/time-series-bootstrap.R</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list/array</em>) – 1D data array on which to perform the block bootstrap.</p></li>
+<li><p><strong>block</strong> (<em>int</em>) – the block length to be used. Default is 5.</p></li>
+<li><p><strong>nrep</strong> (<em>int</em>) – the number of resamples produced in the bootstrap. Default is 500.</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processors, default 1. If larger than 1, multiple processors
+are used in parallell using the multiprocessing module.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>arrBt</strong> – 2D array with bootstrap samples; rows are the samples, columns the
+values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.climateindex">
+<span id="rcatool-stats-climateindex-module"></span><h2>rcatool.stats.climateindex module<a class="headerlink" href="#module-rcatool.stats.climateindex" title="Link to this heading"></a></h2>
+<section id="climate-indices">
+<h3>Climate indices<a class="headerlink" href="#climate-indices" title="Link to this heading"></a></h3>
+<p>Functions for various climate index calculations.</p>
+<p>Authors: Petter Lind &amp; David Lindstedt
+Created: Autumn 2016
+Updates:</p>
+<blockquote>
+<div><p>May 2020</p>
+</div></blockquote>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.RRpX">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">RRpX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#RRpX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.RRpX" title="Link to this definition"></a></dt>
+<dd><p>RRpX mm, total amount of precipitation above the percentile threshold pX;
+RR ≥ pX mm: Let RRij be the daily precipitation amount on day i in period
+j. Sum the precipitation for all days where RRij ≥ pX mm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 1D/2D data array, with time steps on the zeroth axis (axis=0).</p></li>
+<li><p><strong>percentile</strong> (<em>int</em>) – Percentile that defines the threshold.</p></li>
+<li><p><strong>thr</strong> (<em>float/int</em>) – Pre-thresholding of data to do calculation for wet days/hours only.</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If False (default) calculation is performed on all data collectively,
+otherwise for each timeseries on each point in 2d space. ‘Axis’ then
+defines along which axis the timeseries are located.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RRpx</strong> – 1D/2D array with calculated RRpXX indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list/array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.RRtX">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">RRtX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#RRtX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.RRtX" title="Link to this definition"></a></dt>
+<dd><p>RRtX mm, total amount of precipitation above the threshold ‘thr’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 1D/2D data array, with time steps on the zeroth axis (axis=0).</p></li>
+<li><p><strong>thr</strong> (<em>int</em>) – Threshold that defines the threshold above which data is summed.</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If False (default) calculation is performed on all data collectively,
+otherwise for each timeseries on each point in 2d space. ‘Axis’ then
+defines along which axis the timeseries are located.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RRtx</strong> – 1D/2D array with calculated RRtXX indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list/array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.Rxx">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">Rxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#Rxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.Rxx" title="Link to this definition"></a></dt>
+<dd><p>Rxx mm, count of any time units (days, hours, etc) when precipitation ≥
+xx mm: Let RRij be the precipitation amount on time unit i in period j.
+Count the number of days where RRij ≥ xx mm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 1D/2D data array, with time steps on the zeroth axis (axis=0).</p></li>
+<li><p><strong>thr</strong> (<em>float/int</em>) – Threshold to be used; eg 10 for R10, 20 R20 etc. Default 1.0.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Along which axis to calculate Rxx. Defaults to 0</p></li>
+<li><p><strong>normalize</strong> (<em>boolean</em>) – If True (default False) the counts are normalized by total number of
+time units in each array/grid point. Returned values will then be
+fractions.</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If False (default) calculation is performed on all data collectively,
+otherwise for each timeseries on each point in 2d space. ‘Axis’ then
+defines along which axis the timeseries are located.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Rxx</strong> – 1D/2D array with calculated Rxx indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list/array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.SDII">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">SDII</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#SDII"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.SDII" title="Link to this definition"></a></dt>
+<dd><p>SDII, Simple pricipitation intensity index: Let RRwj be the daily
+precipitation amount on wet days, w (RR ≥ 1mm) in period j.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list/array</em>) – 2D array.</p></li>
+<li><p><strong>thr</strong> (<em>float/int</em>) – threshold for wet events (wet days/hours etc)</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis along which the calculation is applied (default 0).</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the zeroth axis (time) and returns a 2d array
+of freq-int dists. If set to False (default) all values are
+collectively assembled before calculation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.cdd">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">cdd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8,</span> <span class="pre">9,</span> <span class="pre">10,</span> <span class="pre">11,</span> <span class="pre">12,</span> <span class="pre">13,</span> <span class="pre">14,</span> <span class="pre">15,</span> <span class="pre">16,</span> <span class="pre">17,</span> <span class="pre">18,</span> <span class="pre">19,</span> <span class="pre">20,</span> <span class="pre">21,</span> <span class="pre">22,</span> <span class="pre">23,</span> <span class="pre">24,</span> <span class="pre">25,</span> <span class="pre">26,</span> <span class="pre">27,</span> <span class="pre">28,</span> <span class="pre">29,</span> <span class="pre">30,</span> <span class="pre">31,</span> <span class="pre">32,</span> <span class="pre">33,</span> <span class="pre">34,</span> <span class="pre">35,</span> <span class="pre">36,</span> <span class="pre">37,</span> <span class="pre">38,</span> <span class="pre">39,</span> <span class="pre">40,</span> <span class="pre">41,</span> <span class="pre">42,</span> <span class="pre">43,</span> <span class="pre">44,</span> <span class="pre">45,</span> <span class="pre">46,</span> <span class="pre">47,</span> <span class="pre">48,</span> <span class="pre">49,</span> <span class="pre">50,</span> <span class="pre">51,</span> <span class="pre">52,</span> <span class="pre">53,</span> <span class="pre">54,</span> <span class="pre">55,</span> <span class="pre">56,</span> <span class="pre">57,</span> <span class="pre">58,</span> <span class="pre">59,</span> <span class="pre">60])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#cdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.cdd" title="Link to this definition"></a></dt>
+<dd><p>Calculate the Consecutive Dry Days index (CDD).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 1D/2D daily precipitation data array in mm.</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – Value of threshold to define dry day. Default 1 mm.</p></li>
+<li><p><strong>periods</strong> (<em>list/array</em>) – Array of lenghts of dry periods to consider; e.g.
+[1, 3, 10, 14, 21, 30] computes frequency of dry periods with lengths
+1-3 days, 3-10 days, etc. Leftmost interval edge is included, not the
+right. Default periods is set to 60 days with 1 day increment.</p></li>
+<li><p><strong>maxper</strong> (<em>boolean</em>) – If set to True the longest CDD period and positioned at last position
+in returned array. Default False.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Along which axis to calculate cdd. Defaults to 0</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If False (default) calculation is performed on all data collectively,
+otherwise for each timeseries on each point in 2d space. ‘Axis’ then
+defines along which axis the timeseries are located.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>dlen</strong> (<em>list</em>) – list with lengths of each dry day event in timeseries</p></li>
+<li><p><strong>cdd</strong> (<em>list/array</em>) – 1D/2D array with frequencies of cdd intervals. For intervals where non
+exists, positions are set to NaN. Length of returned array (along
+computed ‘axis’) is equal to length of ‘periods’ list/array minus 1.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.ehi">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">ehi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#ehi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.ehi" title="Link to this definition"></a></dt>
+<dd><p>Calculate Excessive Heat Index (EHI).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list/array</em>) – 1D/2D array of daily temperature timeseries</p></li>
+<li><p><strong>thr_95</strong> (<em>float</em>) – 95th percentile daily mean value from climatology</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis along which the calculation is applied (default 0).</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the zeroth axis (time) and returns a 2d array
+of calculated statistics. If set to False (default) all values are
+collectively assembled before calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>EHI</strong> – Excessive heat index</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.extr_hotdays_calc">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">extr_hotdays_calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_p95</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#extr_hotdays_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.extr_hotdays_calc" title="Link to this definition"></a></dt>
+<dd><p>Calculate number of extreme hotdays.</p>
+<p>Return days with mean temperature above the 95th percentile
+of climatology.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 1D-array of temperature input timeseries</p></li>
+<li><p><strong>thr_p95</strong> (<em>float</em>) – 95th percentile daily mean value from climatology</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.hotdays_calc">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">hotdays_calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_p75</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#hotdays_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.hotdays_calc" title="Link to this definition"></a></dt>
+<dd><p>Calculate number of hotdays.</p>
+<p>Return days with mean temperature above the 75th percentile
+of climatology.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 1D-array of temperature input timeseries</p></li>
+<li><p><strong>thr_p75</strong> (<em>float</em>) – 75th percentile daily mean value from climatology</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.climateindex.tropnights_calc">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.climateindex.</span></span><span class="sig-name descname"><span class="pre">tropnights_calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/climateindex.html#tropnights_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.climateindex.tropnights_calc" title="Link to this definition"></a></dt>
+<dd><p>Calculate number of tropical nights.</p>
+<p>Return days with minimum temperature not below 20 degrees C.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>array</em>) – 1D-array of minimum temperatures timeseries in degrees Kelvin</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.convolve">
+<span id="rcatool-stats-convolve-module"></span><h2>rcatool.stats.convolve module<a class="headerlink" href="#module-rcatool.stats.convolve" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.convolve.convolve_fft">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.convolve.</span></span><span class="sig-name descname"><span class="pre">convolve_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary='fill'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_fft=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_pad=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_pad=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_nan=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_edge_zeros=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_wt=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_kernel=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_huge=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fftn=&lt;function</span> <span class="pre">fftn&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ifftn=&lt;function</span> <span class="pre">ifftn&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/convolve.html#convolve_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.convolve.convolve_fft" title="Link to this definition"></a></dt>
+<dd><p>Convolve an ndarray with an nd-kernel.  Returns a convolved image with
+shape = array.shape.  Assumes kernel is centered.</p>
+<p><cite>convolve_fft</cite> differs from <cite>scipy.signal.fftconvolve</cite> in a few ways:</p>
+<ul class="simple">
+<li><p>It can treat <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values as zeros or interpolate over them.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inf</span></code> values are treated as <code class="docutils literal notranslate"><span class="pre">NaN</span></code></p></li>
+<li><p>(optionally) It pads to the nearest 2^n size to improve FFT speed.</p></li>
+<li><p>Its only valid <code class="docutils literal notranslate"><span class="pre">mode</span></code> is ‘same’ (i.e. the same shape array is returned)</p></li>
+<li><p>It lets you use your own fft, e.g.,
+<cite>pyFFTW &lt;http://pypi.python.org/pypi/pyFFTW&gt;</cite> or
+<cite>pyFFTW3 &lt;http://pypi.python.org/pypi/PyFFTW3/0.2.1&gt;</cite>,
+which can lead to performance improvements, depending on your system
+configuration. pyFFTW3 is threaded, and therefore may yield significant
+performance benefits on multi-core machines at the cost of greater
+memory requirements. Specify the <code class="docutils literal notranslate"><span class="pre">fftn</span></code> and <code class="docutils literal notranslate"><span class="pre">ifftn</span></code> keywords to
+override the default, which is <cite>numpy.fft.fft</cite> and <cite>numpy.fft.ifft</cite>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<cite>numpy.ndarray</cite>) – Array to be convolved with <code class="docutils literal notranslate"><span class="pre">kernel</span></code></p></li>
+<li><p><strong>kernel</strong> (<cite>numpy.ndarray</cite>) – Will be normalized if <code class="docutils literal notranslate"><span class="pre">normalize_kernel</span></code> is set.  Assumed to be
+centered (i.e., shifts may result if your kernel is asymmetric)</p></li>
+<li><p><strong>boundary</strong> (<em>{'fill'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – A flag indicating how to handle boundaries:
+* ‘fill’: set values outside the array boundary to fill_value (default)
+* ‘wrap’: periodic boundary</p></li>
+<li><p><strong>interpolate_nan</strong> (<em>bool</em><em>, </em><em>optional</em>) – The convolution will be re-weighted assuming <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values are meant
+to be ignored, not treated as zero.  If this is off, all <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values
+will be treated as zero.</p></li>
+<li><p><strong>ignore_edge_zeros</strong> (<em>bool</em><em>, </em><em>optional</em>) – Ignore the zero-pad-created zeros.
+This will effectively decrease the kernel area on the edges but will
+not re-normalize the kernel. This parameter may result in
+‘edge-brightening’ effects if you’re using a normalized kernel</p></li>
+<li><p><strong>min_wt</strong> (<em>float</em><em>, </em><em>optional</em>) – If ignoring <code class="docutils literal notranslate"><span class="pre">NaN</span></code> / zeros, force all grid points with a weight less
+than this value to <code class="docutils literal notranslate"><span class="pre">NaN</span></code> (the weight of a grid point with <em>no</em>
+ignored neighbors is 1.0). If <code class="docutils literal notranslate"><span class="pre">min_wt</span></code> is zero, then all zero-weight
+points will be set to zero instead of <code class="docutils literal notranslate"><span class="pre">NaN</span></code> (which they would be
+otherwise, because 1/0 = nan). See the examples below</p></li>
+<li><p><strong>normalize_kernel</strong> (<em>function</em><em> or </em><em>boolean</em><em>, </em><em>optional</em>) – If specified, this is the function to divide kernel by to normalize it.
+e.g., <code class="docutils literal notranslate"><span class="pre">normalize_kernel=np.sum</span></code> means that kernel will be modified
+to be:
+<code class="docutils literal notranslate"><span class="pre">kernel</span> <span class="pre">=</span> <span class="pre">kernel</span> <span class="pre">/</span> <span class="pre">np.sum(kernel)</span></code>.  If True, defaults to
+<code class="docutils literal notranslate"><span class="pre">normalize_kernel</span> <span class="pre">=</span> <span class="pre">np.sum</span></code>.</p></li>
+<li><p><strong>fft_pad</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default on.  Zero-pad image to the nearest 2^n</p></li>
+<li><p><strong>psf_pad</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default off.  Zero-pad image to be at least the sum of the image sizes
+(in order to avoid edge-wrapping when smoothing)</p></li>
+<li><p><strong>crop</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default on.  Return an image of the size of the largest input image.
+If the images are asymmetric in opposite directions, will return the
+largest image in both directions.
+For example, if an input image has shape [100,3] but a kernel with
+shape [6,6] is used, the output will be [100,6].</p></li>
+<li><p><strong>return_fft</strong> (<em>bool</em><em>, </em><em>optional</em>) – Return the fft(image)*fft(kernel) instead of the convolution (which is
+ifft(fft(image)*fft(kernel))).  Useful for making PSDs.</p></li>
+<li><p><strong>fftn</strong> (<em>functions</em><em>, </em><em>optional</em>) – The fft and inverse fft functions.  Can be overridden to use your own
+ffts, e.g. an fftw3 wrapper or scipy’s fftn, e.g.
+<code class="docutils literal notranslate"><span class="pre">fftn=scipy.fftpack.fftn</span></code></p></li>
+<li><p><strong>ifftn</strong> (<em>functions</em><em>, </em><em>optional</em>) – The fft and inverse fft functions.  Can be overridden to use your own
+ffts, e.g. an fftw3 wrapper or scipy’s fftn, e.g.
+<code class="docutils literal notranslate"><span class="pre">fftn=scipy.fftpack.fftn</span></code></p></li>
+<li><p><strong>complex_dtype</strong> (<em>np.complex</em><em>, </em><em>optional</em>) – Which complex dtype to use.  <cite>numpy</cite> has a range of options, from 64 to
+256.</p></li>
+<li><p><strong>quiet</strong> (<em>bool</em><em>, </em><em>optional</em>) – Silence warning message about NaN interpolation</p></li>
+<li><p><strong>allow_huge</strong> (<em>bool</em><em>, </em><em>optional</em>) – Allow huge arrays in the FFT?  If False, will raise an exception if the
+array or kernel size is &gt;1 GB</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError:</strong> – If the array is bigger than 1 GB after padding, will raise this
+    exception unless allow_huge is True</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">convolve</span></code></dt><dd><p>Convolve is a non-fft version of this code.  It is more memory efficient and for small kernels can be faster.</p>
+</dd>
+</dl>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>default</strong> – <strong>array</strong> convolved with <code class="docutils literal notranslate"><span class="pre">kernel</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">return_fft</span></code> is set, returns fft(<strong>array</strong>) * fft(<code class="docutils literal notranslate"><span class="pre">kernel</span></code>).
+If crop is not set, returns the image, but with the fft-padded size
+instead of the input size</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.convolve.fft_prep">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.convolve.</span></span><span class="sig-name descname"><span class="pre">fft_prep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fill'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/convolve.html#fft_prep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.convolve.fft_prep" title="Link to this definition"></a></dt>
+<dd><p>Prepare data array and kernel for fft computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary</strong> (<em>{'fill'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – <p>A flag indicating how to handle boundaries:</p>
+<blockquote>
+<div><ul>
+<li><p>’fill’: set values outside the array boundary to fill_value
+(default)</p></li>
+<li><p>’wrap’: periodic boundary</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>fft_pad</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default on.  Zero-pad image to the nearest 2^n</p></li>
+<li><p><strong>psf_pad</strong> (<em>bool</em><em>, </em><em>optional</em>) – Default off.  Zero-pad image to be at least the sum of the image sizes
+(in order to avoid edge-wrapping when smoothing)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.convolve.filtering">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.convolve.</span></span><span class="sig-name descname"><span class="pre">filtering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wgts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode='valid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fftn=&lt;function</span> <span class="pre">fftn&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ifftn=&lt;function</span> <span class="pre">ifftn&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/convolve.html#filtering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.convolve.filtering" title="Link to this definition"></a></dt>
+<dd><p>1D and 2D filtering procedures.</p>
+<p>Filters input data, both 1D and 2D, with user defined weights. Set fft to
+True for fast fourier transform to speed things up when data is large.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – Data to be filtered.</p></li>
+<li><p><strong>wgts</strong> (<em>array/list</em>) – The weights (kernel) to be used in the filtering.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – String indicating the size of output (see
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/signal.html">https://docs.scipy.org/doc/scipy/reference/signal.html</a>)</p></li>
+<li><p><strong>dim</strong> (<em>int</em>) – If 1 one-dimensional filtering is performed and if ‘axis’ is also set,
+1D-filtering is applied along this axis. If dim=2 two-dimensional
+filtering is applied.</p></li>
+<li><p><strong>fft</strong> (<em>boolean</em>) – Set True to use fast fourier transform in the 2D filtering.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data_conv</strong> – Convoluted data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.convolve.kernel_gen">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.convolve.</span></span><span class="sig-name descname"><span class="pre">kernel_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ktype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'square'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/convolve.html#kernel_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.convolve.kernel_gen" title="Link to this definition"></a></dt>
+<dd><p>Function to create a kernel, i.e. a moving window (box or disk) with
+side/radius equal to ‘n’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – Side/radius of square/disk of smoothening window.</p></li>
+<li><p><strong>ktype</strong> (<em>string</em>) – The type of box; ‘square’ (default) or ‘disk’.</p></li>
+<li><p><strong>kfun</strong> (<em>string</em>) – The function ‘kfun’ applied to each sub-sample within the moving
+window. Either ‘mean’ (default) or ‘sum’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.convolve.lanczos_filter">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.convolve.</span></span><span class="sig-name descname"><span class="pre">lanczos_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lowpass'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/convolve.html#lanczos_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.convolve.lanczos_filter" title="Link to this definition"></a></dt>
+<dd><p>Calculate weights for a low pass Lanczos filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> (<em>int</em>) – The length of the filter window.</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em>) – The cutoff frequency in inverse time steps.</p></li>
+<li><p><strong>cutoff_2</strong> (<em>float</em>) – The second cutoff frequency in inverse time steps. Only used if ftype
+is ‘bandpass’</p></li>
+<li><p><strong>ftype</strong> (<em>str</em>) – The type of cutoff filtering: ‘lowpass’, ‘highpass’ or ‘bandpass’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>wgts</strong> – Array with calculated weights.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.event_duration">
+<span id="rcatool-stats-event-duration-module"></span><h2>rcatool.stats.event_duration module<a class="headerlink" href="#module-rcatool.stats.event_duration" title="Link to this heading"></a></h2>
+<section id="event-duration-analysis-eda-of-precipitation">
+<h3>Event Duration Analysis (EDA) of Precipitation<a class="headerlink" href="#event-duration-analysis-eda-of-precipitation" title="Link to this heading"></a></h3>
+<p>Author: Petter Lind
+Created: Fall 2020
+Updates:</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.event_duration.eda">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.event_duration.</span></span><span class="sig-name descname"><span class="pre">eda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_statistic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'amount'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statistic_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/event_duration.html#eda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.event_duration.eda" title="Link to this definition"></a></dt>
+<dd><p>Calculate event duration statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 2D or 1D array of data. All data points are collectively used in the
+asop calculation unless ‘keepdims’ is True. Then calculation
+is performed along zeroth axis (expected time dimension).</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the dimension defined by axis argument
+(default 0) and returns a 2d array of asop components. If set to False
+(default) all values are collectively assembled before calculation.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis over which to apply the calculation if keepdims is set to
+True. Default is 0.</p></li>
+<li><p><strong>event_statistic</strong> (<em>str</em>) – The statistic to calculate for each event; choices are ‘amount’,
+‘mean int’ or ‘max int’.</p></li>
+<li><p><strong>duration_bins</strong> (<em>list/array</em>) – Defines the bin edges for event durations, including the rightmost
+edge, allowing for non-uniform bin widths.</p></li>
+<li><p><strong>statistic_bins</strong> (<em>list/array</em>) – Defines the bin edges for event statistic (amount/mean/max),
+including the rightmost edge, allowing for non-uniform bin widths.</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – Value of threshold to identify start/end of events. Default 0.1.</p></li>
+<li><p><strong>dry_events</strong> (<em>bool</em>) – If set to True, duration of dry intervals will be calculated.
+‘dry_bins’ must then be provided.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>eda_arr</strong> – data array with frequency of event statistic (amount, mean, max) per
+duration bin.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.pdf">
+<span id="rcatool-stats-pdf-module"></span><h2>rcatool.stats.pdf module<a class="headerlink" href="#module-rcatool.stats.pdf" title="Link to this heading"></a></h2>
+<section id="probability-distributions">
+<h3>Probability distributions<a class="headerlink" href="#probability-distributions" title="Link to this heading"></a></h3>
+<p>Authors: Petter Lind
+Created: Spring 2015
+Updates:</p>
+<blockquote>
+<div><p>May 2020</p>
+</div></blockquote>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.pdf.freq_int_dist">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.pdf.</span></span><span class="sig-name descname"><span class="pre">freq_int_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ci</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nmc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ci_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/pdf.html#freq_int_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.pdf.freq_int_dist" title="Link to this definition"></a></dt>
+<dd><p>Calculate frequency - instensity distriutions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 2D or 1D array of data. All data points are collectively used in the
+freq-instensity calculation unless ‘keepdims’ is True. Then calculation
+is performed along the dimension defined by axis argument (default 0).</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the dimension defined by axis argument
+(default 0) and returns a 2d array of freq-int dists. If set to False
+(default) all values are collectively assembled before calculation.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis over which to apply the calculation if keepdims is set to
+True. Default is 0.</p></li>
+<li><p><strong>bins</strong> (<em>int/list/array</em>) – If an int, it defines the number of equal-width bins in the given
+range (10, by default). If a sequence, it defines the bin edges,
+including the rightmost edge, allowing for non-uniform bin widths.
+If bins is set to ‘None’ they will be automatically calculated.</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – Value of threshold if thresholding data. Default None.</p></li>
+<li><p><strong>density</strong> (<em>boolean</em>) – If True (default) then the value of the probability density function at
+each bin is returned, otherwise the number of samples per bin.</p></li>
+<li><p><strong>bootstrap</strong> (<em>boolean</em>) – If to use block bootstrap to calculate confidence interval.</p></li>
+<li><p><strong>nmc</strong> (<em>int/float</em>) – Number of bootstrap samples to use.</p></li>
+<li><p><strong>block</strong> (<em>int/float</em>) – Size of block to use in block bootstrap</p></li>
+<li><p><strong>ci_level</strong> (<em>int/float</em>) – The confidence interval level to use (eg 95, 99 representing 95%, 99%
+levels)</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processes to use in bootstrap calculation. Default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>pdf</strong> (<em>array</em>) – data array with size len(bins)-1 with counts/probabilities</p></li>
+<li><p><strong>ci</strong> (<em>dict</em>) – data dictionary with confidence level for each bin; keys
+‘min_levels’/’max_levels’ with corresponding values. If bootstrap is
+False, then None values are returned.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.pdf.perkins_skill_score">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.pdf.</span></span><span class="sig-name descname"><span class="pre">perkins_skill_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_mod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/pdf.html#perkins_skill_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.pdf.perkins_skill_score" title="Link to this definition"></a></dt>
+<dd><p>Calculate the Perkins Skill Score (PSS).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p_mod</strong> (<em>list/array</em>) – 1d or 2d arrays with frequency of values (probability) in a given bin
+from the model and observations respectively.
+Make sure that the sum of probabilities over all the bins should be
+equal to one. This depends on how the pdf was calculated. Bins with
+unity width gives total prob of one.</p></li>
+<li><p><strong>p_obs</strong> (<em>list/array</em>) – 1d or 2d arrays with frequency of values (probability) in a given bin
+from the model and observations respectively.
+Make sure that the sum of probabilities over all the bins should be
+equal to one. This depends on how the pdf was calculated. Bins with
+unity width gives total prob of one.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – If data is 2d, the PSS will be calculated along this axis. Default
+axis is zero.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>pss</strong> – Returns Perkins Skill Score, single float or array with floats.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float/array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.pdf.prob_of_exceed">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.pdf.</span></span><span class="sig-name descname"><span class="pre">prob_of_exceed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pctls_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/pdf.html#prob_of_exceed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.pdf.prob_of_exceed" title="Link to this definition"></a></dt>
+<dd><p>Calculates probability of exceedance distriutions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 2D or 1D array of data. All data points are collectively used in the
+freq-instensity calculation unless ‘keepdims’ is True. Then calculation
+is performed along zeroth axis.</p></li>
+<li><p><strong>pctls_levels</strong> (<em>'default'</em><em>, </em><em>None</em><em> or </em><em>array/list</em>) – If set to ‘default’, probability levels of exceedance are defined by a
+set of percentiles ranging from 0-100 and calculated from input data.
+If an array or list, these levels (between 0 and 100) will be used
+instead.  Default is None in which case input data is merely ranked
+from 0 to 1.</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the zeroth axis (time) and returns a 2d array
+of freq-int dists. If set to False (default) all values are
+collectively assembled before calculation.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis over which to apply the calculation if keepdims is set to
+True. Default is 0.</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – Value of threshold if thresholding data. Default None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>eop</strong> – exceedance of probability array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.precipitation_index">
+<span id="rcatool-stats-precipitation-index-module"></span><h2>rcatool.stats.precipitation_index module<a class="headerlink" href="#module-rcatool.stats.precipitation_index" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.precipitation_index.precip_amount_survival_fraction">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.precipitation_index.</span></span><span class="sig-name descname"><span class="pre">precip_amount_survival_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pctls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/precipitation_index.html#precip_amount_survival_fraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.precipitation_index.precip_amount_survival_fraction" title="Link to this definition"></a></dt>
+<dd><p>Calculate the frequency distribution, normalize by total precipitation, and
+sum the fractions. It answers the question ‘what fraction of total
+precipitation occurs beyond the top p percentile of days in a period?’,
+where p is any percentile of interest.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.precipitation_index.ranked_cumsum">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.precipitation_index.</span></span><span class="sig-name descname"><span class="pre">ranked_cumsum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/precipitation_index.html#ranked_cumsum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.precipitation_index.ranked_cumsum" title="Link to this definition"></a></dt>
+<dd><p>Rank the data and calculate the cumulative sum, starting from the highest
+values.</p>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats.sal">
+<span id="rcatool-stats-sal-module"></span><h2>rcatool.stats.sal module<a class="headerlink" href="#module-rcatool.stats.sal" title="Link to this heading"></a></h2>
+<section id="sal-module">
+<h3>SAL module<a class="headerlink" href="#sal-module" title="Link to this heading"></a></h3>
+<p>Functions for calculation of SAL statistics.</p>
+<p>Based on Wernli et al 2008
+<a class="reference external" href="http://journals.ametsoc.org/doi/abs/10.1175/2008MWR2415.1">http://journals.ametsoc.org/doi/abs/10.1175/2008MWR2415.1</a></p>
+<p>Created: Spring 2018
+Authors: Petter Lind &amp; David Lindstedt</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.A_stat">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">A_stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#A_stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.A_stat" title="Link to this definition"></a></dt>
+<dd><p>Calculate the amplitude component (A).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>arrays</em>) – 2D data arrays to be compared, where refdata is the reference data e.g.
+observations.</p></li>
+<li><p><strong>refdata</strong> (<em>arrays</em>) – 2D data arrays to be compared, where refdata is the reference data e.g.
+observations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>A</strong> – The calculated amplitude component</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.L_stat">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">L_stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#L_stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.L_stat" title="Link to this definition"></a></dt>
+<dd><p>Function to determine the location component (L). It consists of two
+components, L1 and L2.
+L1: measures the normalized distance between the centers of mass of the
+modelled and observed fields.
+L2: The second considers the averaged distance between the center of mass
+of the total field and individual field objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>arrays</em>) – 2D data arrays to be compared, where refdata is the reference data e.g.
+observations.</p></li>
+<li><p><strong>refdata</strong> (<em>arrays</em>) – 2D data arrays to be compared, where refdata is the reference data e.g.
+observations.</p></li>
+<li><p><strong>data_label</strong> (<em>arrays</em>) – Arrays with labeled objects. Returned from the label() function.</p></li>
+<li><p><strong>refdata_label</strong> (<em>arrays</em>) – Arrays with labeled objects. Returned from the label() function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>L1, L2, L</strong> – Dictionary with the calculated location components L1 and L2 as well as
+its composite L (L1 + L2).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.S_stat">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">S_stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lsmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#S_stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.S_stat" title="Link to this definition"></a></dt>
+<dd><p>Function to calculate the structure component (S).  The basic idea is to
+compare the volume of the normalized precipitation objects. This property
+captures information of the geometrical characteristics (size and shape)
+and how they differ between model (M) and reference (O).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>arrays</em>) – 2D data arrays to be compared, where refdata is the reference data e.g.
+observations.</p></li>
+<li><p><strong>refdata</strong> (<em>arrays</em>) – 2D data arrays to be compared, where refdata is the reference data e.g.
+observations.</p></li>
+<li><p><strong>data_label</strong> (<em>arrays</em>) – Arrays with labeled objects. Returned from the label() function.</p></li>
+<li><p><strong>refdata_label</strong> (<em>arrays</em>) – Arrays with labeled objects. Returned from the label() function.</p></li>
+<li><p><strong>obj_prop</strong> (<em>boolean</em>) – If True, individual object (rain fall area) properties are calculated
+and returned.</p></li>
+<li><p><strong>lsmask</strong> (<em>array</em>) – Land/sea mask (2d boolean array) to characterize identified objects as
+land, ocean or coastal objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>S</strong> (<em>float</em>) – The calculated structure component.</p></li>
+<li><p><strong>area_props/ref_area_props</strong> (<em>dictionary</em>) – Dictionary containing properties of identified objects in data and
+refdata respectively.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.distfunc">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">distfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#distfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.distfunc" title="Link to this definition"></a></dt>
+<dd><p>Calculate distances</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.remove_large_objects">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">remove_large_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#remove_large_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.remove_large_objects" title="Link to this definition"></a></dt>
+<dd><p>Remove large objects based on the maximum size limit defined by ‘max_size’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>segments</strong> (<em>array</em>) – Array with labeled objects. Returned from the label() function.</p></li>
+<li><p><strong>max_size</strong> (<em>int</em>) – Maximum size (number of grid points)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out</strong> – The segments array with too large objects removed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.run_sal_analysis">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">run_sal_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_lower_size_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_upper_size_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothening_data_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">land_sea_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_to_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#run_sal_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.run_sal_analysis" title="Link to this definition"></a></dt>
+<dd><p>Run the SAL analysis on the two data sets ‘data’ and ‘refdata’, where the
+latter is supposed to represent the ‘truth’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data/refdata</strong> (<em>arrays</em>) – 2D data arrays with zeroth dimension representing time steps. Both data
+sets must have the same dimension sizes, i.e. both in time and space.</p></li>
+<li><p><strong>thr_type</strong> (<em>string</em>) – Type of threshold to use. See ‘threshold’ function for more
+information.</p></li>
+<li><p><strong>thr_val</strong> (<em>float/int</em>) – Value of threshold.</p></li>
+<li><p><strong>obj_prop</strong> (<em>boolean</em>) – If True (default), a number of object area properties are returned for
+each of the identified objects. See ‘S_stat’ function for more
+information.</p></li>
+<li><p><strong>obj_lower_size_limit</strong> (<em>int</em>) – If set, all objects with an area (number of connected grid points)
+lower than the value set is removed from analysis.</p></li>
+<li><p><strong>obj_upper_size_limit</strong> (<em>int</em>) – If set, all objects with an area (number of connected grid points)
+greater than the value set is removed from analysis.</p></li>
+<li><p><strong>smoothening_data_level</strong> (<em>int</em>) – If set, the number represents the # of grid points of the side of a
+moving window used to smooth the data arrays. Mean value within window
+is calculated.</p></li>
+<li><p><strong>land_sea_mask</strong> (<em>array/None</em>) – If set, land_sea_mask must be a 2d boolean array with same dimension as
+input data. The land/sea-mask is then used to identify objects as
+either land (1), ocean (0) or coastal (2) in the object
+properties dictionary. Thus, mask only used if obj_prop=True.
+N.B. Mask must have True for ocean points and False for land points.</p></li>
+<li><p><strong>write_to_file</strong> (<em>boolean</em>) – Whether to write results to disk.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Name of file for writing to disk.</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processors to use in calculation. If larger than 1 (default),
+the multiprocessing module is used to distribute the calculation in the
+time dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>out_dict</strong> (<em>dictionary</em>) – Dictionary with calculated SAL statistics and area properties (if
+obj_prop is set to True).</p></li>
+<li><p><strong>nc</strong> (<em>file</em>) – If ‘write_to_file’ is True, results are written to disk in a netcdf
+file.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.sal_calc">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">sal_calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">olsl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ousl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smlvl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">land_sea_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#sal_calc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.sal_calc" title="Link to this definition"></a></dt>
+<dd><p>Perform the SAL calculation using the S, A, L functions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.threshold">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.threshold" title="Link to this definition"></a></dt>
+<dd><p>Function to calculate the threshold to be used to identify objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 2D data array.</p></li>
+<li><p><strong>thr_type</strong> (<em>string</em>) – Type of threshold. Can be either “S” for specified (any absolute
+value), “F” for a fraction (between 0 and 1) of the maximum value, and
+“P” for a percentile (95 for the 95th percentile etc).</p></li>
+<li><p><strong>value</strong> (<em>int/float</em>) – The corresponding value based on the chosen threhold type.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.sal.write_to_disk">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.sal.</span></span><span class="sig-name descname"><span class="pre">write_to_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ddict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/sal.html#write_to_disk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.sal.write_to_disk" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rcatool.stats.t_test">
+<span id="rcatool-stats-t-test-module"></span><h2>rcatool.stats.t_test module<a class="headerlink" href="#module-rcatool.stats.t_test" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.t_test.ttest_1d">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.t_test.</span></span><span class="sig-name descname"><span class="pre">ttest_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rcatool/stats/t_test.html#ttest_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.t_test.ttest_1d" title="Link to this definition"></a></dt>
+<dd><p>Function for calculating the t-test for two independent samples</p>
+</dd></dl>
+
+</section>
+<section id="module-rcatool.stats">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rcatool.stats" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RCAT Statistics &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How-To Guides" href="howto.html" />
+    <link rel="prev" title="RCAT Configuration" href="config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">RCAT Configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RCAT Statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">RCAT Statistics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/statistics.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcat-statistics">
+<span id="statistics"></span><h1>RCAT Statistics<a class="headerlink" href="#rcat-statistics" title="Link to this heading"></a></h1>
+<p>In the <strong>STATISTICS</strong> section in the file config_main.ini you specify the
+statistics to be done, in a Python dictionary structure.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&#39;annual cycle&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;seasonal cycle&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;stat method&#39;</span><span class="p">:</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;thr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}},</span>
+  <span class="s1">&#39;percentile&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;resample resolution&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">],</span> <span class="s1">&#39;pctls&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">90</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mf">99.9</span><span class="p">]},</span>
+  <span class="s1">&#39;pdf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;thr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span> <span class="s1">&#39;normalized&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;bins&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">265</span><span class="p">,</span> <span class="mi">290</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}}</span>
+  <span class="s1">&#39;diurnal cycle&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dcycle stat&#39;</span><span class="p">:</span> <span class="s1">&#39;amount&#39;</span><span class="p">,</span> <span class="s1">&#39;stat method&#39;</span><span class="p">:</span> <span class="s1">&#39;percentile 95&#39;</span><span class="p">}</span>
+  <span class="s1">&#39;moments&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;moment stat&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">],</span> <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">]}},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The keys in stats are the statistical measures and values provides the
+settings/configurations to be applied to the specific statistical calculation.
+The statistics that are currently available in RCAT and their default settings
+are given in the <cite>RCAT Statistics &lt;stats_control_functions&gt;</cite> module. Some
+related information is also found in the API-reference <a class="reference internal" href="stats.html#statistics-functions"><span class="std std-ref">Statistics</span></a>. In particular, the default_stats_config function in
+that module specifies the statistics possible to calculate along with their
+properties. Many of the properties (or settings) are common for each of the
+measures, for example resample resolution, thr or chunk dimension, while others
+may be specific for the kind of statistics.</p>
+<p>If you set <em>default</em> as the key value in stats, as is the case for <em>annual cycle</em>
+in the code snippet above, then (obviously) the default settings will be used.
+To modify the settings, the key value should be set to a dictionary containing
+the particular properties to be modified as keys and values with the modified
+item values.</p>
+<ol class="arabic">
+<li><dl>
+<dt>Common settings and properties</dt><dd><p>Here we list the most common settings and give some information of them.</p>
+<p><strong>vars</strong>: String <em>variable_name</em> or list of strings <em>[variable_name_1,
+variable_name_2, …]</em> representing which variables (as defined in
+variables under <strong>SETTINGS</strong> in the main configuration file). If set to empty
+list [] the calculation will be performed for all defined variables. Some
+statistics are specifically for a certain variable and then this variable
+is set as default.</p>
+<p><strong>resample resolution</strong>: If you want to resample input data (model or obs)
+to another time resolution before statistical computation, you can set this
+property to a list with two items; the first defines the temporal
+resolution (e.g. 3 hours, day, month, etc) and the second the method
+resampling used (taking the mean or sum for example).  The <a class="reference external" href="http://xarray.pydata.org">xarray</a> resample function is applied here which builds
+on the similar function in the <a class="reference external" href="https://pandas.pydata.org/">pandas</a>
+package. For example, resampling to 6 hourly data, taking the sum over
+intervening time steps would be defined as follows in the configuration
+file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">resample</span> <span class="n">resolution</span><span class="s1">&#39;: [&#39;</span><span class="mi">6</span><span class="n">H</span><span class="s1">&#39;, &#39;</span><span class="nb">sum</span><span class="s1">&#39;]</span>
+</pre></div>
+</div>
+<p>The documentation of and available options for the resampling function can
+be found <a class="reference external" href="http://xarray.pydata.org/en/stable/time-series.html#resampling-and-grouped-operations">here (xarray)</a>
+and <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html">here (pandas)</a>
+(see DateOffset Objects section for frequency string options).</p>
+<p><strong>chunk dimension</strong>: An important feature behind Dask parallelization is
+the use of <em>blocked algorithms</em>; to divide the data into chunks and then
+run computations on each block of data in parallel (see <a class="reference external" href="https://docs.dask.org/">Dask</a> documentation for more information). When
+working with multiple dimension data arrays in Dask you can chunk the data
+along different dimensions, depending on what kind of calculations you may
+want to do. For example, when computing seasonal means of data with
+dimensions (time, lat, lon) it doesn’t really matter along which dimension
+the data is chunked along. However, if you want to calculate time series
+percentiles for each grid point then chunking should be done in space
+(‘lat’, ‘lon’). The chunk dimension property has two options; time/space.
+For example to chunk along time, set</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;chunk dimension&#39;</span><span class="p">:</span> <span class="s1">&#39;time&#39;</span>
+</pre></div>
+</div>
+<p><strong>pool data</strong>: Boolean switch (True/False). Set to True if statistics should
+be done on pooled data, i.e. assembling all the grid points and time steps
+and then perform calculations. If you want the pooling to be done over
+certain sub-regions, then you need to specify these in the regions property
+in the main configuration file, <em>&lt;path-to-RCAT&gt;/config/config_main.ini</em>.</p>
+<p><strong>thr</strong>: Thresholding of data. The value of this (None is the default)
+should be a dictionary with keys defining variables and values an integer
+of float; e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;thr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="mi">273</span><span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>Specific settings and properties</dt><dd><p>Here we list more specific settings and give some information of them.</p>
+<p><strong>stat method</strong>: In many of the available statistical calculations,
+computations can be done using various methods or moments (e.g. mean, sum,
+std, etc). For example, if calculating the diurnal cycle, one could compute
+the mean of all values for each time unit in the cycle or another measure
+such as a percentile value. This can be specified with this property.
+Default value is mean. To use a percentile, set (for 95th percentile);</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;stat method&#39;</span><span class="p">:</span> <span class="s1">&#39;percentile 95&#39;</span>
+</pre></div>
+</div>
+<p><strong>dcycle stat</strong>: In the computation of the diurnal cycle (including
+harmonic fit) the <em>dcycle stat</em> defines whether to compute magnitudes or
+frequency of occurrences. For the former set it to ‘amount’, for the latter
+to ‘frequency’. When calculating frequencies you must also set the ‘thr’
+option, so for each unit of time in the cycle the occurrence above this
+threshold is calculated.</p>
+<p><strong>hours</strong> (in diurnal cycle): The value of this property is a list of hours
+that should be used in the diurnal cycle computation. It might be changed
+if you want to compare data sets with different temporal resolution (this
+can also be achieved with the <em>resample resolution</em> option).</p>
+<p><strong>normalized</strong> (in pdf): Boolean switch. With normalization, the normalized
+contribution (by the total mean) from each bin interval in the pdf (or
+frequency intensity distribution) is computed.</p>
+<p><strong>normalized</strong> (in Rxx): In the Rxx function (see
+<cite>statistics &lt;statistics_functions&gt;</cite> module) the counts above the
+threshold is normalized by the total number of values if this property is
+set to True.</p>
+<p><strong>moment stat</strong>: The moment statistical calculation involve a basic
+calculation on the data, such as means, sums or standard deviations. It is
+basically the same as the resample resolution property and the <em>moment
+stat</em> is set the same way. For example, if you want to calculate the annual
+maximum of the input data set.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;moment stat&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>How do you add new statistical methods to RCAT?  The code in RCAT is heavily
+based on <a class="reference external" href="http://xarray.pydata.org/">xarray</a> as well as <a class="reference external" href="https://docs.dask.org/">dask</a>. Xarray has been interfaced closely with dask
+applications so much of the things that can be done in xarray, like many
+(basic) statistical calculations, are already dask compliant and therefore
+relatively easy to implement in RCAT. If you would like to include any new
+such feature, have a look in the <a class="reference internal" href="rcat_stats.html#stats-calc-functions"><span class="std std-ref">RCAT Statistics</span></a> module, for example how the implementation of
+‘seasonal cycle’ has been done.</p>
+<p>For more elaborate statistics, using for example functions created by the
+user (using standard numpy/python code), it may be a bit more complex.
+Xarray has a function called <a class="reference external" href="http://xarray.pydata.org/en/stable/generated/xarray.apply_ufunc.html#xarray.apply_ufunc">apply_ufunc</a>
+which allows repeatedly applying a user function to xarray objects
+containing Dask arrays in an automatic way. See <a class="reference external" href="http://xarray.pydata.org/en/stable/computation.html#comput-wrapping-custom">here</a>
+for_some more information.</p>
+</li>
+</ol>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="config.html" class="btn btn-neutral float-left" title="RCAT Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="howto.html" class="btn btn-neutral float-right" title="How-To Guides" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

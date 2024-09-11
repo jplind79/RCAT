@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.stats.pdf.freq_int_dist &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rcatool.stats.pdf.prob_of_exceed" href="rcatool.stats.pdf.prob_of_exceed.html" />
+    <link rel="prev" title="rcatool.stats.convolve.convolve_fft" href="rcatool.stats.convolve.convolve_fft.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Development</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API-reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../user_api.html">User API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../plots.html">Visualization</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../stats.html">Statistics</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../stats.html#arithmetic-routines">Arithmetic routines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../stats.html#asop">ASoP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../stats.html#bootstrapping">Bootstrapping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../stats.html#climate-indices">Climate indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../stats.html#convolution">Convolution</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../stats.html#probability-distributions">Probability distributions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../stats.html#sal-module">SAL module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../utils.html">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../internal_api.html">Internal API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API-reference</a></li>
+          <li class="breadcrumb-item"><a href="../user_api.html">User API</a></li>
+          <li class="breadcrumb-item"><a href="../stats.html">Statistics</a></li>
+      <li class="breadcrumb-item active">rcatool.stats.pdf.freq_int_dist</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/rcatool.stats.pdf.freq_int_dist.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rcatool-stats-pdf-freq-int-dist">
+<h1>rcatool.stats.pdf.freq_int_dist<a class="headerlink" href="#rcatool-stats-pdf-freq-int-dist" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="rcatool.stats.pdf.freq_int_dist">
+<span class="sig-prename descclassname"><span class="pre">rcatool.stats.pdf.</span></span><span class="sig-name descname"><span class="pre">freq_int_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ci</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nmc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ci_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rcatool/stats/pdf.html#freq_int_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rcatool.stats.pdf.freq_int_dist" title="Link to this definition"></a></dt>
+<dd><p>Calculate frequency - instensity distriutions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em>) – 2D or 1D array of data. All data points are collectively used in the
+freq-instensity calculation unless ‘keepdims’ is True. Then calculation
+is performed along the dimension defined by axis argument (default 0).</p></li>
+<li><p><strong>keepdims</strong> (<em>boolean</em>) – If data is 2d (time in third dimesion) and keepdims is set to True,
+calculation is applied to the dimension defined by axis argument
+(default 0) and returns a 2d array of freq-int dists. If set to False
+(default) all values are collectively assembled before calculation.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The axis over which to apply the calculation if keepdims is set to
+True. Default is 0.</p></li>
+<li><p><strong>bins</strong> (<em>int/list/array</em>) – If an int, it defines the number of equal-width bins in the given
+range (10, by default). If a sequence, it defines the bin edges,
+including the rightmost edge, allowing for non-uniform bin widths.
+If bins is set to ‘None’ they will be automatically calculated.</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – Value of threshold if thresholding data. Default None.</p></li>
+<li><p><strong>density</strong> (<em>boolean</em>) – If True (default) then the value of the probability density function at
+each bin is returned, otherwise the number of samples per bin.</p></li>
+<li><p><strong>bootstrap</strong> (<em>boolean</em>) – If to use block bootstrap to calculate confidence interval.</p></li>
+<li><p><strong>nmc</strong> (<em>int/float</em>) – Number of bootstrap samples to use.</p></li>
+<li><p><strong>block</strong> (<em>int/float</em>) – Size of block to use in block bootstrap</p></li>
+<li><p><strong>ci_level</strong> (<em>int/float</em>) – The confidence interval level to use (eg 95, 99 representing 95%, 99%
+levels)</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – Number of processes to use in bootstrap calculation. Default 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>pdf</strong> (<em>array</em>) – data array with size len(bins)-1 with counts/probabilities</p></li>
+<li><p><strong>ci</strong> (<em>dict</em>) – data dictionary with confidence level for each bin; keys
+‘min_levels’/’max_levels’ with corresponding values. If bootstrap is
+False, then None values are returned.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rcatool.stats.convolve.convolve_fft.html" class="btn btn-neutral float-left" title="rcatool.stats.convolve.convolve_fft" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rcatool.stats.pdf.prob_of_exceed.html" class="btn btn-neutral float-right" title="rcatool.stats.pdf.prob_of_exceed" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

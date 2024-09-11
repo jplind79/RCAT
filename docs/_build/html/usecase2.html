@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Use Case 2: Probability distributions &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Use Case 3: Diurnal Cycles" href="usecase3.html" />
+    <link rel="prev" title="Use Case 1: Annual &amp; and Seasonal Cycles" href="usecase1.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="howto.html">How-To Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="howto.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#use-cases">Use Cases</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="howto.html#rcat-polygons">RCAT polygons</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="usecase1.html">Use Case 1: Annual &amp; and Seasonal Cycles</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Use Case 2: Probability distributions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-hourly-pdf-statistics-and-visualize-the-results">Create hourly PDF statistics and visualize the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#calculate-pdf-s-for-daily-maximum-values-instead">Calculate PDF’s for daily maximum values instead</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="usecase3.html">Use Case 3: Diurnal Cycles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polygons-howto.html">Polygons in RCAT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="howto.html">How-To Guides</a></li>
+      <li class="breadcrumb-item active">Use Case 2: Probability distributions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usecase2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="use-case-2-probability-distributions">
+<span id="use-case-2"></span><h1>Use Case 2: Probability distributions<a class="headerlink" href="#use-case-2-probability-distributions" title="Link to this heading"></a></h1>
+<p>In the following RCAT is applied to calculate standard empirical probability
+distribution functions. Similar to <a class="reference internal" href="usecase1.html#use-case-1"><span class="std std-ref">Use Case 1</span></a> most changes
+will be done in the configuration file, <em>&lt;path-to-RCAT&gt;/config/config_main.ini</em>.</p>
+<section id="create-hourly-pdf-statistics-and-visualize-the-results">
+<h2>Create hourly PDF statistics and visualize the results<a class="headerlink" href="#create-hourly-pdf-statistics-and-visualize-the-results" title="Link to this heading"></a></h2>
+<p>In the first example PDF’s based on hourly data for historical and scenario
+simulations will be calculated for precipitation and T2m. Output statistics are
+then compared in line plots for specified regions.</p>
+<section id="step-1-data-input">
+<h3>STEP 1: Data input<a class="headerlink" href="#step-1-data-input" title="Link to this heading"></a></h3>
+<p>Under <strong>MODELS</strong> section configure for two <em>arome</em> simulations – historic
+(<em>arome_his</em>) and future scenario (<em>arome_scn</em>). Thus, different years are
+specified, however, in the example here months 6,7,8 are specified so that
+only data for June, July and August is extracted.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arome_his</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;fpath&#39;</span><span class="p">:</span> <span class="s1">&#39;/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ECE_ALADIN_1985_2005/netcdf&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;grid type&#39;</span><span class="p">:</span> <span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="s1">&#39;grid name&#39;</span><span class="p">:</span> <span class="s1">&#39;NEU-3&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;start year&#39;</span><span class="p">:</span> <span class="mi">1990</span><span class="p">,</span> <span class="s1">&#39;end year&#39;</span><span class="p">:</span> <span class="mi">1994</span><span class="p">,</span> <span class="s1">&#39;months&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+     <span class="p">}</span>
+<span class="n">arome_scn</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;fpath&#39;</span><span class="p">:</span> <span class="s1">&#39;/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ECE_ALADIN_RCP85_2080_2100/netcdf&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;grid type&#39;</span><span class="p">:</span> <span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="s1">&#39;grid name&#39;</span><span class="p">:</span> <span class="s1">&#39;NEU-3&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;start year&#39;</span><span class="p">:</span> <span class="mi">2090</span><span class="p">,</span> <span class="s1">&#39;end year&#39;</span><span class="p">:</span> <span class="mi">2094</span><span class="p">,</span> <span class="s1">&#39;months&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+     <span class="p">}</span>
+</pre></div>
+</div>
+<p>We’re looking at climate change signal in the model, so the <strong>OBS</strong> section can be left as is.</p>
+</section>
+<section id="step-2-variables">
+<h3>STEP 2: Variables<a class="headerlink" href="#step-2-variables" title="Link to this heading"></a></h3>
+<p>Set output directory under the <strong>SETTINGS</strong> section.</p>
+<p>The key <em>variables</em> defines which variables to analyze along with some options
+regarding that particular variable. Since only models will be analyzed here,
+<em>obs</em> is set to None. Further, models will be kept at their respective grids,
+thus <em>regrid to</em> is also set to None. Statistics is configured for T2m (<em>tas</em>)
+and precipitation (<em>pr</em>) with hourly data as input (<em>freq</em> set to <em>1H</em>).</p>
+<p>Specify regions the <em>regions</em> key for which statistics will be selected for.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="nb">dir</span> <span class="o">=</span> <span class="o">/</span><span class="n">nobackup</span><span class="o">/</span><span class="n">rossby22</span><span class="o">/</span><span class="n">sm_petli</span><span class="o">/</span><span class="n">analysis</span><span class="o">/</span><span class="n">test_pdf_analysis</span>
+
+<span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="s1">&#39;1H&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;accumulated&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+           <span class="s1">&#39;obs&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;var names&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;regrid to&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+    <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="s1">&#39;1H&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;accumulated&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;obs&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;var names&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;regrid to&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+    <span class="p">}</span>
+
+<span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Scandinavia&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="step-3-select-statistics">
+<h3>STEP 3: Select statistics<a class="headerlink" href="#step-3-select-statistics" title="Link to this heading"></a></h3>
+<p>Under <strong>STATISTICS</strong> <em>pdf</em> will be specified. A list of bins will be used in the pdf.
+If not given here these bins will be defined automatically in RCAT by taking minimum
+and maximum of input data. This can be quite crude and not so representative, so
+it is suggested to define them here under the <em>pdf</em> key. They are specified in a
+dictionary where the keys are input variables and the values are the respective bin
+definitions. The bin definition is a list/tuple with start, stop and step values.
+For example, for precpitation a list of bins starting with 0 and ending with 50
+using a step of 1 is defined here.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+   <span class="s1">&#39;pdf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bins&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">264</span><span class="p">,</span> <span class="mi">312</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>See the <em>default_stats_config</em> function in <a class="reference internal" href="rcat_stats.html#stats-control-functions"><span class="std std-ref">RCAT Statistics</span></a> module for the default options for pdf.</p>
+</section>
+<section id="step-4-plotting">
+<h3>STEP 4: Plotting<a class="headerlink" href="#step-4-plotting" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Under <strong>PLOTTING</strong>, <em>validation plot</em> should be set to <em>True</em> to enable plotting.
+Plotting of pdf’s will be line plots only (regions should therefore be
+specified). We only specify linewidths to be 2.5.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validation</span> <span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="nb">map</span> <span class="n">configure</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="nb">map</span> <span class="n">grid</span> <span class="n">setup</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="nb">map</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">line</span> <span class="n">grid</span> <span class="n">setup</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">line</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="step-5-configure-cluster">
+<h3>STEP 5: Configure cluster<a class="headerlink" href="#step-5-configure-cluster" title="Link to this heading"></a></h3>
+<p>The number of nodes to be used in the selected SLURM cluster is set to 20
+(increase if needed) and a walltime of 2 hours.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cluster</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">slurm</span>
+<span class="n">nodes</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">cluster</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;walltime&#39;</span><span class="p">:</span> <span class="s1">&#39;02:00:00&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="step-6-run-rcat">
+<h3>STEP 6: Run RCAT<a class="headerlink" href="#step-6-run-rcat" title="Link to this heading"></a></h3>
+<p>To run the analysis run from terminal (see <em>Run RCAT</em> in <a class="reference internal" href="config.html#configuration"><span class="std std-ref">RCAT Configuration</span></a>):</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>&lt;path-to-RCAT&gt;/runtime/RCAT_main.py<span class="w"> </span>-c<span class="w"> </span>config_main.ini
+</pre></div>
+</div>
+</div></blockquote>
+<p>Output statistics files will be located in the sub-folder <em>stats</em> under the
+user-defined output directory.</p>
+</section>
+</section>
+<section id="calculate-pdf-s-for-daily-maximum-values-instead">
+<h2>Calculate PDF’s for daily maximum values instead<a class="headerlink" href="#calculate-pdf-s-for-daily-maximum-values-instead" title="Link to this heading"></a></h2>
+<p>Imagine one would like to do the same kind of statistical analysis as above,
+however, with a different temporal resolution and/or time statistic on the input
+data. For example, let’s assume that pdf’s should be calculated for daily
+maxmimum data instead. How can this be achieved?</p>
+<p>This can be done during RCAT runtime, using an option in the <em>stats</em> property
+(under <strong>SETTINGS</strong>) called <em>resample resolution</em>. It is specified by a
+list/tuple with two locations; the first index represents the time resolution
+sought after and the second location the statistic used for each sample in the
+resampling. In the example here data is resampled into daily maximum values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+   <span class="s1">&#39;pdf&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;bins&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">264</span><span class="p">,</span> <span class="mi">312</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span> <span class="s1">&#39;resample resolution&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">]}</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>When set, run RCAT again.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usecase1.html" class="btn btn-neutral float-left" title="Use Case 1: Annual &amp; and Seasonal Cycles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usecase3.html" class="btn btn-neutral float-right" title="Use Case 3: Diurnal Cycles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

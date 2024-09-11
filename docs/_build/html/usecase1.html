@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Use Case 1: Annual &amp; and Seasonal Cycles &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=2709fde1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Use Case 2: Probability distributions" href="usecase2.html" />
+    <link rel="prev" title="How-To Guides" href="howto.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="howto.html">How-To Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="howto.html#preparation">Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#use-cases">Use Cases</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="howto.html#rcat-polygons">RCAT polygons</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Use Case 1: Annual &amp; and Seasonal Cycles</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-calculate-monthly-and-seasonal-mean-statistics">How to calculate monthly and seasonal mean statistics?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adding-comparison-to-observations-and-visualize-results">Adding comparison to observations and visualize results</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="usecase2.html">Use Case 2: Probability distributions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usecase3.html">Use Case 3: Diurnal Cycles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polygons-howto.html">Polygons in RCAT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="howto.html">How-To Guides</a></li>
+      <li class="breadcrumb-item active">Use Case 1: Annual &amp; and Seasonal Cycles</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usecase1.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="use-case-1-annual-and-seasonal-cycles">
+<span id="use-case-1"></span><h1>Use Case 1: Annual &amp; and Seasonal Cycles<a class="headerlink" href="#use-case-1-annual-and-seasonal-cycles" title="Link to this heading"></a></h1>
+<p>In this example annual and seasonal statistics will be calculated and in most
+steps, changes are made in different sections of the configuration file,
+<em>&lt;path-to-RCAT&gt;/config/config_main.ini</em>. It is recommended to copy this file to your
+experiment folder. Detailed information of what can be configured and how can be
+found in <a class="reference internal" href="config.html#configuration"><span class="std std-ref">RCAT Configuration</span></a>.</p>
+<section id="how-to-calculate-monthly-and-seasonal-mean-statistics">
+<h2>How to calculate monthly and seasonal mean statistics?<a class="headerlink" href="#how-to-calculate-monthly-and-seasonal-mean-statistics" title="Link to this heading"></a></h2>
+<p>Daily data from two models is used as input for calculation of monthly and
+seasonal means at each point of their respective (native) grids. Statistical
+results are written to disk in netcdf files; a separate file for each model and
+statistic (and sub-region if specified). No plotting is done here.</p>
+<section id="step-1-data-input">
+<h3>STEP 1: Data input<a class="headerlink" href="#step-1-data-input" title="Link to this heading"></a></h3>
+<p>Under section <strong>MODELS</strong> you’ll specify the path to model data. Configure for
+two models – <em>arome</em> and <em>aladin</em> – using the same time period and months.
+Since the annual and seasonal cycles will be calculated, all months are chosen.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arome</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;fpath&#39;</span><span class="p">:</span> <span class="s1">&#39;/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ERAI_ALADIN_1997_2017/netcdf&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;grid type&#39;</span><span class="p">:</span> <span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="s1">&#39;grid name&#39;</span><span class="p">:</span> <span class="s1">&#39;NEU-3&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;start year&#39;</span><span class="p">:</span> <span class="mi">1998</span><span class="p">,</span> <span class="s1">&#39;end year&#39;</span><span class="p">:</span> <span class="mi">2002</span><span class="p">,</span> <span class="s1">&#39;months&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">]</span>
+     <span class="p">}</span>
+<span class="n">aladin</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;fpath&#39;</span><span class="p">:</span> <span class="s1">&#39;/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_ALADIN_ERAI_1997_2017/netcdf&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;grid type&#39;</span><span class="p">:</span> <span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="s1">&#39;grid name&#39;</span><span class="p">:</span> <span class="s1">&#39;NEU-12&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;start year&#39;</span><span class="p">:</span> <span class="mi">1998</span><span class="p">,</span> <span class="s1">&#39;end year&#39;</span><span class="p">:</span> <span class="mi">2002</span><span class="p">,</span> <span class="s1">&#39;months&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">]</span>
+     <span class="p">}</span>
+</pre></div>
+</div>
+<p>In this example we will not use any observations so no modifications are needed
+in the <strong>OBS</strong> section.</p>
+</section>
+<section id="step-2-variables">
+<h3>STEP 2: Variables<a class="headerlink" href="#step-2-variables" title="Link to this heading"></a></h3>
+<p>Under <strong>SETTINGS</strong> the full path to output directory should be defined. If
+folder doesn’t exist already it will be created by RCAT.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output</span> <span class="nb">dir</span> <span class="o">=</span> <span class="o">/</span><span class="n">nobackup</span><span class="o">/</span><span class="n">rossby22</span><span class="o">/</span><span class="n">sm_petli</span><span class="o">/</span><span class="n">analysis</span><span class="o">/</span><span class="n">test_analysis</span>
+</pre></div>
+</div>
+<p>The key <em>variables</em> defines which variables to analyze along with some options
+regarding that particular variable. Since only models will be analyzed here,
+<em>‘obs’</em> is set to None. Further, models will be kept at their respective grids,
+thus <em>‘regrid to’</em> is also set to None. Statistics is configured for T2m (<em>tas</em>)
+and precipitation (<em>pr</em>) with daily data as input (<em>‘freq’</em> set to <em>‘day’</em>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;accumulated&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+           <span class="s1">&#39;obs&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;var names&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;regrid to&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+    <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;accumulated&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;obs&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;var names&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;regrid to&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Fenno-Scandinavia&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><em>regions</em> is a list of pre-defined regions – see available regions in <em>&lt;path-to-RCAT&gt;/utils/polygon_files</em> folder (see also <a class="reference internal" href="utils.html#polygons"><span class="std std-ref">Polygons</span></a> module).
+Statistics will be selected for the specified sub-regions.</p>
+</section>
+<section id="step-3-select-statistics">
+<h3>STEP 3: Select statistics<a class="headerlink" href="#step-3-select-statistics" title="Link to this heading"></a></h3>
+<p>Under <strong>STATISTICS</strong> seasonal and annual cycles are chosen.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;annual cycle&#39;</span><span class="p">:</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;seasonal cycle&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;thr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}},</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <em>‘default’</em> property means that default options for the particular statistic are used.
+All default options can be seen in the <em>default_stats_config</em> function in
+<a class="reference internal" href="rcat_stats.html#stats-control-functions"><span class="std std-ref">RCAT Statistics</span></a>. For seasonal cycle, we choose to
+use a threshold for precipitation of <em>1.0</em> and so calculation is only based on wet days.</p>
+</section>
+<section id="step-4-no-plotting">
+<h3>STEP 4: No plotting<a class="headerlink" href="#step-4-no-plotting" title="Link to this heading"></a></h3>
+<p>Set validation plot to false – no plotting done in this example.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validation</span> <span class="n">plot</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</section>
+<section id="step-5-configure-cluster">
+<h3>STEP 5: Configure cluster<a class="headerlink" href="#step-5-configure-cluster" title="Link to this heading"></a></h3>
+<p>Under the <strong>CLUSTER</strong> section one should specify which type of cluster to use.
+Here, it is configured for a SLURM cluster. <em>nodes</em> specify the number of nodes
+to be used. In <em>cluster kwargs</em> a number of different options can be set (here
+specific for SLURM), for example walltime which is set to 2 hours.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cluster</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">slurm</span>
+<span class="n">nodes</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">cluster</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;walltime&#39;</span><span class="p">:</span> <span class="s1">&#39;02:00:00&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="step-6-run-rcat">
+<h3>STEP 6: Run RCAT<a class="headerlink" href="#step-6-run-rcat" title="Link to this heading"></a></h3>
+<p>To run the analysis run from terminal (see <em>Run RCAT</em> in <a class="reference internal" href="config.html#configuration"><span class="std std-ref">RCAT Configuration</span></a>):</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>&lt;path-to-RCAT&gt;/runtime/RCAT_main.py<span class="w"> </span>-c<span class="w"> </span>config_main.ini
+</pre></div>
+</div>
+</div></blockquote>
+<p>If successfully completed, output statistics netcdf files will be located in the
+sub-folder <em>stats</em> under the user-defined output directory. An <em>img</em> folder
+is also created, however, it will be empty as no plotting have been done.</p>
+</section>
+</section>
+<section id="adding-comparison-to-observations-and-visualize-results">
+<h2>Adding comparison to observations and visualize results<a class="headerlink" href="#adding-comparison-to-observations-and-visualize-results" title="Link to this heading"></a></h2>
+<p>In order to include observations and visualize the end results, follow the
+procedure as in the previous example with the following changes introduced:</p>
+<ol class="arabic">
+<li><p>Under <strong>OBS</strong> section, choose same years and months as models</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="n">year</span> <span class="o">=</span> <span class="mi">1998</span>
+<span class="n">end</span> <span class="n">year</span> <span class="o">=</span> <span class="mi">2002</span>
+<span class="n">months</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>The <em>variables</em> property in <strong>SETTINGS</strong> section shall be modified:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Include observations; <em>‘obs’: [‘EOBS20’, ‘ERA5’]</em>. Also, scale
+factors are now included for observations as well.</p></li>
+<li><p>Since models and observations will be compared, taking differences, the data
+must be on the same grid. Therefore, set <em>‘regrid to’: ‘ERA5’</em>. This means that
+all data will be interpolated to the <em>ERA5</em> grid. Further, the <em>‘regrid method’</em>
+needs to be set – <em>bilinear</em> for T2m and <em>conservative</em> for pr.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;pr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;accumulated&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+           <span class="s1">&#39;obs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;EOBS20&#39;</span><span class="p">,</span> <span class="s1">&#39;ERA5&#39;</span><span class="p">],</span>
+           <span class="s1">&#39;obs scale factor&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">86400</span><span class="p">,</span> <span class="mi">86400</span><span class="p">],</span>
+           <span class="s1">&#39;var names&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="s1">&#39;regrid to&#39;</span><span class="p">:</span> <span class="s1">&#39;ERA5&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;regrid method&#39;</span><span class="p">:</span> <span class="s1">&#39;conservative&#39;</span><span class="p">},</span>
+    <span class="s1">&#39;tas&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;accumulated&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;obs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;EOBS20&#39;</span><span class="p">,</span> <span class="s1">&#39;ERA5&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;obs scale factor&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;var names&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;regrid to&#39;</span><span class="p">:</span> <span class="s1">&#39;ERA5&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;regrid method&#39;</span><span class="p">:</span> <span class="s1">&#39;bilinear&#39;</span><span class="p">},</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Under <strong>PLOTTING</strong>, <em>validation plot</em> should be set to <em>True</em> to enable plotting.
+It is possible to configure the visualization in different ways, for
+example various map configurations in map plots or the looks of line plots.
+However, for simplicity here, the default configurations will be used, which means
+setting all properties to an empty dictionary ({}).</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validation</span> <span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="nb">map</span> <span class="n">configure</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="nb">map</span> <span class="n">grid</span> <span class="n">setup</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="nb">map</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">line</span> <span class="n">grid</span> <span class="n">setup</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">line</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<p>With these modifications in place, run RCAT again (STEP 6 above).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="howto.html" class="btn btn-neutral float-left" title="How-To Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usecase2.html" class="btn btn-neutral float-right" title="Use Case 2: Probability distributions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

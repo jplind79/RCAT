@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rcatool.utils.grids &mdash; RCAT 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            RCAT
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howto.html">How-To Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API-reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">RCAT</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rcatool.utils.grids</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rcatool.utils.grids</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Grid applications</span>
+<span class="sd">-----------------</span>
+<span class="sd">Functions to remap data given source and target grids</span>
+<span class="sd">Some utilities use python tool xESMF.</span>
+
+<span class="sd">Author: Petter Lind (contributions from A. Prein)</span>
+<span class="sd">Date: Jan 2019</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="rotated_grid_transform">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.grids.rotated_grid_transform">[docs]</a>
+<span class="k">def</span> <span class="nf">rotated_grid_transform</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">pole_lon</span><span class="p">,</span> <span class="n">pole_lat</span><span class="p">,</span> <span class="n">rot2reg</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="c1"># If lon/lat is 1D; create 2D meshgrid</span>
+    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>\
+        <span class="k">if</span> <span class="n">lats</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
+
+    <span class="n">lon</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mi">180</span>  <span class="c1"># Convert degrees to radians</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mi">180</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="mi">90</span> <span class="o">-</span> <span class="n">pole_lat</span>  <span class="c1"># Rotation around y-axis</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pole_lon</span> <span class="o">+</span> <span class="mi">180</span>  <span class="c1"># Rotation around z-axis</span>
+
+    <span class="c1"># Convert degrees to radians</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="p">(</span><span class="n">theta</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mi">180</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">phi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mi">180</span>
+
+    <span class="c1"># Convert from spherical to cartesian coordinates</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rot2reg</span><span class="p">:</span>  <span class="c1"># Rotated -&gt; Regular</span>
+
+        <span class="n">phi</span> <span class="o">=</span> <span class="o">-</span><span class="n">phi</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="o">-</span><span class="n">theta</span>
+
+        <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">z</span>
+        <span class="n">y_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">z</span>
+        <span class="n">z_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">z</span>
+
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Regular -&gt; Rotated</span>
+
+        <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">z</span>
+        <span class="n">y_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">y</span>
+        <span class="n">z_new</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">*</span><span class="n">z</span>
+
+    <span class="c1"># Convert cartesian back to spherical coordinates</span>
+    <span class="n">lon_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y_new</span><span class="p">,</span> <span class="n">x_new</span><span class="p">)</span>
+    <span class="n">lat_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">z_new</span><span class="p">)</span>
+
+    <span class="c1"># Convert radians back to degrees</span>
+    <span class="n">lon_trans</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon_trans</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">lat_trans</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat_trans</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="k">return</span> <span class="n">lon_trans</span><span class="p">,</span> <span class="n">lat_trans</span></div>
+
+
+
+<div class="viewcode-block" id="fnCellCorners">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.grids.fnCellCorners">[docs]</a>
+<span class="k">def</span> <span class="nf">fnCellCorners</span><span class="p">(</span><span class="n">rgrLon</span><span class="p">,</span> <span class="n">rgrLat</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File name: fnCellBoundaries</span>
+<span class="sd">    Author: Andreas Prein</span>
+<span class="sd">    E-mail: prein@ucar.edu</span>
+<span class="sd">    Date created: 20.03.2015</span>
+<span class="sd">    Date last modified: 20.03.2015</span>
+
+<span class="sd">    Estimate the cell boundaries from the cell location of regular grids</span>
+
+<span class="sd">    returns: rgrLonBND &amp; rgrLatBND --&gt; arrays of dimension [nlon,nlat]</span>
+<span class="sd">    containing the cell boundaries of each gridcell in rgrlon and rgrlat</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># from ipdb import set_trace as stop</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;fnCellCorners&#39;</span><span class="p">)</span>
+    <span class="n">rgLonSize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rgrLon</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">rgLatSize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rgrLat</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgLonSize</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">rgrLat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">rgrLat</span><span class="p">,</span> <span class="p">(</span><span class="n">rgLonSize</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                          <span class="n">rgLatSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">rgrLon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">rgrLon</span><span class="p">,</span> <span class="p">(</span><span class="n">rgLatSize</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgLonSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">rgiSize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rgrLon</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">rgrLonBND</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="n">rgrLonBND</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NAN</span>
+    <span class="n">rgrLatBND</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="n">rgrLatBND</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NAN</span>
+
+    <span class="k">for</span> <span class="n">lo</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">la</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">la</span> <span class="o">&lt;</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># All points except at the boundaries</span>
+                <span class="n">rgrLonBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">rgrLatBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">elif</span> <span class="n">lo</span> <span class="o">&gt;=</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">la</span> <span class="o">&lt;</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># reight boundary second last row</span>
+                <span class="n">rgrLonBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">+</span>\
+                    <span class="p">(</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">rgrLatBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">elif</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">la</span> <span class="o">&gt;=</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># upper boundary second last row</span>
+                <span class="n">rgrLonBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">rgrLatBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">elif</span> <span class="n">lo</span> <span class="o">&gt;=</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">la</span> <span class="o">&gt;=</span> <span class="n">rgiSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># upper right grid cells</span>
+                <span class="n">rgrLonBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLon</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">rgrLatBND</span><span class="p">[</span><span class="n">lo</span><span class="p">,</span> <span class="n">la</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span>\
+                    <span class="p">(</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">rgrLat</span><span class="p">[</span><span class="n">lo</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">la</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgLonSize</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">rgrLonBND</span> <span class="o">=</span> <span class="n">rgrLonBND</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">rgrLatBND</span> <span class="o">=</span> <span class="n">rgrLatBND</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">rgrLonBND</span><span class="p">,</span> <span class="n">rgrLatBND</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_vertices">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.grids.calc_vertices">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_vertices</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">write_to_file</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimate the cell boundaries from the cell location of regular grids</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lons, lats: arrays</span>
+<span class="sd">        Longitude and latitude values</span>
+<span class="sd">    write_to_file: bool</span>
+<span class="sd">        If True lat/lon information, including vertices, is written to file</span>
+<span class="sd">        following the structure given by cdo commmand &#39;griddes&#39;</span>
+<span class="sd">    filename: str</span>
+<span class="sd">        Name of text file for the grid information. Only used if write_to_file</span>
+<span class="sd">        is True. If not provided, a default name will be used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lon_bnds, lat_bnds: arrays</span>
+<span class="sd">        Arrays of dimension [4, nlat, nlon] containing cell boundaries of each</span>
+<span class="sd">        gridcell in lons and lats</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Dimensions lats/lons</span>
+    <span class="n">nlon</span> <span class="o">=</span> <span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">nlat</span> <span class="o">=</span> <span class="n">lats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Rearrange lat/lons</span>
+    <span class="n">lons_row</span> <span class="o">=</span> <span class="n">lons</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">lats_row</span> <span class="o">=</span> <span class="n">lats</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="c1"># Allocate lat/lon corners</span>
+    <span class="n">lons_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">lons_row</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="mi">4</span><span class="p">))</span>
+    <span class="n">lats_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">lats_row</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="mi">4</span><span class="p">))</span>
+
+    <span class="n">lons_crnr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">lons_crnr</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">lats_crnr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">lats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lats</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">lats_crnr</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># -------- Calculating corners --------- #</span>
+
+    <span class="c1"># Loop through all grid points except at the boundaries</span>
+    <span class="k">for</span> <span class="n">lat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">lon</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="c1"># SW corner for each lat/lon index is calculated</span>
+            <span class="n">lons_crnr</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lons</span><span class="p">[</span><span class="n">lat</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">lons</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                                   <span class="n">lons</span><span class="p">[</span><span class="n">lat</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span> <span class="o">+</span> <span class="n">lons</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">])</span><span class="o">/</span><span class="mf">4.</span>
+            <span class="n">lats_crnr</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lats</span><span class="p">[</span><span class="n">lat</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">lats</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+                                   <span class="n">lats</span><span class="p">[</span><span class="n">lat</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span> <span class="o">+</span> <span class="n">lats</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">])</span><span class="o">/</span><span class="mf">4.</span>
+
+    <span class="c1"># Grid points at boundaries</span>
+    <span class="n">lons_crnr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="p">(</span><span class="n">lons_crnr</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">lons_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="p">(</span><span class="n">lons_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">lons_crnr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">lons_crnr</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">lons_crnr</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">lons_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">lons_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">lons_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">lats_crnr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="p">(</span><span class="n">lats_crnr</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">lats_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="p">(</span><span class="n">lats_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">lats_crnr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">lats_crnr</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">lats_crnr</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">lats_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">lats_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">lats_crnr</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c1"># ------------ DONE ------------- #</span>
+
+    <span class="c1"># Fill in counterclockwise and rearrange</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">lat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">lon</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lons</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+
+            <span class="n">lons_cor</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span>
+            <span class="n">lons_cor</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lons_cor</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="n">lat</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lons_cor</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons_crnr</span><span class="p">[</span><span class="n">lat</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span>
+
+            <span class="n">lats_cor</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span>
+            <span class="n">lats_cor</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lats_cor</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="n">lat</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lats_cor</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats_crnr</span><span class="p">[</span><span class="n">lat</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lon</span><span class="p">]</span>
+
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">4</span>
+
+    <span class="n">lons_bnds</span> <span class="o">=</span> <span class="n">lons_cor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nlat</span><span class="p">,</span> <span class="n">nlon</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">lats_bnds</span> <span class="o">=</span> <span class="n">lats_cor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nlat</span><span class="p">,</span> <span class="n">nlon</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">write_to_file</span><span class="p">:</span>
+        <span class="n">_write_grid_info</span><span class="p">(</span><span class="n">lons_row</span><span class="p">,</span> <span class="n">lons_cor</span><span class="p">,</span> <span class="n">lats_row</span><span class="p">,</span> <span class="n">lats_cor</span><span class="p">,</span>
+                         <span class="n">nlon</span><span class="p">,</span> <span class="n">nlat</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">lons_bnds</span><span class="p">,</span> <span class="n">lats_bnds</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_write_grid_info</span><span class="p">(</span><span class="n">lons_row</span><span class="p">,</span> <span class="n">lons_cor</span><span class="p">,</span> <span class="n">lats_row</span><span class="p">,</span> <span class="n">lats_cor</span><span class="p">,</span> <span class="n">nlon</span><span class="p">,</span> <span class="n">nlat</span><span class="p">,</span>
+                     <span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write grid info to file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing grid info to disk ...&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+        <span class="n">dtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H%M%S&#39;</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;./grid_</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">_latlon_bounds_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nlon</span><span class="p">,</span> <span class="n">nlat</span><span class="p">,</span> <span class="n">dtime</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">filename</span>
+
+    <span class="n">lt_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">lats_row</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lats_row</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+    <span class="n">lt_row_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">lt_row</span><span class="p">])</span>
+    <span class="n">lt_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">lats_cor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lats_cor</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+    <span class="n">lt_cor_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">lt_cor</span><span class="p">])</span>
+    <span class="n">ln_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">lons_row</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lons_row</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+    <span class="n">ln_row_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">ln_row</span><span class="p">])</span>
+    <span class="n">ln_cor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">lons_cor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">lons_cor</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+    <span class="n">ln_cor_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">ln_cor</span><span class="p">])</span>
+
+    <span class="n">grid_txt</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2"># gridID 0</span><span class="se">\n</span><span class="s2">#</span><span class="se">\n</span><span class="s2">gridtype  = curvilinear</span><span class="se">\n</span><span class="s2">gridsize  = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;xname     = lon</span><span class="se">\n</span><span class="s2">xlongname = longitude</span><span class="se">\n</span><span class="s2">xunits    = &quot;</span>
+                <span class="s2">&quot;degrees_east</span><span class="se">\n</span><span class="s2">yname     = lat</span><span class="se">\n</span><span class="s2">ylongname = latitude</span><span class="se">\n</span><span class="s2">yunits&quot;</span>
+                <span class="s2">&quot;    = degrees_north</span><span class="se">\n</span><span class="s2">xsize     = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">ysize     = </span><span class="si">{}</span><span class="se">\n</span><span class="s2">xvals &quot;</span>
+                <span class="s2">&quot;    =</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">xbounds     =</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">yvals     =</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">ybounds     &quot;</span>
+                <span class="s2">&quot;=</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nlon</span><span class="o">*</span><span class="n">nlat</span><span class="p">,</span> <span class="n">nlon</span><span class="p">,</span> <span class="n">nlat</span><span class="p">,</span> <span class="n">ln_row_str</span><span class="p">,</span> <span class="n">ln_cor_str</span><span class="p">,</span>
+                               <span class="n">lt_row_str</span><span class="p">,</span> <span class="n">lt_cor_str</span><span class="p">))</span>
+
+    <span class="c1"># Write to file</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">grid_txt</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="fnRemapConOperator">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.grids.fnRemapConOperator">[docs]</a>
+<span class="k">def</span> <span class="nf">fnRemapConOperator</span><span class="p">(</span><span class="n">rgrLonS</span><span class="p">,</span> <span class="n">rgrLatS</span><span class="p">,</span> <span class="n">rgrLonT</span><span class="p">,</span> <span class="n">rgrLatT</span><span class="p">,</span> <span class="n">rgrLonSBNDS</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">rgrLatSBNDS</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rgrLonTBNDS</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rgrLatTBNDS</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File name: fnRemapConOperator</span>
+<span class="sd">    Author: Andreas Prein</span>
+<span class="sd">    E-mail: prein@ucar.edu</span>
+<span class="sd">    Date created: 26.05.2017</span>
+<span class="sd">    Date last modified: 26.05.2017</span>
+
+<span class="sd">    Generates an opperator to coservatively remapp data from a source</span>
+<span class="sd">    rectangular grid to an target rectangular grid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rgrLonS,rgrLatS: arrays</span>
+<span class="sd">        Source grid longitude and latitude values</span>
+<span class="sd">    rgrLonT,rgrLatT: arrays</span>
+<span class="sd">        Target grid longitude and latitude values</span>
+<span class="sd">    rgrLonSBNDS,rgrLatSBNDS: arrays</span>
+<span class="sd">        Source grid longitude and latitude grid point boundaries (corners).</span>
+<span class="sd">        These must be given in the structure (lat, lon, vertices) where</span>
+<span class="sd">        vertices are the four corners of each grid point. If not provided</span>
+<span class="sd">        (default) then corners are calculated using fnCellCorners.</span>
+<span class="sd">    rgrLonTBNDS,rgrLatTBNDS: arrays</span>
+<span class="sd">        Target grid longitude and latitude grid point boundaries (corners).</span>
+<span class="sd">        See above for more info.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    grConRemapOp: dictionary</span>
+<span class="sd">        opperator that contains the grid cells and their wheights of the</span>
+<span class="sd">        source grid for each target grid cell</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;fnRemapConOperator&#39;</span><span class="p">)</span>
+
+    <span class="c1"># check if the grids are given in 2D</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrLonS</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">rgrLonS1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(([</span><span class="n">rgrLonS</span><span class="p">,</span> <span class="p">]</span><span class="o">*</span><span class="n">rgrLatS</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">rgrLatS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(([</span><span class="n">rgrLatS</span><span class="p">,</span> <span class="p">]</span><span class="o">*</span><span class="n">rgrLonS</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="n">rgrLonS</span> <span class="o">=</span> <span class="n">rgrLonS1</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">rgrLonT1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(([</span><span class="n">rgrLonT</span><span class="p">,</span> <span class="p">]</span><span class="o">*</span><span class="n">rgrLatT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">rgrLatT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(([</span><span class="n">rgrLatT</span><span class="p">,</span> <span class="p">]</span><span class="o">*</span><span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="n">rgrLonT</span> <span class="o">=</span> <span class="n">rgrLonT1</span>
+
+    <span class="c1"># All lon grids have to go from -180 to +180 --&gt; convert now!&#39;</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rgrLonS</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+        <span class="n">rgi180</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rgrLonS</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">)</span>
+        <span class="n">rgrLonS</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLonS</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">-</span> <span class="mf">360.</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rgrLonT</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+        <span class="n">rgi180</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rgrLonT</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">)</span>
+        <span class="n">rgrLonT</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLonT</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">-</span> <span class="mf">360.</span>
+
+    <span class="k">if</span> <span class="n">rgrLonSBNDS</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># get boundarie estimations for the grid cells since the center points</span>
+        <span class="c1"># are given</span>
+        <span class="n">rgrLonSB</span><span class="p">,</span> <span class="n">rgrLatSB</span> <span class="o">=</span> <span class="n">fnCellCorners</span><span class="p">(</span><span class="n">rgrLonS</span><span class="p">,</span> <span class="n">rgrLatS</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rgrLonSB</span> <span class="o">=</span> <span class="n">rgrLonSBNDS</span>
+        <span class="n">rgrLatSB</span> <span class="o">=</span> <span class="n">rgrLatSBNDS</span>
+        <span class="c1"># All lon grids have to go from -180 to +180 --&gt; convert now!&#39;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rgrLonSB</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+            <span class="n">rgi180</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rgrLonSB</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">)</span>
+            <span class="n">rgrLonSB</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLonSB</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">-</span> <span class="mf">360.</span>
+    <span class="k">if</span> <span class="n">rgrLonTBNDS</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rgrLonTB</span><span class="p">,</span> <span class="n">rgrLatTB</span> <span class="o">=</span> <span class="n">fnCellCorners</span><span class="p">(</span><span class="n">rgrLonT</span><span class="p">,</span> <span class="n">rgrLatT</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rgrLonTB</span> <span class="o">=</span> <span class="n">rgrLonTBNDS</span>
+        <span class="n">rgrLatTB</span> <span class="o">=</span> <span class="n">rgrLatTBNDS</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rgrLonTB</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+            <span class="n">rgi180</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rgrLonTB</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">)</span>
+            <span class="n">rgrLonTB</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">=</span> <span class="n">rgrLonTB</span><span class="p">[</span><span class="n">rgi180</span><span class="p">]</span> <span class="o">-</span> <span class="mf">360.</span>
+
+    <span class="c1"># get approximate grid spacing of source and target grid</span>
+    <span class="n">rGsS</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rgrLonS</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">rgrLonS</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rgrLatS</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span><span class="o">-</span><span class="n">rgrLatS</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])))</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">rGsT</span> <span class="o">=</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rgrLonT</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">rgrLonT</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span> <span class="o">+</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rgrLatT</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span><span class="o">-</span><span class="n">rgrLatT</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])))</span><span class="o">/</span><span class="mi">2</span>
+    <span class="n">rRadius</span> <span class="o">=</span> <span class="p">((</span><span class="n">rGsS</span><span class="o">+</span><span class="n">rGsT</span><span class="p">)</span><span class="o">*</span><span class="mf">1.2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+
+    <span class="c1"># loop over the target grid cells and calculate the weights</span>
+    <span class="n">grRemapOperator</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">la</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">lo</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">rgbGCact</span> <span class="o">=</span> <span class="p">((</span><span class="n">rgrLonS</span> <span class="o">&gt;</span> <span class="n">rgrLonT</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">]</span><span class="o">-</span><span class="n">rRadius</span><span class="p">)</span> <span class="o">&amp;</span>
+                        <span class="p">(</span><span class="n">rgrLonS</span> <span class="o">&lt;</span> <span class="n">rgrLonT</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">]</span><span class="o">+</span><span class="n">rRadius</span><span class="p">)</span> <span class="o">&amp;</span>
+                        <span class="p">(</span><span class="n">rgrLatS</span> <span class="o">&gt;</span> <span class="n">rgrLatT</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">]</span><span class="o">-</span><span class="n">rRadius</span><span class="p">)</span> <span class="o">&amp;</span>
+                        <span class="p">(</span><span class="n">rgrLatS</span> <span class="o">&lt;</span> <span class="n">rgrLatT</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">]</span><span class="o">+</span><span class="n">rRadius</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rgbGCact</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rgrLaLoArea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+                <span class="c1"># produce polygon for target grid cell</span>
+                <span class="k">if</span> <span class="n">rgrLonTBNDS</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">points</span> <span class="o">=</span> <span class="p">[(</span><span class="n">rgrLonTB</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">],</span> <span class="n">rgrLatTB</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">]),</span>
+                              <span class="p">(</span><span class="n">rgrLonTB</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrLatTB</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                              <span class="p">(</span><span class="n">rgrLonTB</span><span class="p">[</span><span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrLatTB</span><span class="p">[</span><span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                              <span class="p">(</span><span class="n">rgrLonTB</span><span class="p">[</span><span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lo</span><span class="p">],</span> <span class="n">rgrLatTB</span><span class="p">[</span><span class="n">la</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">lo</span><span class="p">])]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">points</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rgrLonTB</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="p">:],</span>
+                                                     <span class="n">rgrLatTB</span><span class="p">[</span><span class="n">la</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="p">:])]</span>
+                <span class="n">pT</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+                <span class="c1"># loop over source grid cells</span>
+                <span class="n">rgiGCact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rgbGCact</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rgbGCact</span><span class="p">)):</span>
+                    <span class="n">laS</span> <span class="o">=</span> <span class="n">rgiGCact</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">sg</span><span class="p">]</span>
+                    <span class="n">loS</span> <span class="o">=</span> <span class="n">rgiGCact</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">sg</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">rgrLonSBNDS</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">points</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="p">(</span><span class="n">rgrLonSB</span><span class="p">[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="p">],</span> <span class="n">rgrLatSB</span><span class="p">[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="p">]),</span>
+                            <span class="p">(</span><span class="n">rgrLonSB</span><span class="p">[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrLatSB</span><span class="p">[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                            <span class="p">(</span><span class="n">rgrLonSB</span><span class="p">[</span><span class="n">laS</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">loS</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">rgrLatSB</span><span class="p">[</span><span class="n">laS</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">loS</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                            <span class="p">(</span><span class="n">rgrLonSB</span><span class="p">[</span><span class="n">laS</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">loS</span><span class="p">],</span> <span class="n">rgrLatSB</span><span class="p">[</span><span class="n">laS</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">loS</span><span class="p">])]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">points</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+                                  <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rgrLonSB</span><span class="p">[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="p">,</span> <span class="p">:],</span>
+                                                  <span class="n">rgrLatSB</span><span class="p">[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="p">,</span> <span class="p">:])]</span>
+                    <span class="n">pS</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+                    <span class="n">rIntArea</span> <span class="o">=</span> <span class="n">pS</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">pT</span><span class="p">)</span><span class="o">.</span><span class="n">area</span><span class="o">/</span><span class="n">pS</span><span class="o">.</span><span class="n">area</span>
+                    <span class="k">if</span> <span class="n">rIntArea</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrLaLoArea</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">rgrLaLoArea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="p">,</span> <span class="n">rIntArea</span><span class="p">]])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">rgrLaLoArea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="n">rgrLaLoArea</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">laS</span><span class="p">,</span> <span class="n">loS</span><span class="p">,</span> <span class="n">rIntArea</span><span class="p">]]),</span>
+                                <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">grRemapOperator</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">la</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">lo</span><span class="p">)]</span> <span class="o">=</span> <span class="n">rgrLaLoArea</span>
+
+    <span class="k">return</span> <span class="n">grRemapOperator</span></div>
+
+
+
+<div class="viewcode-block" id="fnRemapCon">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.grids.fnRemapCon">[docs]</a>
+<span class="k">def</span> <span class="nf">fnRemapCon</span><span class="p">(</span><span class="n">rgrLonS</span><span class="p">,</span> <span class="n">rgrLatS</span><span class="p">,</span> <span class="n">rgrLonT</span><span class="p">,</span> <span class="n">rgrLatT</span><span class="p">,</span> <span class="n">grOperator</span><span class="p">,</span> <span class="n">rgrData</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File name: fnRemapCon</span>
+<span class="sd">    Author: Andreas Prein</span>
+<span class="sd">    E-mail: prein@ucar.edu</span>
+<span class="sd">    Date created: 13.06.2017</span>
+<span class="sd">    Date last modified: 13.06.2017</span>
+
+<span class="sd">    Uses the remap operator generated by the function fnRemapConOperator to</span>
+<span class="sd">    remap data to a target grid conservatively</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rgrLonS,rgrLatS: arrays</span>
+<span class="sd">        Source grid longitude and latitude values</span>
+<span class="sd">    rgrLonT,rgrLatT: arrays</span>
+<span class="sd">        Target grid longitude and latitude values</span>
+<span class="sd">    grOperator: dictionary</span>
+<span class="sd">        Remapping operator returned from fnRemapConOperator.</span>
+<span class="sd">    rgrData: 3D/4D array</span>
+<span class="sd">        Data to be regridded, structured as (time, lat, lon) or (time,</span>
+<span class="sd">        variables, lat, lon).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rgrTarData: array</span>
+<span class="sd">        Remapped data matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">ipdb</span> <span class="kn">import</span> <span class="n">set_trace</span> <span class="k">as</span> <span class="n">stop</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;fnRemapCon&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrData</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rgrTarData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rgrData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrLatT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                   <span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">rgrTarData</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">rgrTarData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rgrData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrLatT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                   <span class="n">rgrLatT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">rgrTarData</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">for</span> <span class="n">gc</span> <span class="ow">in</span> <span class="n">grOperator</span><span class="p">:</span>
+            <span class="n">rgiGcT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+            <span class="n">rgrSource</span> <span class="o">=</span> <span class="n">grOperator</span><span class="p">[</span><span class="n">gc</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrSource</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rgrTarData</span><span class="p">[:,</span> <span class="n">rgiGcT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgiGcT</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                        <span class="n">rgrData</span><span class="p">[:,</span> <span class="n">rgrSource</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">),</span>
+                                <span class="n">rgrSource</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)],</span>
+                        <span class="n">weights</span><span class="o">=</span><span class="n">rgrSource</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">)</span>
+                    <span class="n">stop</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rgrData</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="c1"># the data has to be in [time, variables, lat, lon]</span>
+        <span class="n">rgrTarData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rgrData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="n">rgrLatT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgrLonT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">rgrTarData</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">for</span> <span class="n">gc</span> <span class="ow">in</span> <span class="n">grOperator</span><span class="p">:</span>
+            <span class="n">rgiGcT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+            <span class="n">rgrSource</span> <span class="o">=</span> <span class="n">grOperator</span><span class="p">[</span><span class="n">gc</span><span class="p">]</span>
+            <span class="n">rgrTarData</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">rgiGcT</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgiGcT</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span>
+                <span class="n">rgrData</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">rgrSource</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">),</span>
+                        <span class="n">rgrSource</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)],</span>
+                <span class="n">weights</span><span class="o">=</span><span class="n">rgrSource</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rgrTarData</span></div>
+
+
+
+<div class="viewcode-block" id="add_matrix_NaNs">
+<a class="viewcode-back" href="../../../rcatool.utils.html#rcatool.utils.grids.add_matrix_NaNs">[docs]</a>
+<span class="k">def</span> <span class="nf">add_matrix_NaNs</span><span class="p">(</span><span class="n">regridder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Replace zero values of cells in the new grid that are outside</span>
+<span class="sd">    the old grid&#39;s domain with NaN&#39;s.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    regridder: Object from xESMF Regridder function</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    regridder</span>
+<span class="sd">        Modified regridder where zero valued cells (outside source grid)</span>
+<span class="sd">        has been replaced with NaN&#39;s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">regridder</span><span class="o">.</span><span class="n">weights</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">num_nonzeros</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">M</span><span class="o">.</span><span class="n">indptr</span><span class="p">)</span>
+    <span class="n">M</span><span class="p">[</span><span class="n">num_nonzeros</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+    <span class="n">regridder</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">regridder</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Petter Lind.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
