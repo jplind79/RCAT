@@ -3,7 +3,17 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - python
+  - numpy
+  - xarray
   - esmpy
+  - xesmf
+  - dask-jobqueue
+  - dask[complete]
+  - matplotlib
+  - netcdf4
+  - h5netcdf
+  - cartopy
   - pip
   - pip:
     - rcatool
