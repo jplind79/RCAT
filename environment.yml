@@ -1,0 +1,9 @@
+name: rcatenv
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - esmpy
+  - pip
+  - pip:
+    - rcatool
