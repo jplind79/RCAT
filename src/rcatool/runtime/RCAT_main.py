@@ -128,7 +128,7 @@ def get_variable_config(var_config):
     return vardict
 
 
-def variabel_modification(dd, nv_dd, funargs, mlist, olist):
+def variabel_modification(dd, nv_dd, funargs, new_variable, mlist, olist):
     """
     Create new or modify existing variables.
     """
@@ -169,7 +169,7 @@ def variabel_modification(dd, nv_dd, funargs, mlist, olist):
                 func, *input_data, input_core_dims=[[]]*len(input_data),
                 dask='parallelized', output_dtypes=[float],
             )
-            new_data = _new_data.to_dataset(name=new_var).assign_coords(
+            new_data = _new_data.to_dataset(name=new_variable).assign_coords(
                 input_data[0].coords)
             out_dd[m] = {'data': new_data}
     if _obslist is not None:
@@ -182,7 +182,7 @@ def variabel_modification(dd, nv_dd, funargs, mlist, olist):
                 func, *input_data, input_core_dims=[[]]*len(input_data),
                 dask='parallelized', output_dtypes=[float],
             )
-            new_data = _new_data.to_dataset(name=new_var)
+            new_data = _new_data.to_dataset(name=new_variable)
             out_dd[o] = {'data': new_data}
 
     return out_dd
@@ -620,7 +620,7 @@ def data_resampling(data, resample_conf):
             # time_comp = (np.unique(resampled_data['time.month']) ==
             #              np.unique(data['time.month']))
             # if not np.all(time_comp):
-            #     print("\t\t** The resampling added months - removing these **")
+            #   print("\t\t** The resampling added months - removing these **")
             #     resampled_data = resampled_data.isel(
             #         time=np.isin(resampled_data['time.month'],
             #                      np.unique(data['time.month'])))
@@ -1102,16 +1102,16 @@ def get_time_resolution_string(resample, cdict, v, mod, obs):
             if isinstance(tres_out_o, list):
                 msg = ("The number of input frequencies must match "
                        "number of observations!")
-                assert len(tres_out_o) == len(obslist), msg
-                tres_dd.update({o: tr for o, tr in zip(obslist, tres_out_o)})
+                assert len(tres_out_o) == len(obs), msg
+                tres_dd.update({o: tr for o, tr in zip(obs, tres_out_o)})
             elif isinstance(tres_out_o, str):
-                tres_dd.update({o: tres_out_o for o in obslist})
+                tres_dd.update({o: tres_out_o for o in obs})
             else:
                 msg = (f"Unknown format on obs time frequency: {tres_out_o}. "
                        f"Should be either string or list.")
                 raise ValueError(msg)
         else:
-            tres_dd.update({o: tres_out_obs for o in obslist})
+            tres_dd.update({o: tres_out_obs for o in obs})
 
     return tres_dd
 
@@ -1370,8 +1370,8 @@ if cdict['var modification'] is not None:
     for new_var, nv_dict in cdict['var modification'].items():
         arglist = list(nv_dict['input'].keys())
         inargs = ",".join(arglist)
-        data_dict[new_var] = variabel_modification(data_dict, nv_dict, inargs,
-                                                   mod_names, obs_list)
+        data_dict[new_var] = variabel_modification(
+            data_dict, nv_dict, inargs, new_var, mod_names, obs_list)
 
         # Change parameters and dictionaries accordingly
         cdict['variables'][new_var] = \
