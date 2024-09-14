@@ -1,16 +1,19 @@
 Installation
 ============
 
-RCAT requires Python>=3.10. The major dependencies are `dask_`, `xarray_` and
-`ESMPy_` (via the regridding tool `xESMF_`), and the best way to install them
-is using Conda_ or Mamba_.  If you don't have conda installed follow the
-installation guide from start.  Otherwise you can follow from `RCAT
+RCAT requires Python>=3.10. The major dependencies are dask_, xarray_ and
+ESMPy_ (through the regridding tool xESMF_), and the best way to install them
+is using Conda_ or Mamba_.  If you don't have any of the latter installed follow the
+installation information below. Otherwise you can jump directly to `RCAT
 environment`_ .
 
-Miniconda
----------
+Conda
+-----
 
-Install `Miniconda <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
+Conda can be installed either using Miniconda_ or Miniforge_. Miniforge is a
+set of installers for Conda and Mamba that use the conda-forge channel as the
+default and only source of package. Here is information on `installing Miniconda
+<https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_.
 
 **Add conda-forge channel**
 
@@ -28,15 +31,21 @@ Install `Miniconda <https://conda.io/projects/conda/en/latest/user-guide/install
 
     $ conda update -n base conda
 
+Mamba
+-----
+Mamba_ is a fast and lightweight alternative to Conda, and the good thing is
+that if you know how to use Conda then you also know how to use Mamba.
+Mamba is `installed <https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html>`_
+using Miniforge.
+
+
 RCAT environment
 ----------------
 
 When having installed Conda (or Mamba), the next step is to create and install
 the RCAT environment. We recommend to create a new, clean Conda environment. 
 
-**Create environment**
-
-* environment.yml
+**Create environment from YAML file**
 The quickest way is to create and install the environment is to use the
 environment.yml file
 
@@ -45,7 +54,7 @@ environment.yml file
     $ conda env create --file environment.yml
     $ conda activate rcatenv
 
-* Install dependencies separately
+**Install dependencies separately**
 An alternative is to install RCAT and the dependencies separately:
 
 .. code-block:: bash
@@ -54,7 +63,7 @@ An alternative is to install RCAT and the dependencies separately:
     $ conda activate rcatenv
     $ conda install xarray, esmpy, xesmf>=0.8, dask, dask-jobqueue, matplotlib, cartopy, netcdf4, h5netcdf
 
-RCAT package can then be installed from PyPI using pip:
+RCAT package can then be installed from PyPI using ``pip``:
 
 .. code-block:: bash
 
