@@ -22,7 +22,7 @@ file to the new folder.
     $ cp <path-to-RCAT>/src/rcatool/config/config_main.ini .
 
 Running RCAT 
-------------
+============
 When you have done your configuration and saved config_main.ini you can
 start the analysis step. The main program is located in the *rcat* directory
 and called RCAT_main.py. See point 1: :ref:`Setup folder structure
@@ -38,8 +38,8 @@ and called RCAT_main.py. See point 1: :ref:`Setup folder structure
    name can be used, and a suggestion is to choose names appropriate for the
    specific application.
 
-Configure settings in config_main.ini
--------------------------------------
+Settings in config_main.ini
+===========================
 A configuration ``.ini`` file has a specific structure based
 on sections, properties and values. The RCAT config_main.ini file consists of a handful
 of these sections, for example **MODELS**, under which you specify certain
@@ -124,7 +124,7 @@ the reference data.
     *get_mod_data* function in *src/rcatool/runtime/RCAT_main.py*. 
 
 OBS
-^^^
+---
 If observations should be included in the analysis, you will need to
 specify a meta data file by setting the full path to
 *observations_metadata_NN.py* (located under *src/rcatool/config*).
@@ -143,22 +143,25 @@ specific observations to include is not defined here, but in the
 **SETTINGS** section, in the variables properties.
 
 SETTINGS
-^^^^^^^^
-- **output dir**:
-    The path for the output (statistics files, plots). If
-    you re-run the analysis with the same output directory, you will
-    prompted to say whether to overwrite existing output. "overwrite" does
-    not mean that existing folder will be completely overwritten (deleted
-    and created again). The existing folder structure will be kept intact
-    together with output files. However, potentially some output
-    (statistics/figure files) with same names will be overwritten.
+--------
 
-- **variables**: 
-    This is a key settings in the configuration file. The
-    value of this property is represented by a dictionary; the keys are
-    strings of variable names ('pr', 'tas', ...) and the value of each key
-    (variable) is another dictionary consisting of a number of specific
-    settings (the same for all variables):
+output dir
+**********
+The path for the output (statistics files, plots). If
+you re-run the analysis with the same output directory, you will
+prompted to say whether to overwrite existing output. "overwrite" does
+not mean that existing folder will be completely overwritten (deleted
+and created again). The existing folder structure will be kept intact
+together with output files. However, potentially some output
+(statistics/figure files) with same names will be overwritten.
+
+variables
+*********
+This is a key settings in the configuration file. The
+value of this property is represented by a dictionary; the keys are
+strings of variable names ('pr', 'tas', ...) and the value of each key
+(variable) is another dictionary consisting of a number of specific
+settings (the same for all variables):
 
 ::
 
@@ -202,6 +205,7 @@ SETTINGS
  }
 
 - **var names**:
+
   Variable names specified in the top key of *variables*
   usually refers to common names defined in CF conventions. However,
   there might be cases where either the variable name specified in the
@@ -214,17 +218,20 @@ SETTINGS
   above for examples of both types of settings.
 
 - **freq**: 
+
   A string of the time resolution of input model data. The
   string should match any of the sub-folders under the path to model
   data, e.g. 'day', '1hr', '3hr'. In effect, you may choose different
   time resolutions for different variables in the analysis.
 
 - **units**: 
+
   The units of the variable data (which will appear in
   figures created in RCAT, and thus should reflect the units after
   data have been manipulated through the analysis).
 
 - **scale factor**: 
+
   A numeric factor (integer/float) that model data is
   multiplied with, to convert to desired units (e.g. from J/m2 to
   W/m2) and to ensure that all data (model and observations) have the
@@ -239,15 +246,18 @@ SETTINGS
   same length as number of specified models. 
 
 - **offset factor**: 
+
   The same as for *scale factor*, although the *offset factor* is added to the
   model data. A negative value will then subtract the factor from model data.
 
 - **accumulated**: 
+
   Boolean switch identifying variable data as
   accumulated fields or not. If the former (True), then data will be
   de-accumulated "on the fly" when opening files of data.
 
 - **obs**: 
+
   String or list of strings with acronyms of observations to be
   included in the analysis (for the variable of choice, and therefore
   different observations can be chosen for different variables).
@@ -256,6 +266,7 @@ SETTINGS
   file you can also add new observational data sets. 
 
 - **obs scale factor**: 
+
   The same as *scale factor* above but applied to observations. If
   multiple observations are defined, some of which would need
   different scale factors, a list of factors can be provided. However,
@@ -263,9 +274,11 @@ SETTINGS
   to just specify a single factor.
 
 - **obs freq**: 
+
   A string of the time resolution of observation data. 
 
 - **regrid to**:
+
   If data is to be remapped to a common grid, you specify
   either the name (model name or observation acronym) of a model
   defined under **MODELS** section or an observation defined under
@@ -278,37 +291,87 @@ SETTINGS
   is to be done, set *regrid to* to None.
 
 - **regrid method**: 
+
   String defining the interpolation method: 'conservative' or 'bilinear'.
 
-regions: 
-********
+regions
+*******
 A list of strings with region names, defining
 geographical areas data will be extracted from. If set, 2D statistical
 fields calculated by RCAT will be cropped over these regions (polygons), and in
 line plots produced in RCAT the statistical values will be averaged over
 and plotted for each of the regions. Read more about
 how to handle regions and polygons in RCAT :ref:`here <polygons_howto>`.
+Set ``regions=`` or ``regions=[]`` if not using any regions.
 
-- STATISTICS
-    This is another important section of the analysis configuration. Therefore, the
-    description of this segment is given separately, see :doc:`RCAT
-    Statistics </statistics>`
+STATISTICS
+----------
+This is another important section of the analysis configuration. Therefore, the
+description of this segment is given separately, see :doc:`RCAT
+Statistics </statistics>`
 
-- PLOTTING
-    This section is intended for the case you want to perform a general
-    evaluation/validation of the model. This means that (for the moment) a
-    set of standards plots (maps and line plots) can be done by RCAT for a
-    set of standard statistical output: annual, seasonal and diurnal
-    cycles, pdf's, percentiles and ASoP analysis. If plotting procedures
-    for other statistics is wished for, they need to be implemented in the
-    RCAT :doc:`plotting module <plots>`.
+PLOTTING
+--------
+This section is intended for the case you want to perform a general
+evaluation/validation of the model. This means that (for the moment) a
+set of standards plots (maps and line plots) can be done by RCAT for a
+set of standard statistical output: annual, seasonal and diurnal
+cycles, pdf's, percentiles and ASoP analysis. If plotting procedures
+for other statistics is wished for, they need to be implemented in the
+RCAT :doc:`plotting module <plots>`.
 
-    **validation plot**: If validation plot is set to True, standard plots
+- **validation plot**:
+
+    If validation plot is set to True, standard plots
     will be produced for the defined statistics. Otherwise, plotting can
     be done elsewhere using the statistical output files (netcdf format)
     created by RCAT.
 
-    **map configure**: In this property you can change/add key value pairs
+- **moments plot config**:
+    
+    Here one configures the plots for *moments* statistics (see :doc:`RCAT Statistics </statistics>`).
+    At the moment, only timeseries or map plots can be produced (``plot type: 'timeseries'`` and ``plot type: 'map'`` respectively).
+    For timeseries, one can also choose to add either running mean values and/or
+    linear trends (using numpy's ``polyfit`` and ``poly1d`` functions). To use
+    running means, set the window size (in terms of time units from the
+    calculated moment statistics), otherwise set to False. The switch for
+    trendlines is True/False.  
+
+- **map projection**
+
+    Define here the projection to use in the map plots. See Cartopy's
+    documentation for available `projections <https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html>`_. 
+    For example, to use Lambert Conformal conic projection, set ``map
+    projection = 'LambertConformal'``. 
+
+- **map configuration**
+
+    Settings for the specified map projection. 
+    See Cartopy documentation for available options of the projections.
+    The options shall be set in dictionary format, e.g.
+
+::
+
+    map configuration = {
+    'central_longitude': 10,
+    'central_latitude': 60.6,
+    'standard_parallels': (60.6, 60.6),
+ }
+
+- **map extent**
+
+    Define the geographical extent of the maps. The value of *map extent* is a
+    list of values corrsponding to [longitude_start, longitude_end,
+    latitude_start, latitude_end]
+
+map gridlines = False
+map grid config = {'axes_pad': 0.3, 'cbar_mode': 'each', 'cbar_location': 'right',
+              	  'cbar_size': '5%%', 'cbar_pad': 0.05}
+map plot kwargs = {'filled': True, 'mesh': True}
+map model domain =
+- **map configure**: 
+
+    In this property you can change/add key value pairs
     that control for example map projection ('proj') and resolution
     ('res') as well as the dimensions of the map; 'zoom' can be set to
     'crnrs' if corners of model grid is to be used, or 'geom' if you want
@@ -317,93 +380,94 @@ how to handle regions and polygons in RCAT :ref:`here <polygons_howto>`.
     refers to the reference model in the analysis which is the first model
     data set specified in the **MODELS** section.
 
+::
+
+   map configure = {'proj': 'stere', 'res': 'l', 'zoom': 'geom', 'zoom_geom': [1700000, 2100000], 'lon_0': 16.5, 'lat_0': 63}
+
+For more settings, see the map_setup function in the :doc:`plots module <plots>`.
+
+**map grid setup**: Settings for the map plot configuration, for
+example whether to use a colorbar or not (cbar_mode) and where to put
+it and the padding between panels. For more info, see the
+*image_grid_setup* function in the :doc:`plots module <plots>`.
+
+::
+
+   map grid setup = {'axes_pad': 0.5, 'cbar_mode': 'each', 'cbar_location': 'right', 'cbar_size': '5%%', 'cbar_pad': 0.03}
+
+**map kwargs**: Additional keyword arguments to be added in the
+matplotlib contour plot call, see the make_map_plot function in
+the :doc:`plotting module <plots>`.
+
+**line plot settings**: Likewise, settings for line plots can be made,
+e.g. line widths and styles as well as axes configurations. There are
+a number of functions in the :doc:`plotting module <plots>` that
+handles line/scatter/box plots, see for example the fig_grid_setup and
+make_line_plot functions.
+
+::
+
+   line grid setup = {'axes_pad': (11., 6.)}
+   line kwargs = {'lw': 2.5}
+
+CLUSTER
+-------
+The last section control the cluster type. You can choose between local
+pc and SLURM at the moment.
+
+**cluster type**: choose "local" for running on you local pc and
+"slurm" if you want to run RCAT on a HPC with a SLURM job scheduler and
+read information below. For local pc no other settings need to be made
+in this section.
+
+*SLURM*
+    RCAT uses `Dask <https://docs.dask.org/>`_ to perform file managing
+    and statistical analysis in an efficient way through parallelization.
+    When applying Dask on queuing systems like PBS or Slurm,
+    `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_ provides an
+    excellent interface for handling such work flow. It is used in RCAT
+    and to properly use Dask and Dask-Jobqueue on an HPC system you need
+    to provide some information about that system and how you plan to use
+    it. By default, when Dask-Jobqueue is first imported a configuration
+    file is placed in ~/.config/dask/jobqueue.yaml. What is set in this
+    file are the default settings being used. On Bi/NSC we have set up a
+    default configuration file as below.
+
+    .. code-block:: yaml
+
+       jobqueue:
+           slurm:
+           name: dask-worker
+
+           # Dask worker options
+           cores: 16
+           memory: "64 GB"
+           processes: 1
+
+           interface: ib0
+           death-timeout: 60
+           local-directory: $SNIC_TMP
+
+           # SLURM resource manager options
+           queue: null
+           project: null
+           walltime: '01:00:00'
+           job-extra: ['--exclusive']
+
+    When default settings have been set up, the main properties that you
+    usually want to change in the **CLUSTER** section are the number of nodes
+    to use and wall time:
+
     ::
 
-       map configure = {'proj': 'stere', 'res': 'l', 'zoom': 'geom', 'zoom_geom': [1700000, 2100000], 'lon_0': 16.5, 'lat_0': 63}
+       nodes = 15
+       slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
 
-    For more settings, see the map_setup function in the :doc:`plots module <plots>`.
-
-    **map grid setup**: Settings for the map plot configuration, for
-    example whether to use a colorbar or not (cbar_mode) and where to put
-    it and the padding between panels. For more info, see the
-    *image_grid_setup* function in the :doc:`plots module <plots>`.
+    **nodes**: Sometimes you might need more memory on the nodes, and on
+    Bi/NSC there are fat nodes available. If you want to use fat nodes,
+    you can specify this through
 
     ::
 
-       map grid setup = {'axes_pad': 0.5, 'cbar_mode': 'each', 'cbar_location': 'right', 'cbar_size': '5%%', 'cbar_pad': 0.03}
-
-    **map kwargs**: Additional keyword arguments to be added in the
-    matplotlib contour plot call, see the make_map_plot function in
-    the :doc:`plotting module <plots>`.
-
-    **line plot settings**: Likewise, settings for line plots can be made,
-    e.g. line widths and styles as well as axes configurations. There are
-    a number of functions in the :doc:`plotting module <plots>` that
-    handles line/scatter/box plots, see for example the fig_grid_setup and
-    make_line_plot functions.
-
-    ::
-
-       line grid setup = {'axes_pad': (11., 6.)}
-       line kwargs = {'lw': 2.5}
-
-- CLUSTER
-   The last section control the cluster type. You can choose between local
-   pc and SLURM at the moment.
-
-   **cluster type**: choose "local" for running on you local pc and
-   "slurm" if you want to run RCAT on a HPC with a SLURM job scheduler and
-   read information below. For local pc no other settings need to be made
-   in this section.
-
-   *SLURM*
-       RCAT uses `Dask <https://docs.dask.org/>`_ to perform file managing
-       and statistical analysis in an efficient way through parallelization.
-       When applying Dask on queuing systems like PBS or Slurm,
-       `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_ provides an
-       excellent interface for handling such work flow. It is used in RCAT
-       and to properly use Dask and Dask-Jobqueue on an HPC system you need
-       to provide some information about that system and how you plan to use
-       it. By default, when Dask-Jobqueue is first imported a configuration
-       file is placed in ~/.config/dask/jobqueue.yaml. What is set in this
-       file are the default settings being used. On Bi/NSC we have set up a
-       default configuration file as below.
-
-       .. code-block:: yaml
-
-          jobqueue:
-              slurm:
-              name: dask-worker
-
-              # Dask worker options
-              cores: 16
-              memory: "64 GB"
-              processes: 1
-
-              interface: ib0
-              death-timeout: 60
-              local-directory: $SNIC_TMP
-
-              # SLURM resource manager options
-              queue: null
-              project: null
-              walltime: '01:00:00'
-              job-extra: ['--exclusive']
-
-       When default settings have been set up, the main properties that you
-       usually want to change in the **CLUSTER** section are the number of nodes
-       to use and wall time:
-
-       ::
-
-          nodes = 15
-          slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
-
-       **nodes**: Sometimes you might need more memory on the nodes, and on
-       Bi/NSC there are fat nodes available. If you want to use fat nodes,
-       you can specify this through
-
-       ::
-
-          slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
+       slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
 
