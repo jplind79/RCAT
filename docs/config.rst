@@ -1,28 +1,28 @@
 .. _configuration:
 
+==================
 RCAT Configuration
 ==================
 
-The main setup is done in the
-**<path-to-RCAT>/src/rcatool/config/config_main.ini** file. Here you will set
-up paths to model data, variables to analyze and how (choosing statistics),
-observations to compare with etc. In other words, this is your starting point
-in applications of RCAT.
+The main setup is done in the **config_main.ini** file (located under
+``src/rcatool/config/``). Here you will set up paths to model data, variables
+to analyze and how (choosing statistics), observations to compare with etc. In
+other words, this is your starting point in applications of RCAT.
 
-Setup folder structure
-----------------------
+Set up folder structure
+=======================
 If you don't want to pollute your cloned git repository we suggest to
 create a new folder for your analysis and copy the main RCAT configuration 
 file to the new folder.
 
 .. code-block:: bash
 
-    mkdir -p $HOME/rcat_analysis/test
-    cd $HOME/rcat_analysis/test
-    cp <path-to-RCAT>/src/rcatool/config/config_main.ini .
+    $ mkdir -p $HOME/rcat_analysis/test
+    $ cd $HOME/rcat_analysis/test
+    $ cp <path-to-RCAT>/src/rcatool/config/config_main.ini .
 
-Run RCAT
---------
+Running RCAT 
+------------
 When you have done your configuration and saved config_main.ini you can
 start the analysis step. The main program is located in the *rcat* directory
 and called RCAT_main.py. See point 1: :ref:`Setup folder structure
@@ -31,7 +31,7 @@ and called RCAT_main.py. See point 1: :ref:`Setup folder structure
 
 .. code-block:: bash
 
-   python <path-to-RCAT>/runtime/RCAT_main.py -c config_main.ini
+   $ python <path-to-RCAT>/src/rcatool/runtime/RCAT_main.py -c config_main.ini
 
 .. note::
    The configuration file does not need to be named *config_main.ini*. Any file
@@ -48,7 +48,7 @@ used in python like lists or dictionaries. Below follows a description of
 each of the sections needed to setup the analysis.
 
 MODELS
-^^^^^^
+------
 Here you specify the path to model data. At the moment a specific
 folder structure is anticipated, with sub-folders under ``fpath``
 according to output frequency; ``fpath/day``, ``fpath/6hr``, ``fpath/15min``, etc.
@@ -92,136 +92,117 @@ that model files include coordinate variables in accordance with CF conventions;
 data is to be remapped to this model grid, the output filenames from RCAT
 analysis will include this specified grid name.
 
-Here is another example when two models are specified:
+Here is another example with two simulations; one for the historic period and
+one future scenario.
 
 ::
 
-   model_his = {
-      'fpath': '/path/to/model_1/data',
-      'grid type': 'reg', 'grid name': 'FPS-ALPS3',
-      'start year': 1985, 'end year': 2005, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
-   }
-   model_scn = {
-      'fpath': '/path/to/model_2/data',
-      'grid type': 'reg', 'grid name': 'FPS-ALPS3',
-      'start year': 2080, 'end year': 2100, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
-   }
+    model_his = {
+        'fpath': '/path/to/model_1/data',
+        'grid type': 'reg', 'grid name': 'FPS-ALPS3',
+        'start year': 1985, 'end year': 2005, 'months': [6,7,8]
+    	'date interval start': '<yyyy>-<mm>', 'date interval end': '<yyyy>-<mm>',
+        'chunks_time': {'time': -1}, 'chunks_x': {'x': -1}, 'chunks_y': {'y': -1},
+        }
+    model_scn = {
+        'fpath': '/path/to/model_2/data',
+        'grid type': 'reg', 'grid name': 'FPS-ALPS3',
+        'start year': 2080, 'end year': 2100, 'months': [6,7,8]
+    	'date interval start': '<yyyy>-<mm>', 'date interval end': '<yyyy>-<mm>',
+        'chunks_time': {'time': -1}, 'chunks_x': {'x': -1}, 'chunks_y': {'y': -1},
+        }
 
-Two different periods is set here because a simulation of historic
-period will be compared with a simulation of future climate. More
-models can be added to the section, but note that the first model (e.g.
-model_his in the above example) will be the reference model. That is,
-if validation plot is True, and no obs data is specified, the
-difference plots will use the first specified model in section as reference data.
+More models can be added to the section, but note that the first defined model
+(e.g.  *model_his* in the above example) will be the reference model. That is,
+if validation plot is True, and no observations are specified (see below), the
+anomaly/difference plots will use the first specified model in this section as
+the reference data.
 
-.. note:: If you want to see how RCAT uses defined file paths and other
-       information to retrieve lists of model data files, see the
-       *get_mod_data* function in *<path-to-RCAT/runtime/RCAT_main.py*. 
+.. note:: 
+    If you want to see how RCAT uses defined file paths and other
+    information to retrieve lists of model data files, see the
+    *get_mod_data* function in *src/rcatool/runtime/RCAT_main.py*. 
 
 OBS
 ^^^
-If observation data is to be used in the analysis, you will need to 
+If observations should be included in the analysis, you will need to
 specify a meta data file by setting the full path to
-*observations_metadata_NN.py* (located under <path-to-RCAT>/config).
+*observations_metadata_NN.py* (located under *src/rcatool/config*).
 *NN* is any label that signifies the observation meta data for a
-specific location or system (for example a HPC system). If such a
-specific meta data file does not exist, it should be created
-(SAMPLE_observations_metadata.py can be used as a template) and
-modified. **N.B.** Change only the *obs_data* function -- where
-observations are specified.
+specific location or system (for example a HPC system). If no such
+meta data file exists yet, it should be created
+(SAMPLE_observations_metadata.py in the same folder can be used as a template) and
+modified. **N.B.** Changes should only be done in the *obs_data* function, where
+reference data sets are specified.
 
-In addition, in this section one will specify the time period and
-months for obs data. The same time period will be used for all
-observations.  Which specific observations to include in the analysis
-is not defined here, but in the **SETTINGS** section, in the variables
-property.
+In addition, in the **OBS** section the time period and months for obs data shall
+be defined. As for the models there is also the option to set a date interval
+instead, which, if set, takes precedence over years/months settings.
+The same time period will be applied to all observations included in the analysis. Which
+specific observations to include is not defined here, but in the
+**SETTINGS** section, in the variables properties.
 
 SETTINGS
 ^^^^^^^^
-**output dir**: The path for the output (statistics files, plots). If
-you re-run the analysis with the same output directory, you will
-prompted to say whether to overwrite existing output. "overwrite" does
-not mean that existing folder will be completely overwritten (deleted
-and created again). The existing folder structure will be kept intact
-together with output files. However, potentially some output
-(statistics/figure files) with same names will be overwritten.
+- **output dir**:
+    The path for the output (statistics files, plots). If
+    you re-run the analysis with the same output directory, you will
+    prompted to say whether to overwrite existing output. "overwrite" does
+    not mean that existing folder will be completely overwritten (deleted
+    and created again). The existing folder structure will be kept intact
+    together with output files. However, potentially some output
+    (statistics/figure files) with same names will be overwritten.
 
-**variables**: One of the key settings in the configuration file. The
-value of this property is represented by a dictionary; the keys are
-strings of variable names ('pr', 'tas', ...) and the value of each key
-(variable) is another dictionary consisting of a number of specific
-settings:
+- **variables**: 
+    This is a key settings in the configuration file. The
+    value of this property is represented by a dictionary; the keys are
+    strings of variable names ('pr', 'tas', ...) and the value of each key
+    (variable) is another dictionary consisting of a number of specific
+    settings (the same for all variables):
 
 ::
 
-       variables = {
-        'tas': {
-           'freq': 'day',
-           'units': 'K',
-           'scale factor': None,
-           'accumulated': False,
-           'obs': 'ERA5',
-           'obs scale factor': None,
-           'var names': {'model_1': {'prfx': 'tas', 'vname': 'var167'}},
-           'regrid to': 'ERA5',
-           'regrid method': 'bilinear'},
-        'psl': {
-           'freq': '3hr',
-           'units': 'hPa',
-           'scale factor': 0.01,
-           'accumulated': False,
-           'obs': None,
-           'obs scale factor': None,
-           'var names': None,
-           'regrid to': None,
-           'regrid method': 'bilinear'},
-        'pr': {
-           'freq': '1hr',
-           'units': 'mm',
-           'scale factor': 3600,
-           'accumulated': False,
-           'obs': 'EOBS20',
-           'obs scale factor': 86400,
-           'var names': None,
-           'regrid to': {'name': 'NORCP12', 'file': '/nobackup/rossby20/sm_petli/data/grids/grid_norcp_ald12.nc'},
-           'regrid method': 'conservative'},
-           }
+ variables = {
+    'tas': {
+       'var names': {'model_1': {'prfx': 'tas', 'vname': 'var167'}},
+       'freq': 'day',
+       'units': 'K',
+       'scale factor': None,
+       'offset factor': -273.15,
+       'accumulated': False,
+       'obs': 'EOBS',
+       'obs scale factor': None,
+       'obs freq': 'day',
+       'regrid to': 'model_2',
+       'regrid method': 'bilinear'},
+    'psl': {
+       'var names': None,
+       'freq': '3hr',
+       'units': 'hPa',
+       'scale factor': 0.01,
+       'offset factor': None,
+       'accumulated': False,
+       'obs': None,
+       'obs scale factor': None,
+       'obs freq': 'day',
+       'regrid to': None,
+       'regrid method': 'bilinear'},
+    'pr': {
+       'var names': None,
+       'freq': '1hr',
+       'units': 'mm',
+       'scale factor': 3600,
+       'offset factor': None,
+       'accumulated': False,
+       'obs': 'ERA5',
+       'obs scale factor': 86400,
+       'obs freq': 'day',
+       'regrid to': 'ERA5',
+       'regrid method': 'conservative'},
+ }
 
-* *freq*: A string of the time resolution of input model data. The
-  string should match any of the sub-folders under the path to model
-  data, e.g. 'day', '1hr', '3hr'. In effect, you may choose different
-  time resolutions for different variables in the analysis.
-
-* *units*: The units of the variable data (which will appear in
-  figures created in RCAT, and thus should reflect the units after
-  data have been manipulated through the analysis).
-
-* *scale factor*: A numeric factor (integer/float) that model data is
-  multiplied with, to convert to desired units (e.g. from J/m2 to
-  W/m2) and to ensure that all data (model and observations) have the
-  same units. If no scaling is to be done, set value to None. An
-  arithmetic expression is not allowed; for example if data is to be
-  divided by 10 you cannot define factor as 1/10, it must then be 0.1.
-  It is assumed that all model data will use the same factor..
-
-* *accumulated*: Boolean switch identifying variable data as
-  accumulated fields or not. If the former (True), then data will be
-  de-accumulated "on the fly" when opening files of data.
-
-* *obs*: String or list of strings with acronyms of observations to be
-  included in the analysis (for the variable of choice, and therefore
-  different observations can be chosen for different variables).
-  Available observations, and their acronyms, are specified in the
-  <path-to-RCAT>/config/observations_metadata_NN.py file. In this
-  file you can also add new observational data sets. 
-
-* *obs scale factor*: As scale factor above but for observations. If
-  multiple observations are defined, some of which would need
-  different scale factors, a list of factors can be provided. However,
-  if the same factor should be used for all observations, it is enough
-  to just specify a single factor.
-
-* *var names*: Variable names specified in the top key of *variables*
+- **var names**:
+  Variable names specified in the top key of *variables*
   usually refers to common names defined in CF conventions. However,
   there might be cases where either the variable name specified in the
   file name or of the variable in the file differ from these
@@ -231,32 +212,85 @@ settings:
   the conventions, and thus have same prefix and name as the top key
   variable name, *var names* should be set to *None*. See code snippet
   above for examples of both types of settings.
-  
-* *regrid to*: If data is to be remapped to a common grid, you specify
+
+- **freq**: 
+  A string of the time resolution of input model data. The
+  string should match any of the sub-folders under the path to model
+  data, e.g. 'day', '1hr', '3hr'. In effect, you may choose different
+  time resolutions for different variables in the analysis.
+
+- **units**: 
+  The units of the variable data (which will appear in
+  figures created in RCAT, and thus should reflect the units after
+  data have been manipulated through the analysis).
+
+- **scale factor**: 
+  A numeric factor (integer/float) that model data is
+  multiplied with, to convert to desired units (e.g. from J/m2 to
+  W/m2) and to ensure that all data (model and observations) have the
+  same units. If no scaling is to be done, set value to None. An
+  arithmetic expression is not allowed; for example if data is to be
+  divided by 10 you cannot define factor as 1/10, it must then be 0.1.
+
+  A list of scale factors can be defined if different scale factors should be
+  used for the different models specified under **MODELS** section. Thus, for 
+  a list of scale factors [f1, f2, f3, ...], these will applied as f1*model_1,
+  f2*model_2, etc. Note that the list of scale factors need then to be of the
+  same length as number of specified models. 
+
+- **offset factor**: 
+  The same as for *scale factor*, although the *offset factor* is added to the
+  model data. A negative value will then subtract the factor from model data.
+
+- **accumulated**: 
+  Boolean switch identifying variable data as
+  accumulated fields or not. If the former (True), then data will be
+  de-accumulated "on the fly" when opening files of data.
+
+- **obs**: 
+  String or list of strings with acronyms of observations to be
+  included in the analysis (for the variable of choice, and therefore
+  different observations can be chosen for different variables).
+  Available observations, and their acronyms, are specified in the
+  *src/rcatool/config/observations_metadata_NN.py* file. In this
+  file you can also add new observational data sets. 
+
+- **obs scale factor**: 
+  The same as *scale factor* above but applied to observations. If
+  multiple observations are defined, some of which would need
+  different scale factors, a list of factors can be provided. However,
+  if the same factor should be used for all observations, it is enough
+  to just specify a single factor.
+
+- **obs freq**: 
+  A string of the time resolution of observation data. 
+
+- **regrid to**:
+  If data is to be remapped to a common grid, you specify
   either the name (model name or observation acronym) of a model
   defined under **MODELS** section or an observation defined under
   *obs* key. Or, if an external grid should be used, it can be set to a
   dictionary with the *name* and *file* keys. *name* has the same
-  purpose as *grid name* in the **MODELS** section above. The value of
+  purpose as *grid name* in the **MODELS** section above.
+  The value of
   *file* must be the full path to a netcdf file that at least contains
   *lon* and *lat* variables defining the target grid. If no remapping
   is to be done, set *regrid to* to None.
 
-* *regrid method*: String defining the interpolation method:
-  'conservative' or 'bilinear'.
+- **regrid method**: 
+  String defining the interpolation method: 'conservative' or 'bilinear'.
 
-**regions**: A list of strings with region names, defining
+regions: 
+********
+A list of strings with region names, defining
 geographical areas data will be extracted from. If set, 2D statistical
-fields calculated by RCAT will be cropped over these regions, and in
-line plots produced in RCAT mean statistical values will calculated
-and plotted for each of the regions. If the pool data option in
-statistics configuration (see below) is set to True, then data over
-regions will be pooled together before statistical calculations. If no
-cropping of data is wanted, set this property to None. Read more about
+fields calculated by RCAT will be cropped over these regions (polygons), and in
+line plots produced in RCAT the statistical values will be averaged over
+and plotted for each of the regions. Read more about
 how to handle regions and polygons in RCAT :ref:`here <polygons_howto>`.
 
 - STATISTICS
-    Another main section of the analysis configuration. Therefore, the
+    This is another important section of the analysis configuration. Therefore, the
     description of this segment is given separately, see :doc:`RCAT
     Statistics </statistics>`
 

@@ -61,8 +61,10 @@ An alternative is to install RCAT and the dependencies separately:
 
     $ conda create -n rcatenv
     $ conda activate rcatenv
-    $ conda install xarray, esmpy, xesmf>=0.8, dask, dask-jobqueue, matplotlib, cartopy, netcdf4, h5netcdf
+    $ conda install xarray, esmpy, "xesmf>=0.8", dask, dask-jobqueue, matplotlib, cartopy, netcdf4, h5netcdf
 
+Note the quotes around *xesmf>=0.8*. These are required when installing package
+versions using *>=* or *<=* expressions. 
 RCAT package can then be installed from PyPI using ``pip``:
 
 .. code-block:: bash
