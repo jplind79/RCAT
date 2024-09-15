@@ -4,40 +4,41 @@ Use Case 2: Probability distributions
 =====================================
 
 In the following RCAT is applied to calculate standard empirical probability
-distribution functions. Similar to :ref:`Use Case 1 <use_case_1>` most changes
-will be done in the configuration file, *<path-to-RCAT>/config/config_main.ini*.
-
+distribution functions, PDF's. 
 
 Create hourly PDF statistics and visualize the results
 ******************************************************
 
-In the first example PDF's based on hourly data for historical and scenario
-simulations will be calculated for precipitation and T2m. Output statistics are
-then compared in line plots for specified regions.
+The target of this example is to calculate PDF's based on hourly data
+of precipitation and T2m for the summer season. 
 
 
 STEP 1: Data input
 ..................
 
-Under **MODELS** section configure for two *arome* simulations -- historic
-(*arome_his*) and future scenario (*arome_scn*). Thus, different years are
-specified, however, in the example here months 6,7,8 are specified so that
-only data for June, July and August is extracted. 
+Under section **MODELS** specify the paths to model data. Configure for two or
+more models, and select start and end years. Select months 6,7,8 in order to extract 
+data for June, July and August.
 
 ::
 
-   arome_his = {
-        'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ECE_ALADIN_1985_2005/netcdf',
-        'grid type': 'reg', 'grid name': 'NEU-3',
-        'start year': 1990, 'end year': 1994, 'months': [6,7,8]
+   model_1 = {
+        'fpath': '<path-to-folder-1>',
+        'grid type': 'reg', 'grid name': '<grid-name>',
+        'start year': <start year>, 'end year': <end year>, 'months': [6,7,8]
+	'date interval start': '<yyyy>-<mm>', 'date interval end': '<yyyy>-<mm>',
+     	'chunks_time': {'time': -1}, 'chunks_x': {'x': -1}, 'chunks_y': {'y': -1},
         }
-   arome_scn = {
-        'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ECE_ALADIN_RCP85_2080_2100/netcdf',
-        'grid type': 'reg', 'grid name': 'NEU-3',
-        'start year': 2090, 'end year': 2094, 'months': [6,7,8]
+   model_2 = {
+        'fpath': '<path-to-folder-2>',
+        'grid type': 'reg', 'grid name': '<grid-name>',
+        'start year': <start year>, 'end year': <end year>, 'months': [6,7,8]
+	'date interval start': '<yyyy>-<mm>', 'date interval end': '<yyyy>-<mm>',
+     	'chunks_time': {'time': -1}, 'chunks_x': {'x': -1}, 'chunks_y': {'y': -1},
         }
 
-We're looking at climate change signal in the model, so the **OBS** section can be left as is.
+
+We can skip the observations here and ignore **OBS** settings.
 
 
 STEP 2: Variables
@@ -49,32 +50,42 @@ The key *variables* defines which variables to analyze along with some options
 regarding that particular variable. Since only models will be analyzed here,
 *obs* is set to None. Further, models will be kept at their respective grids,
 thus *regrid to* is also set to None. Statistics is configured for T2m (*tas*)
-and precipitation (*pr*) with hourly data as input (*freq* set to *1H*).
+and precipitation (*pr*) with hourly data as input (*freq* set to *1hr*).
 
 Specify regions the *regions* key for which statistics will be selected for.
 
 ::
 
-    output dir = /nobackup/rossby22/sm_petli/analysis/test_pdf_analysis
+    output dir = <path-to-output-directory>
 
     variables = {
-        'pr': {'freq': '1H', 
-               'units': 'mm', 
-               'scale factor': None, 
-               'accumulated': True, 
-               'obs': None, 
-               'var names': None,
-               'regrid to': None},
-        'tas': {'freq': '1H', 
-                'units': 'K', 
-                'scale factor': None, 
-                'accumulated': False, 
-                'obs': None, 
-                'var names': None,
-                'regrid to': None},
+        'pr': {
+            'freq': '1hr',
+            'units': 'mm', 
+            'scale factor': 3600, 
+            'offset factor': None,
+            'accumulated': True, 
+            'obs': None, 
+            'obs scale factor': None,
+            'obs freq': 'day',
+            'var names': None,
+            'regrid to': None
+            },
+        'tas': {
+            'freq': '1hr', 
+            'units': 'K', 
+            'scale factor': None, 
+            'offset factor': None,
+            'accumulated': False, 
+            'obs': None, 
+            'obs scale factor': None,
+            'obs freq': 'day',
+            'var names': None,
+            'regrid to': None
+            },
         }
 
-    regions = ['Scandinavia']
+    regions = ['Germany', 'France']
 
 
 STEP 3: Select statistics
@@ -102,43 +113,36 @@ See the *default_stats_config* function in :ref:`RCAT Statistics
 STEP 4: Plotting
 ................
 
-* Under **PLOTTING**, *validation plot* should be set to *True* to enable plotting.
+* Under **PLOTTING**, set *validation plot* to *True* to enable plotting.
   Plotting of pdf's will be line plots only (regions should therefore be
-  specified). We only specify linewidths to be 2.5.
+  specified). We only specify linewidths to be 3.
 
 ::
 
     validation plot = True
 
-    map configure = {}
-    map grid setup = {}
-    map kwargs = {}
-    
     line grid setup = {}
-    line kwargs = {'lw': 2.5}
+    line kwargs = {'lw': 3}
 
 
 STEP 5: Configure cluster
 .........................
 
-The number of nodes to be used in the selected SLURM cluster is set to 20
-(increase if needed) and a walltime of 2 hours.
-
 ::
 
     cluster type = slurm
-    nodes = 20
-    cluster kwargs = {'walltime': '02:00:00'}
+    nodes = 10
+    cluster kwargs = {'walltime': '02:00:00', 'cores': 24, 'memory': '128GB'}
 
 
 STEP 6: Run RCAT
 ................
 
-To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
+Run the analysis run from the command line (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python <path-to-RCAT>/runtime/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/src/rcatool/runtime/RCAT_main.py -c config_main.ini
 
 
 Output statistics files will be located in the sub-folder *stats* under the
@@ -148,12 +152,12 @@ user-defined output directory.
 Calculate PDF's for daily maximum values instead
 ************************************************
 
-Imagine one would like to do the same kind of statistical analysis as above,
+Say you would like to do the same statistical analysis as above,
 however, with a different temporal resolution and/or time statistic on the input
 data. For example, let's assume that pdf's should be calculated for daily
 maxmimum data instead. How can this be achieved?
 
-This can be done during RCAT runtime, using an option in the *stats* property
+This can be done using an option in the *stats* property
 (under **SETTINGS**) called *resample resolution*. It is specified by a
 list/tuple with two locations; the first index represents the time resolution
 sought after and the second location the statistic used for each sample in the

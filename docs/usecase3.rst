@@ -15,7 +15,7 @@ be applied to calculate diurnal cycles of some model output using different
 statistical measures and how the splitting/chunking of data matters.
 
 Similar to :ref:`Use Case 1 <use_case_1>` most changes will be done in the
-configuration file, *<path-to-RCAT>/config/config_main.ini*.
+configuration file, *<path-to-RCAT>/src/rcatool/config/config_main.ini*.
 
 
 Calculate diurnal cycles of mean CAPE and plot the results
@@ -29,15 +29,19 @@ years as well as months to analyze.
 
 ::
 
-   arome = {
-        'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ERAI_ALADIN_1997_2017/netcdf',
-        'grid type': 'reg', 'grid name': 'NEU-3',
-        'start year': 1998, 'end year': 2002, 'months': [5,6,7,8,9]
+   model_1 = {
+        'fpath': '<path-to-folder-1>',
+        'grid type': 'reg', 'grid name': '<grid-name>',
+        'start year': <start year>, 'end year': <end year>, 'months': [5,6,7,8,9]
+	'date interval start': '<yyyy>-<mm>', 'date interval end': '<yyyy>-<mm>',
+     	'chunks_time': {'time': -1}, 'chunks_x': {'x': -1}, 'chunks_y': {'y': -1},
         }
-   aladin = {
-        'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_ALADIN_ERAI_1997_2017/netcdf',
-        'grid type': 'reg', 'grid name': 'NEU-12',
-        'start year': 1998, 'end year': 2002, 'months': [5,6,7,8,9]
+   model_2 = {
+        'fpath': '<path-to-folder-2>',
+        'grid type': 'reg', 'grid name': '<grid-name>',
+        'start year': <start year>, 'end year': <end year>, 'months': [5,6,7,8,9]
+	'date interval start': '<yyyy>-<mm>', 'date interval end': '<yyyy>-<mm>',
+     	'chunks_time': {'time': -1}, 'chunks_x': {'x': -1}, 'chunks_y': {'y': -1},
         }
 
 If you would like to include observations as well, set accordingly in the **OBS** section.
@@ -50,11 +54,11 @@ Set output directory under the **SETTINGS** section.
 
 In the key *variables* we specify in this example *pcape* (a specific model
 version of CAPE) available on 3 hourly time resolution.  If only models will be
-analyzed set *'obs'* to None.  *'regrid to'* is set to the coarser grid of the
-two models and data is interpolated using the *bilinear* method.
+analyzed set *'obs'* to None.  
 
 Specify region(s) in the *regions* key for which statistics will be selected,
-and finally plotted, for.
+and finally plotted, for. See *src/rcatool/utils/polygon_files* for available
+regions.
 
 ::
 
@@ -64,14 +68,17 @@ and finally plotted, for.
         'pcape': {'freq': '3H', 
                   'units': 'J/kg', 
                   'scale factor': None, 
+                  'offset factor': None, 
                   'accumulated': False, 
                   'obs': None, 
+                  'obs scale factor': None, 
+                  'obs freq': None, 
                   'var names': None,
-                  'regrid to': 'aladin', 
+                  'regrid to': None, 
                   'regrid method': 'bilinear'},
         }
 
-    regions = ['Sweden', 'Denmark', 'Norway', 'Finland']
+    regions = <list-of-regions>
 
 
 STEP 3: Select statistics
@@ -99,18 +106,30 @@ STEP 4: Plotting
 
 Under **PLOTTING**, *validation plot* should be set to *True* to enable
 plotting.  Plotting of diurnal cycles will be both maps (for each hour) and
-line plots for specified regions.
+line plots for specified regions. Why not testing different map projections or map
+extents?
 
 ::
 
     validation plot = True
 
-    map configure = {}
-    map grid setup = {}
-    map kwargs = {}
+    map projection = 'LambertConformal'
+    map configuration = {
+        'central_longitude': 10,
+        'central_latitude': 60.6,
+        'standard_parallels': (60.6, 60.6),
+     }
+    map extent = [4, 29, 52, 72]  # Extent of the map; [lon_start, lon_end, lat_start, lat_end]
+    map gridlines = False
+    map grid config = {'axes_pad': 0.3, 'cbar_mode': 'each', 'cbar_location': 'right',
+                  	  'cbar_size': '5%%', 'cbar_pad': 0.05}
+    map plot kwargs = {'filled': True, 'mesh': True}
+    map model domain =
     
-    line grid setup = {}
-    line kwargs = {'lw': 2.5}
+    # Line plot settings
+    line grid setup = {'axes_pad': (2., 2.)}
+    line kwargs = {'lw': 2}
+
 
 
 STEP 5: Configure cluster
@@ -133,7 +152,7 @@ To run the analysis run from terminal (see *Run RCAT* in :ref:`configuration`):
 
      .. code-block:: bash
 
-        python <path-to-RCAT>/runtime/RCAT_main.py -c config_main.ini
+        python <path-to-RCAT>/src/rcatool/runtime/RCAT_main.py -c config_main.ini
 
 
 Output statistics and image files will be located under the user-defined output
