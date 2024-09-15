@@ -320,35 +320,36 @@ cycles, pdf's, percentiles and ASoP analysis. If plotting procedures
 for other statistics is wished for, they need to be implemented in the
 RCAT :doc:`plotting module <plots>`.
 
-- **validation plot**:
 
-    If validation plot is set to True, standard plots
-    will be produced for the defined statistics. Otherwise, plotting can
-    be done elsewhere using the statistical output files (netcdf format)
-    created by RCAT.
+validation plot
+***************
+If validation plot is set to True, standard plots
+will be produced for the defined statistics. Otherwise, plotting can
+be done elsewhere using the statistical output files (netcdf format)
+created by RCAT.
 
-- **moments plot config**:
-    
-    Here one configures the plots for *moments* statistics (see :doc:`RCAT Statistics </statistics>`).
-    At the moment, only timeseries or map plots can be produced (``plot type: 'timeseries'`` and ``plot type: 'map'`` respectively).
-    For timeseries, one can also choose to add either running mean values and/or
-    linear trends (using numpy's ``polyfit`` and ``poly1d`` functions). To use
-    running means, set the window size (in terms of time units from the
-    calculated moment statistics), otherwise set to False. The switch for
-    trendlines is True/False.  
+moments plot config
+*******************
+Here one configures the plots for *moments* statistics (see :doc:`RCAT Statistics </statistics>`).
+At the moment, only timeseries or map plots can be produced (``plot type: 'timeseries'`` and ``plot type: 'map'`` respectively).
+For timeseries, one can also choose to add either running mean values and/or
+linear trends (using numpy's ``polyfit`` and ``poly1d`` functions). To use
+running means, set the window size (in terms of time units from the
+calculated moment statistics), otherwise set to False. The switch for
+trendlines is True/False.  
 
-- **map projection**
+map projection
+**************
+Define here the projection to use in the map plots. See Cartopy's
+documentation for available `projections <https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html>`_. 
+For example, to use Lambert Conformal conic projection, set ``map
+projection = 'LambertConformal'``. 
 
-    Define here the projection to use in the map plots. See Cartopy's
-    documentation for available `projections <https://scitools.org.uk/cartopy/docs/v0.15/crs/projections.html>`_. 
-    For example, to use Lambert Conformal conic projection, set ``map
-    projection = 'LambertConformal'``. 
-
-- **map configuration**
-
-    Settings for the specified map projection. 
-    See Cartopy documentation for available options of the projections.
-    The options shall be set in dictionary format, e.g.
+map configuration
+*****************
+Settings for the specified map projection. 
+See Cartopy documentation for available options of the projections.
+The options shall be set in dictionary format, e.g.
 
 ::
 
@@ -358,48 +359,52 @@ RCAT :doc:`plotting module <plots>`.
     'standard_parallels': (60.6, 60.6),
  }
 
-- **map extent**
+map extent
+**********
+Define the geographical extent of the maps. The value of *map extent* is a
+list of values corrsponding to [longitude_start, longitude_end,
+latitude_start, latitude_end]
 
-    Define the geographical extent of the maps. The value of *map extent* is a
-    list of values corrsponding to [longitude_start, longitude_end,
-    latitude_start, latitude_end]
+map gridlines
+*************
+Whether to plot labeled latitude/longitude lines in map plots (True/False)
 
-map gridlines = False
-map grid config = {'axes_pad': 0.3, 'cbar_mode': 'each', 'cbar_location': 'right',
-              	  'cbar_size': '5%%', 'cbar_pad': 0.05}
-map plot kwargs = {'filled': True, 'mesh': True}
-map model domain =
-- **map configure**: 
-
-    In this property you can change/add key value pairs
-    that control for example map projection ('proj') and resolution
-    ('res') as well as the dimensions of the map; 'zoom' can be set to
-    'crnrs' if corners of model grid is to be used, or 'geom' if you want
-    to specify width and height (in meters) of the map. In the latter case
-    you need to set 'zoom_geom' [width, height]. Note that these settings
-    refers to the reference model in the analysis which is the first model
-    data set specified in the **MODELS** section.
+map grid config
+***************
+Settings for the map plot panel configuration, for
+example whether to use a single colorbar or not (cbar_mode), colorbar location,
+the padding between panels, etc.
 
 ::
 
-   map configure = {'proj': 'stere', 'res': 'l', 'zoom': 'geom', 'zoom_geom': [1700000, 2100000], 'lon_0': 16.5, 'lat_0': 63}
+ map grid config = {
+    'axes_pad': 0.3,
+    'cbar_mode': 'each',
+    'cbar_location': 'right',
+    'cbar_size': '5%%',
+    'cbar_pad': 0.05
+    }
 
-For more settings, see the map_setup function in the :doc:`plots module <plots>`.
+The *map grid cofig* dictionary constitute the keyword arguments (kwargs)
+for the *map_setup* function in the :doc:`plots module <plots>`. See this
+function for more information on other available options.
 
-**map grid setup**: Settings for the map plot configuration, for
-example whether to use a colorbar or not (cbar_mode) and where to put
-it and the padding between panels. For more info, see the
-*image_grid_setup* function in the :doc:`plots module <plots>`.
-
-::
-
-   map grid setup = {'axes_pad': 0.5, 'cbar_mode': 'each', 'cbar_location': 'right', 'cbar_size': '5%%', 'cbar_pad': 0.03}
-
-**map kwargs**: Additional keyword arguments to be added in the
+map plot kwargs
+***************
+Additional keyword arguments to be added in the
 matplotlib contour plot call, see the make_map_plot function in
 the :doc:`plotting module <plots>`.
 
-**line plot settings**: Likewise, settings for line plots can be made,
+map model domain
+****************
+For the map plots, all data is masked by the spatial extent of the reference model 
+(first model listed under **MODELS**), mainly to achieve appropriate levels for
+the data values. The *map model domain* can be set to choose another model from
+**MODELS** for the data masking (other than the first one).
+
+line plot settings
+******************
+Likewise, settings for line plots can be made,
 e.g. line widths and styles as well as axes configurations. There are
 a number of functions in the :doc:`plotting module <plots>` that
 handles line/scatter/box plots, see for example the fig_grid_setup and
@@ -413,26 +418,25 @@ make_line_plot functions.
 CLUSTER
 -------
 The last section control the cluster type. You can choose between local
-pc and SLURM at the moment.
+machine and SLURM at the moment.
 
-**cluster type**: choose "local" for running on you local pc and
-"slurm" if you want to run RCAT on a HPC with a SLURM job scheduler and
-read information below. For local pc no other settings need to be made
-in this section.
+cluster type
+************
+Choose ``local`` for running on your local machine and ``slurm`` if you want to
+run RCAT on a HPC with a SLURM job scheduler.  For local machine no other
+settings need to be made in this section, for SLURM see information below.
 
 *SLURM*
     RCAT uses `Dask <https://docs.dask.org/>`_ to perform file managing
     and statistical analysis in an efficient way through parallelization.
-    When applying Dask on queuing systems like PBS or Slurm,
+    When using Dask on queuing systems like PBS or SLURM,
     `Dask-Jobqueue <https://dask-jobqueue.readthedocs.io>`_ provides an
-    excellent interface for handling such work flow. It is used in RCAT
-    and to properly use Dask and Dask-Jobqueue on an HPC system you need
-    to provide some information about that system and how you plan to use
+    excellent interface for deploying and managing such a work flow. To properly use Dask and Dask-Jobqueue on an HPC system you need
+    to provide some information about the system and how you plan to use
     it. By default, when Dask-Jobqueue is first imported a configuration
-    file is placed in ~/.config/dask/jobqueue.yaml. What is set in this
-    file are the default settings being used. On Bi/NSC we have set up a
-    default configuration file as below.
-
+    file is placed in ~/.config/dask/jobqueue.yaml. Below is an example of the
+    content in this file:
+    
     .. code-block:: yaml
 
        jobqueue:
@@ -446,28 +450,19 @@ in this section.
 
            interface: ib0
            death-timeout: 60
-           local-directory: $SNIC_TMP
+           local-directory: $TMP
 
            # SLURM resource manager options
            queue: null
            project: null
            walltime: '01:00:00'
-           job-extra: ['--exclusive']
+           job-extra-directives: ['--exclusive']
 
     When default settings have been set up, the main properties that you
     usually want to change in the **CLUSTER** section are the number of nodes
-    to use and wall time:
+    to use, ``nodes`` and walltime:
 
     ::
 
        nodes = 15
-       slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
-
-    **nodes**: Sometimes you might need more memory on the nodes, and on
-    Bi/NSC there are fat nodes available. If you want to use fat nodes,
-    you can specify this through
-
-    ::
-
-       slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB', 'job_extra': ['-C fat']}
-
+       slurm kwargs = {'walltime': '02:00:00', 'memory': '256GB'}

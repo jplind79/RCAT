@@ -5,7 +5,7 @@ Use Case 1: Annual & and Seasonal Cycles
 
 In this example annual and seasonal statistics will be calculated and in most
 steps, changes are made in different sections of the configuration file,
-*<path-to-RCAT>/config/config_main.ini*. It is recommended to copy this file to your
+*src/rcatool/config/config_main.ini*. It is recommended to copy this file to your
 experiment folder. Detailed information of what can be configured and how can be
 found in :ref:`configuration`.
 
@@ -20,21 +20,20 @@ statistic (and sub-region if specified). No plotting is done here.
 STEP 1: Data input
 ..................
 
-Under section **MODELS** you'll specify the path to model data. Configure for
-two models -- *arome* and *aladin* -- using the same time period and months.
-Since the annual and seasonal cycles will be calculated, all months are chosen.
+Under section **MODELS** specify the paths to model data. Configure for
+two or more models. Since the annual and seasonal cycles will be calculated, select all 12 months.
 
 ::
 
-   arome = {
-        'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_AROME_ERAI_ALADIN_1997_2017/netcdf',
-        'grid type': 'reg', 'grid name': 'NEU-3',
-        'start year': 1998, 'end year': 2002, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
+   model_1 = {
+        'fpath': '<path-to-folder-1>',
+        'grid type': 'reg', 'grid name': '<grid-name>',
+        'start year': <start year>, 'end year': <end year>, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
         }
-   aladin = {
-        'fpath': '/nobackup/rossby21/rossby/joint_exp/norcp/NorCP_ALADIN_ERAI_1997_2017/netcdf',
-        'grid type': 'reg', 'grid name': 'NEU-12',
-        'start year': 1998, 'end year': 2002, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
+   model_2 = {
+        'fpath': '<path-to-folder-2>',
+        'grid type': 'reg', 'grid name': '<grid-name>',
+        'start year': <start year>, 'end year': <end year>, 'months': [1,2,3,4,5,6,7,8,9,10,11,12]
         }
 
 In this example we will not use any observations so no modifications are needed
@@ -48,7 +47,7 @@ folder doesn't exist already it will be created by RCAT.
 
 ::
 
-    output dir = /nobackup/rossby22/sm_petli/analysis/test_analysis
+    output dir = <path-to-output-directory>
 
 The key *variables* defines which variables to analyze along with some options
 regarding that particular variable. Since only models will be analyzed here,
