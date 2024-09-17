@@ -62,10 +62,10 @@ regions.
 
 ::
 
-    output dir = /nobackup/rossby22/sm_petli/analysis/test_dcycle_analysis
+    output dir = <path-to-output-directory>
 
     variables = {
-        'pcape': {'freq': '3H', 
+        'pcape': {'freq': '3hr', 
                   'units': 'J/kg', 
                   'scale factor': None, 
                   'offset factor': None, 
