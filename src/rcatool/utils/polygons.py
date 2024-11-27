@@ -137,8 +137,8 @@ def mask_region(xp, yp, area, data=None, iter_3d=None, cut_data=False):
                        np.max(np.where(~mask)[i]))
                       for i in range(2)]
         reg_x_edges, reg_y_edges = xp_r, yp_r
-        xr = np.int(np.diff(xp_r)+1)
-        yr = np.int(np.diff(yp_r)+1)
+        xr = int(np.diff(xp_r)+1)
+        yr = int(np.diff(yp_r)+1)
         if xp.ndim == 2:
             xp_cut = xp[yp_r[0]:yp_r[1]+1, xp_r[0]:xp_r[1]+1]
             yp_cut = yp[yp_r[0]:yp_r[1]+1, xp_r[0]:xp_r[1]+1]

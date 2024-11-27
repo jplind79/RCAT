@@ -937,17 +937,19 @@ def map_setup(map_proj, map_extent, figsize=(12, 12), figshape=(1, 1),
     # Add features to map
     for ax in axgrid:
 
-        ax.add_feature(cf.COASTLINE, edgecolor='#606060', linewidth=.7)
-        ax.add_feature(cf.BORDERS, edgecolor='#606060', linewidth=.4)
+        ax.add_feature(cf.COASTLINE, edgecolor='#292929', linewidth=1.0)
+        ax.add_feature(cf.LAKES, edgecolor='#292929', facecolor='none',
+                       linewidth=0.8)
+        ax.add_feature(cf.BORDERS, edgecolor='#292929', linewidth=0.8)
 
         # Set the lat/lon extent of map
         ax.set_extent(map_extent, crs=ccrs.PlateCarree())
 
         if grid_lines:
             gl = ax.gridlines(
-                draw_labels=True, linewidth=0.5, color='gray',
+                draw_labels=True, linewidth=0.6, color='gray',
                 x_inline=False, y_inline=False, linestyle='-',
-                alpha=.7, crs=ccrs.PlateCarree())
+                alpha=.8, crs=ccrs.PlateCarree())
             gl.top_labels = False
             gl.right_labels = False
 
