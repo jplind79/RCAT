@@ -64,3 +64,6 @@ path = "rcat/__init__.py"
 include = [
     "/rcat",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rcatool"]
