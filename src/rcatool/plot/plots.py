@@ -1188,7 +1188,7 @@ def plot_map(ax, x, y, data, clevs, cmap, norm, mesh, filled, **map_kwargs):
 
 
 def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
-                   labelsize='x-large', formatter='{:.2f}', **cbar_kwargs):
+                   labelsize='large', formatter='{:.2f}', **cbar_kwargs):
     """
     Add colobar to map plot
 

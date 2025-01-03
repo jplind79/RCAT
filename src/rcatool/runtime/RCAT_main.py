@@ -117,8 +117,8 @@ def get_variable_config(var_config):
         'units': var_config['units'],
         'scale factor': var_config['scale factor'],
         'offset factor': var_config['offset factor'],
-        'obs scale factor': var_config['obs scale factor'] if
-        'obs scale factor' in var_config else None,
+        'obs scale factor': var_config['obs scale factor'],
+        'obs offset factor': var_config['obs offset factor'],
         'deacc': var_config['accumulated'],
         'regrid': var_config['regrid to'] if 'regrid to' in
         var_config else None,
@@ -161,10 +161,6 @@ def variabel_modification(dd, nv_dd, funargs, new_variable, mlist, olist):
                     dd[nv_dd['input'][a]][m]['data'][nv_dd['input'][a]]
                     for a in args]
 
-            # 2024-04: Temp fix for EURO-CORDEX upsampling HCLIM-ALADIN data
-            time_fix = input_data[0].time
-            input_data[1] = input_data[1].reindex(time=time_fix).ffill(
-                dim='time')
             _new_data = xa.apply_ufunc(
                 func, *input_data, input_core_dims=[[]]*len(input_data),
                 dask='parallelized', output_dtypes=[float],
@@ -249,7 +245,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     # -- Opening files (possibly with de-accumulation preprocessing)
     if deacc:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='h5netcdf',
+            flist, parallel=True, engine='netcdf4',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time'))).drop_duplicates(
@@ -263,7 +259,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
             np.timedelta64(dt.timedelta(seconds=np.round(nsec/2)))
     else:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='h5netcdf',
+            flist, parallel=True, engine='netcdf4',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y}).drop_duplicates(
                 dim='time', keep='last')
@@ -345,7 +341,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     return model_data
 
 
-def get_obs_data(metadata_file, obs, var, factor, time_dict):
+def get_obs_data(metadata_file, obs, var, factor, offset, time_dict):
     """Open observation data"""
 
     from importlib.machinery import SourceFileLoader
@@ -401,6 +397,10 @@ def get_obs_data(metadata_file, obs, var, factor, time_dict):
     # Scale data
     if factor is not None:
         obs_data[var] *= factor
+
+    # Add/subtract to data
+    if offset is not None:
+        obs_data[var] += offset
 
     # Labels for spatial coordinates
     xc, yc = _space_coords(obs_data)
@@ -768,6 +768,10 @@ def calculate_statistics(ddict, varlist, stat, pool, chunk_dim,
 
             # ----- Resampling of data
             if stats_config[stat]['resample resolution'] is not None:
+                # Chunking of data over time dim
+                if chunk_dim != 'time':
+                    indata = manage_chunks(indata, 'time')
+
                 resample_args = stats_config[stat]['resample resolution']
                 if isinstance(resample_args, dict):
                     if v in resample_args:
@@ -1321,10 +1325,15 @@ for var in cdict['variables']:
     obs_scale_factors = ([obs_scale_factors]*len(obs_list)
                          if not isinstance(obs_scale_factors, list) else
                          obs_scale_factors)
+    obs_offset_factors = var_conf['obs offset factor']
+    obs_offset_factors = ([obs_offset_factors]*len(obs_list)
+                          if not isinstance(obs_offset_factors, list) else
+                          obs_offset_factors)
     if obs_names is not None:
-        for obsname, cfactor in zip(obs_list, obs_scale_factors):
+        for obsname, scf, ofs\
+                in zip(obs_list, obs_scale_factors, obs_offset_factors):
             obs_data = get_obs_data(
-                obs_metadata_file, obsname, var, cfactor,
+                obs_metadata_file, obsname, var, scf, ofs,
                 cdict['obs time dict'])
             data_dict[var][obsname] = obs_data
 
@@ -1464,4 +1473,5 @@ if cdict['validation plot']:
                 time_suffix_dict[v], tres_str[sn][v], img_outdir,
                 stat_outdir, sn)
             print("\t\n** Plotting: {} for {} **".format(sn, v))
-            rplot.plot_main(plot_dict, sn)
+            plot_inst = rplot.PlotConfiguration(plot_dict, sn)
+            plot_inst.run_plotting_application()

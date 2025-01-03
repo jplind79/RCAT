@@ -192,7 +192,7 @@ def create_polygon():
     poly: list
         List with tuples of lat/lon coordinates for drawn polygon
     """
-    from rcat.utils import draw_polygon
+    from rcatool.utils import draw_polygon
 
     def get_map(area, map_dict=None):
         # Create map object
@@ -362,7 +362,7 @@ def create_polygon():
         s1 = "Type file directory path and file name as: fdir, fname"
         s2 = "Make sure 'fname' is an appropriate name for the polygon."
         s3 = ("N.B.\nIf polygon should be added to RCAT, make sure directory "
-              "path is set to: <path-to-RCAT>/rcat/utils/polygon_files")
+              "path is set to: <path-to-RCAT>/rcatool/utils/polygon_files")
         file_info = input('\n{}\t\n{}\t\n{}\n>> '.format(s1, s2, s3))
         file_info = file_info.split(',')
 
