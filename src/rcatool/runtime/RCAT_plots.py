@@ -213,7 +213,9 @@ class PlotConfiguration(object):
             else:
                 sel_n = list_nsamples[indices[0]]
 
-            return np.linspace(int_min, int_max, sel_n)
+            sel_clevs = np.linspace(_min, _max, sel_n)
+            sel_clevs = sel_clevs / factor
+            return sel_clevs
 
         def _count_sigfigs(numstr):
             return len(Decimal(numstr).normalize().as_tuple().digits)

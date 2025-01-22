@@ -31,9 +31,9 @@ def figure_init(plottype='line', printtypes=False):
 
     pltypes = {
             'map': 'classic',
-            'line': 'ggplot',
+            'line': 'seaborn-v0_8-white',
             'scatter': 'fivethirtyeight',
-            'raster': 'seaborn-white',
+            'raster': 'seaborn-v0_8-white',
             'box': 'fivethirtyeight',
             }
 
@@ -551,7 +551,7 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
 
             if np.any([np.any(np.array(dd) > 0.0) for dd in yd[i]]) and\
                np.any([np.any(np.array(dd) < 0.0) for dd in yd[i]]):
-                ax.axhline(color='k', lw=2, ls='--', alpha=.7)
+                ax.axhline(color='k', lw=1.4, ls='--', alpha=.6)
 
             if axis_type in ('logx', 'logxy'):
                 ax.set_xscale('log')
@@ -580,10 +580,10 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
             if isinstance(yd[0], (list, tuple, range, np.ndarray)):
                 if xdata is not None:
                     xd = xdata[i]
-                    lines = [ax.plot(xx, yy, **lp_kwargs)[0]
+                    lines = [ax.plot(xx, yy, lw=2.5, **lp_kwargs)[0]
                              for xx, yy in zip(xd, yd)]
                 else:
-                    lines = [ax.plot(yy, **lp_kwargs)[0] for yy in yd]
+                    lines = [ax.plot(yy, lw=2.5, **lp_kwargs)[0] for yy in yd]
 
                 if labels is not None:
                     [line.set_label(lbl)
@@ -592,19 +592,19 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
 
                 if np.any([np.any(np.array(dd) > 0.0) for dd in yd]) and\
                    np.any([np.any(np.array(dd) < 0.0) for dd in yd]):
-                    ax.axhline(color='k', lw=2, ls='--', alpha=.7)
+                    ax.axhline(color='k', lw=1.4, ls='--', alpha=.6)
             else:
                 if xdata is not None:
-                    lines = ax.plot(xdata[i], yd, **lp_kwargs)
+                    lines = ax.plot(xdata[i], yd, lw=2.5, **lp_kwargs)
                 else:
-                    lines = ax.plot(yd, **lp_kwargs)
+                    lines = ax.plot(yd, lw=2.5, **lp_kwargs)
 
                 if labels is not None:
                     [line.set_label(labels[i]) for line in lines]
                     ax.legend(fontsize=lbl_fontsize)
 
                 if np.any(yd > 0.0) and np.any(yd < 0.0):
-                    ax.axhline(color='k', lw=2, ls='--', alpha=.7)
+                    ax.axhline(color='k', lw=1.4, ls='--', alpha=.6)
 
             if axis_type in ('logx', 'logxy'):
                 ax.set_xscale('log')
