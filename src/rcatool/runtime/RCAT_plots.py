@@ -572,7 +572,6 @@ class PlotConfiguration(object):
                 lgrid, data=dlist, labels=lbls, leg_labels=None,
                 grouped=True, whis=[5, 95], showfliers=False)
 
-            # breakpoint()
             _ = [rpl._decorate_box(axs[0], bps[0][i], self.abs_colors)
                  for s, i in seasons.items()]
             _ = [[rpl._decorate_box(ax, bp[i], self.rel_colors)
@@ -1634,7 +1633,6 @@ class PlotConfiguration(object):
             rpl.figure_init(plottype='scatter')
             fig, lgrid = rpl.fig_grid_setup(fshape=figshape, figsize=figsize,
                                             **self.line_grid)
-
             axs = rpl.make_line_plot(lgrid, ydata=dlist, **self.line_sets)
             if self.var == 'pr':
                 axs[0].set_yscale('log')
