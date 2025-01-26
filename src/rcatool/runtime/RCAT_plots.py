@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 import math
+import re
 import rcatool.plot.plots as rpl
 from rcatool.utils.polygons import mask_region
 from rcatool.stats.arithmetics import run_mean
@@ -112,11 +113,13 @@ class PlotConfiguration(object):
             'asop': self.map_asop,
         }
 
-        # types_of_diff = ['absolute', 'relative']
-        self.include_relative_change = True
+        # No relative change for temperature variables
+        pattern = r"ta[0-9]+|tas|ts|sst"
+        self.include_relative_change = False if\
+            bool(re.match(pattern, self.var)) else True
+
         self.plot_mulc = 2 if self.include_relative_change else 1
 
-        # for diff_type in types_of_diff:
         # Call plot function
         plot_funcs[self.statistic]()
 
@@ -481,7 +484,7 @@ class PlotConfiguration(object):
                                    for m in self.models} for s in seasons}
                     fdiff_o = {s: {o: fobs[s][o] - fobs[s][self.ref_obs]
                                    for o in self.obslist[1:]} for s in seasons}
-                    fdiff = [fdiff_m | fdiff_o]
+                    fdiff = [{k: v | fdiff_o[k] for k, v in fdiff_m.items()}]
                     if self.include_relative_change:
                         fdiff_mr = {s: {m: (mdata[s][m] / fobs[s][self.ref_obs]
                                             - 1)*100
@@ -490,10 +493,11 @@ class PlotConfiguration(object):
                                             - 1)*100
                                         for o in self.obslist[1:]}
                                     for s in seasons}
-                        fdiff += [fdiff_mr | fdiff_or]
+                        fdiff += [{k: v | fdiff_or[k]
+                                   for k, v in fdiff_mr.items()}]
                     dlist = [{s: [_flatten(fobs[s][self.ref_obs])] +
-                              [_flatten(mdata[s][m])
-                               for m in self.models + self.obslist[1:]]
+                              [_flatten(mdata[s][m]) for m in self.models] +
+                              [_flatten(fobs[s][o]) for o in self.obslist[1:]]
                               for s, i in seasons.items()}] +\
                             [{s: [_flatten(fd[s][m])
                                   for m in self.models + self.obslist[1:]]
