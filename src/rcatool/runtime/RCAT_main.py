@@ -22,7 +22,7 @@ from rcatool.utils.polygons import mask_region
 import rcatool.runtime.RCAT_stats as st
 import rcatool.utils.grids as gr
 
-dask.config.set(scheduler="single-threaded")
+# dask.config.set(scheduler="single-threaded")
 warnings.filterwarnings("ignore")
 
 
@@ -245,7 +245,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     # -- Opening files (possibly with de-accumulation preprocessing)
     if deacc:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='netcdf4',
+            flist, parallel=True, engine='h5netcdf',  # engine='netcdf4',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time'))).drop_duplicates(
@@ -259,7 +259,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
             np.timedelta64(dt.timedelta(seconds=np.round(nsec/2)))
     else:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='netcdf4',
+            flist, parallel=True, engine='h5netcdf',  # engine='netcdf4',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y}).drop_duplicates(
                 dim='time', keep='last')
@@ -384,7 +384,8 @@ def get_obs_data(metadata_file, obs, var, factor, offset, time_dict):
 
     f_obs = xa.open_mfdataset(
         flist, parallel=True, data_vars='minimal', coords='minimal',
-        combine='by_coords').unify_chunks()
+        combine='by_coords', engine='h5netcdf').unify_chunks()
+    # f_obs = f_obs.chunk({'time': 100}).unify_chunks()
 
     # Extract years and months
     if time_dict['date interval start'] is not None:
@@ -969,19 +970,22 @@ def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
                 f"{time_suffix.replace('_', ' ')}"
             fname = '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, rn, grid, time_suffix)
-            data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname))
+            data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname),
+                                         engine='netcdf4')
         if fulldomain:
             fname = '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, grid, time_suffix)
             data['domain'].attrs['Analysed time'] =\
                 f"{time_suffix.replace('_', ' ')}"
-            data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
+            data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
+                                     engine='netcdf4')
     else:
         fname = '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
             label, stat_fn, var, thr, tres, tstat, grid, time_suffix)
         data['domain'].attrs['Analysed time'] =\
             f"{time_suffix.replace('_', ' ')}"
-        data['domain'].to_netcdf(os.path.join(odir, stat_name, fname))
+        data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
+                                 engine='netcdf4')
 
 
 def get_masked_data(data, var, mask):
