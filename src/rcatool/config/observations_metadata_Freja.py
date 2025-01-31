@@ -382,6 +382,10 @@ def obs_data():
             'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clwvi_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
+        'CLARA_A3': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A3/day',  # noqa
+            'file pattern': 'clwvi_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
+        },
     },
 
     # ------------------------------------------------------------------------
@@ -394,6 +398,10 @@ def obs_data():
         'CLARA_A2': {
             'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
             'file pattern': 'clivi_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+        'CLARA_A3': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A3/day',  # noqa
+            'file pattern': 'clivi_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
 
