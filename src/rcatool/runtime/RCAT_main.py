@@ -385,7 +385,13 @@ def get_obs_data(metadata_file, obs, var, factor, offset, time_dict):
     f_obs = xa.open_mfdataset(
         flist, parallel=True, data_vars='minimal', coords='minimal',
         combine='by_coords', engine='h5netcdf').unify_chunks()
-    # f_obs = f_obs.chunk({'time': 100}).unify_chunks()
+    # f_obs = f_obs.chunk({'time': 300}).unify_chunks()
+
+    # EDIT 2025-02-05:
+    # Recent occurrences of issues with netcdf writing seem to be related
+    # to 'time_bnds' variables
+    if 'time_bnds' in f_obs.variables:
+        f_obs = f_obs.drop_vars('time_bnds')
 
     # Extract years and months
     if time_dict['date interval start'] is not None:
@@ -950,7 +956,9 @@ def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
                  tres, thr='', regs=None, fulldomain=True):
     """Saving data to netcdf files"""
 
-    # Encoding for time variable. EDIT 240826: Often not applicable
+    # Encoding for time variable
+    # EDIT 240826: Often not applicable since the time dimension
+    # might have different name due to resampling etc
     # encoding = {'time': {'dtype': 'i4'}}
 
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):

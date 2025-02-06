@@ -39,9 +39,9 @@ def obs_data():
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'tas_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
-        'EOBS19': {
-            'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
-            'file pattern': 'tas_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'EOBS25': {
+            'path': '/home/rossby/imports/obs/EOBS/EOBS25-0e/EUR-10/input/day',
+            'file pattern': 'tas_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
@@ -72,13 +72,13 @@ def obs_data():
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'tasmax_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
-        'EOBS19': {
-            'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
-            'file pattern': 'tasmax_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-        },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'tasmax_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+        'EOBS25': {
+            'path': '/home/rossby/imports/obs/EOBS/EOBS25-0e/EUR-10/input/day',
+            'file pattern': 'tasmax_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
             'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
@@ -95,13 +95,13 @@ def obs_data():
             'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
             'file pattern': 'tasmin_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
-        'EOBS19': {
-            'path': '/home/rossby/imports/obs/EOBS/EOBS19/EUR-10/input/day',
-            'file pattern': 'tasmin_EUR-10_EOBS19e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-        },
         'EOBS20': {
             'path': '/home/rossby/imports/obs/EOBS/EOBS20/EUR-10/input/day',
             'file pattern': 'tasmin_EUR-10_EOBS20e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+        'EOBS25': {
+            'path': '/home/rossby/imports/obs/EOBS/EOBS25-0e/EUR-10/input/day',
+            'file pattern': 'tasmin_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'ERA5': {
             'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
