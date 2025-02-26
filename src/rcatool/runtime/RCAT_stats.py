@@ -407,7 +407,10 @@ def moments(data, var, stat, stat_config):
             f"Moment statistic: No statistics applied | Threshold: {thr}"
     else:
         if mstat[0] == 'all':
-            st_data = eval(f"data.{mstat[1]}(dim='time', skipna=True)")
+            if mstat[1] == 'sum':
+                st_data = eval(f"data.{mstat[1]}(dim='time', min_count=1)")
+            else:
+                st_data = eval(f"data.{mstat[1]}(dim='time')")
         else:
             # Resample expression
             res_kw = stat_config[stat]['moment resample kwargs']
@@ -419,8 +422,12 @@ def moments(data, var, stat, stat_config):
                     expr = (f"data[var].resample(time='{mstat[0]}')"
                             f".interpolate({mstat[2]}).dropna('time', 'all')")
                 else:
-                    expr = (f"data[var].resample(time='{mstat[0]}')"
-                            f".{mstat[1]}('time').dropna('time', 'all')")
+                    if mstat[1] == 'sum':
+                        expr = (f"data[var].resample(time='{mstat[0]}')"
+                                f".{mstat[1]}('time', min_count=1).dropna('time', 'all')")
+                    else:
+                        expr = (f"data[var].resample(time='{mstat[0]}')"
+                                f".{mstat[1]}('time').dropna('time', 'all')")
             else:
                 if mstat[1] == 'apply function':
                     expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
@@ -429,8 +436,13 @@ def moments(data, var, stat, stat_config):
                     expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
                             f".interpolate({mstat[2]}).dropna('time', 'all')")
                 else:
-                    expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
-                            f".{mstat[1]}('time').dropna('time', 'all')")
+                    if mstat[1] == 'sum':
+                        expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                                f".{mstat[1]}('time', min_count=1).dropna('time', 'all')")
+                    else:
+                        expr = (f"data[var].resample(time='{mstat[0]}', **res_kw)"
+                                f".{mstat[1]}('time').dropna('time', 'all')")
+
             diff = data.time.values[1] - data.time.values[0]
             nsec = to_timedelta(diff).total_seconds()
             tr, fr = _get_freq(mstat[0])

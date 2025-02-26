@@ -101,7 +101,7 @@ def td2sh(Td, P):
 
     Returns
     -------
-    p, float/array of floats
+    q, float/array of floats
         Specific humidity in g/kg
     """
 

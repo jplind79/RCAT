@@ -5,6 +5,7 @@ import sys
 import xarray as xa
 import numpy as np
 import matplotlib as mpl
+mpl.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
@@ -1338,19 +1339,19 @@ class PlotConfiguration(object):
                 leg_elements = [Line2D([0], [0], lw=3, color=c, label=l)
                                 for c, l in zip(self.abs_colors, lg_lbls[0])]
                 if self.moments_plot_conf['trendline']:
-                    legend_elements = leg_elements + [
+                    leg_elements = leg_elements + [
                         Line2D([0], [0], lw=3, color='k', marker='o', mfc=c,
                                mec=c, markersize=8, alpha=.6,
                                label='lin. trend')
                         for c, _ in zip(self.abs_colors, lg_lbls[0])]
                 if self.moments_plot_conf['running mean']:
-                    legend_elements = leg_elements + [
+                    leg_elements = leg_elements + [
                         Line2D([0], [0], lw=3, color='k', marker='o', mfc=c,
                                mec=c, markersize=8, alpha=.6,
                                label=f'run. avg (window: {window})')
                         for c, _ in zip(self.abs_colors, lg_lbls[0])]
 
-                axs[0].legend(handles=legend_elements, ncol=2,
+                axs[0].legend(handles=leg_elements, ncol=2,
                               fontsize='x-large', framealpha=.5)
                 leg_elements = [Line2D([0], [0], lw=3, color=c, label=l)
                                 for c, l in zip(self.rel_colors, lg_lbls[1])]
@@ -1662,7 +1663,7 @@ class PlotConfiguration(object):
              for a, ax in enumerate(axs)]
 
             ttl = fig.suptitle(headtitle, fontsize='xx-large')
-            ttl.set_position((.5, 1.05))
+            ttl.set_position((.5, 1.08))
 
             plt.savefig(os.path.join(self.img_dir, fn), bbox_inches='tight')
 
