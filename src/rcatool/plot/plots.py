@@ -580,10 +580,10 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
             if isinstance(yd[0], (list, tuple, range, np.ndarray)):
                 if xdata is not None:
                     xd = xdata[i]
-                    lines = [ax.plot(xx, yy, lw=2.5, **lp_kwargs)[0]
+                    lines = [ax.plot(xx, yy, **lp_kwargs)[0]
                              for xx, yy in zip(xd, yd)]
                 else:
-                    lines = [ax.plot(yy, lw=2.5, **lp_kwargs)[0] for yy in yd]
+                    lines = [ax.plot(yy, **lp_kwargs)[0] for yy in yd]
 
                 if labels is not None:
                     [line.set_label(lbl)
@@ -595,9 +595,9 @@ def make_line_plot(grid, ydata, xdata=None, labels=None,
                     ax.axhline(color='k', lw=1.4, ls='--', alpha=.6)
             else:
                 if xdata is not None:
-                    lines = ax.plot(xdata[i], yd, lw=2.5, **lp_kwargs)
+                    lines = ax.plot(xdata[i], yd, **lp_kwargs)
                 else:
-                    lines = ax.plot(yd, lw=2.5, **lp_kwargs)
+                    lines = ax.plot(yd, **lp_kwargs)
 
                 if labels is not None:
                     [line.set_label(labels[i]) for line in lines]

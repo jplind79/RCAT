@@ -1318,21 +1318,21 @@ class PlotConfiguration(object):
                         p = np.poly1d(z)
                         rpl.make_line_plot(
                             [lgrid[0]], ydata=p(np.arange(len(ydata))),
-                            color='k', lw=2, alpha=.6)
+                            color='k', lw=1.4, alpha=.6)
                         rpl.make_line_plot(
                             [lgrid[0]], ydata=p(np.arange(len(ydata))),
-                            lw=0, marker='o', markersize=4.5, mec=lc, mfc=lc,
-                            markevery=2, alpha=1)
+                            lw=0, marker='o', markersize=3., mec=lc, mfc=lc,
+                            markevery=4, alpha=1)
                 # Running mean
                 if self.moments_plot_conf['running mean']:
                     window = self.moments_plot_conf['running mean']
                     for ydata, lc in zip(dlist[0], self.abs_colors):
                         rmn = run_mean(ydata, window, 'same')
                         rpl.make_line_plot(
-                            [lgrid[0]], ydata=rmn, color='k', lw=2, alpha=.6)
+                            [lgrid[0]], ydata=rmn, color='k', lw=1.4, alpha=.6)
                         rpl.make_line_plot(
                             [lgrid[0]], ydata=rmn, lw=0, marker='o',
-                            markersize=4, mec=lc, mfc=lc, alpha=1)
+                            markersize=2.5, mec=lc, mfc=lc, alpha=1)
 
                 # Legend
                 leg_elements = [Line2D([0], [0], lw=3, color=c, label=l)
