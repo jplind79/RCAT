@@ -53,6 +53,10 @@ def obs_data():
             'path': '/home/rossby/imports/obs/ECMWF/ERA5/remap/EUR-11/day',
             'file pattern': 'tas_EUR-11_ECMWF-ERA5_rean_r1i1p1_ECMWF_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
         },
+        'ERA5-Land': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/1hr/tas',
+            'file pattern': 'tas_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
         'NGCD': {
             'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
             'file pattern': 'tas_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
@@ -259,6 +263,10 @@ def obs_data():
             'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'rlds_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
+        'ERA5-Land': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/day/rlds',
+            'file pattern': 'rlds_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
     },
 
     # ------------------------------------------------------------------------
@@ -267,6 +275,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
             'file pattern': 'rsds_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+        'ERA5-Land': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/day/rsds',
+            'file pattern': 'rsds_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
         'CLARA_A2': {
             'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/SW/CLARA-A2/day',  # noqa
@@ -308,6 +320,10 @@ def obs_data():
             'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'hfls_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
+        'ERA5-Land': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/1hr',
+            'file pattern': 'hfls_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
     },
 
     # ------------------------------------------------------------------------
@@ -316,6 +332,10 @@ def obs_data():
         'ERA5': {
             'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
             'file pattern': 'hfss_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        },
+        'ERA5-Land': {
+            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/1hr',
+            'file pattern': 'hfss_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
         },
     },
 

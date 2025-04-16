@@ -943,7 +943,8 @@ def map_setup(map_proj, map_extent, figsize=(12, 12), figshape=(1, 1),
         ax.add_feature(cf.BORDERS, edgecolor='#292929', linewidth=0.8)
 
         # Set the lat/lon extent of map
-        ax.set_extent(map_extent, crs=ccrs.PlateCarree())
+        if map_extent is not None:
+            ax.set_extent(map_extent, crs=ccrs.PlateCarree())
 
         if grid_lines:
             gl = ax.gridlines(
