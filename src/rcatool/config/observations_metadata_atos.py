@@ -25,8 +25,9 @@ import glob
 
 def obs_data():
     """
-    Dictionary with variables as top keys and available observations
-    directly below. For each observation data set, path and file pattern must
+    Dictionary with variables as top keys, followed by observation temporal
+    resolution (e.g. 'day', '6hr', '1hr'), and the available observations
+    nested below. For each observation data set, path and file pattern must
     be defined.
     """
 
@@ -35,215 +36,318 @@ def obs_data():
     # ------------------------------------------------------------------------
     # 2m temperature
     'tas': {
-        'EOBS': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/EOBS/day',
-            'file pattern': 'tas_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'tas_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/tas',
+                'file pattern': 'tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/tas',
+                'file pattern': 'tas_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
-        'ERA5': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/ERA5/day',
-            'file pattern': 'tas_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/tas',
+                'file pattern': 'tas_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     'tasmax': {
-        'EOBS': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/EOBS/day',
-            'file pattern': 'tasmax_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-        'ERA5': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/ERA5/day',
-            'file pattern': 'tasmax_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'tasmax_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/tasmax',
+                'file pattern': 'tasmax_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     'tasmin': {
-        'EOBS': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/EOBS/day',
-            'file pattern': 'tasmin_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'tasmin_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/tasmin',
+                'file pattern': 'tasmin_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
-        'ERA5': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/ERA5/day',
-            'file pattern': 'tasmin_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+    },
+
+    # ------------------------------------------------------------------------
+    # Surface skin temperature
+    'ts': {
+        'day': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/ts',
+                'file pattern': 'ts_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/ts',
+                'file pattern': 'ts_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Precipitation
     'pr': {
-        'EOBS': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/EOBS/day',
-            'file pattern': 'pr_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'pr_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/pr',
+                'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'MSWEP': {
+                'path': '/perm/sm0i/data/reference_data/MSWEP/day',
+                'file pattern': 'pr_MSWEP_v2_europe_0.1deg_day_YYYYMM0100-YYYYMM3100.nc', # noqa
+            },
         },
-        'ERA5': {
-            'path': '/ec/res4/scratch/sm0i/data/obs/ERA5/day',
-            'file pattern': 'pr_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-    },
-
-    # ------------------------------------------------------------------------
-    # Convective Precipitation
-    'cpr': {
-        'ERAI': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
-            'file pattern': 'cpr_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-    },
-
-    # ------------------------------------------------------------------------
-    # CAPE
-    'cape': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'cape_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        '1hr': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/1hr/pr',
+                'file pattern': 'pr_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # MSLP
     'psl': {
-        'EOBS': {
-            'path': '/home/rossby/imports/obs/EOBS/EOBS17/EUR-22/input/day',
-            'file pattern': 'psl_EUR-22_EOBS17_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-        'ERA5': {
-            'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
-            'file pattern': 'psl_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/psl',
+                'file pattern': 'psl_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Surface wind speed
     'sfcWind': {
-        'ERA5': {
-            'path': '/home/rossby/imports/obs/ECMWF/ERA5/input/day',
-            'file pattern': 'sfcWind_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'sfcWind_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
-        'EOBS25': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/EOBS/EOBS25/day',
-            'file pattern': 'sfcWind_EOBS25_ens_mean_0.1deg_reg_v25.0e_YYYYMM01-YYYYMM31.nc', # noqa
+    },
+
+    # ------------------------------------------------------------------------
+    # Near-surface relative humidity
+    'hurs': {
+        'day': {
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'hurs_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Total evaporation over land
+    'evaptl': {
+        'day': {
+            'GLEAM': {
+                'path': '/perm/sm0i/data/reference_data/GLEAM/v3.6a/europe/day/evaptl',
+                'file pattern': 'evaptl_GLEAM_v3.6a_europe_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Short-wave down-welling radiation
     'rsds': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'rsds_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'ERA5': {
+                'path': '/perm/smf/obs/ERA5/input/day',
+                'file pattern': 'rsds_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/rsds',
+                'file pattern': 'rsds_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'CLARA_A3': {
+                'path': '/perm/sm0i/data/reference_data/CLARA_A3/day/rsds',  # noqa
+                'file pattern': 'rsds_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'EOBS': {
+                'path': '/perm/sm0i/data/reference_data/EOBS/EOBS25-0e/EUR-10/input/day',
+                'file pattern': 'rsds_EUR-10_EOBS25-0e_obs_r1i1p1_ECAD_v1_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
-        'CLARA_A2': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/SW/CLARA-A2/day',  # noqa
-            'file pattern': 'rsds_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/rsds',
+                'file pattern': 'rsds_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Long-wave down-welling radiation
+    'rlds': {
+        'day': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/rlds',
+                'file pattern': 'rlds_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/rlds',
+                'file pattern': 'rlds_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Short-wave surface net radiation
     'rsns': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
-            'file pattern': 'rsns_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/rsns',
+                'file pattern': 'rsns_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/rsns',
+                'file pattern': 'rsns_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/rsns',
+                'file pattern': 'rsns_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
+    # ------------------------------------------------------------------------
+    # Long-wave surface net radiation
+    'rlns': {
+        'day': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/rlns',
+                'file pattern': 'rlns_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/rlns',
+                'file pattern': 'rlns_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/rlns',
+                'file pattern': 'rlns_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+    },
 
     # ------------------------------------------------------------------------
     # Surface upward latent heat fluxes
     'hfls': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
-            'file pattern': 'hfls_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/hfls',
+                'file pattern': 'hfls_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/hfls',
+                'file pattern': 'hfls_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/hfls',
+                'file pattern': 'hfls_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Surface upward sensible heat fluxes
     'hfss': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/1h',
-            'file pattern': 'hfss_1H_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day/hfss',
+                'file pattern': 'hfss_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/day/hfss',
+                'file pattern': 'hfss_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+        '1hr': {
+            'ERA5-Land': {
+                'path': '/perm/sm0i/data/reference_data/ERA5-Land/1hr/hfss',
+                'file pattern': 'hfss_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Total Cloud Cover
     'clt': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'clt_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-        'CLARA_A2': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
-            'file pattern': 'clt_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'ERA5': {
+                'path': '/perm/sm0i/data/reference_data/ERA5/day',
+                'file pattern': 'clt_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'CLARA_A3': {
+                'path': '/perm/sm0i/data/reference_data/CLARA_A3/day/clt',  # noqa
+                'file pattern': 'clt_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Low-level Cloud Cover
     'cll': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'cll_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-        'CLARA_A2': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
-            'file pattern': 'cll_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'CLARA_A3': {
+                'path': '/perm/sm0i/data/reference_data/CLARA_A3/day/cll',  # noqa
+                'file pattern': 'cll_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # Middle-level Cloud Cover
     'clm': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'clm_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-        'CLARA_A2': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
-            'file pattern': 'clm_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'CLARA_A3': {
+                'path': '/perm/sm0i/data/reference_data/CLARA_A3/day/clm',  # noqa
+                'file pattern': 'clm_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
     # ------------------------------------------------------------------------
     # High-level Cloud Cover
     'clh': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'clh_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-        'CLARA_A2': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/CM_SAF/CLOUD/CLARA-A2/day',  # noqa
-            'file pattern': 'clh_CMSAF_CLARA-A2_day_YYYYMM01-YYYYMM31.nc', # noqa
+        'day': {
+            'CLARA_A3': {
+                'path': '/perm/sm0i/data/reference_data/CLARA_A3/day/clh',  # noqa
+                'file pattern': 'clh_CMSAF_CLARA-A3_day_YYYYMM01-YYYYMM31.nc', # noqa
+            },
         },
     },
 
-
-    # ------------------------------------------------------------------------
-    # Total column water vapor
-    'prw': {
-        'ERA5': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
-            'file pattern': 'prw_day_ECMWF-ERA5_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-    },
-
-    # ------------------------------------------------------------------------
-    # Temperature 850hPa
-    'ta850': {
-        'ERAI': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
-            'file pattern': 'ta850_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-    },
-
-    # ------------------------------------------------------------------------
-    # Specific humidity 850hPa
-    'hus850': {
-        'ERAI': {
-            'path': '/nobackup/rossby26/users/sm_petli/data/ERAI/VALIDATION/EUR/day',
-            'file pattern': 'hus850_day_ECMWF-ERAINT_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
-        },
-    },
 
     # ------------------------ END OF OBSERVATION LIST -----------------------
     }
@@ -251,7 +355,7 @@ def obs_data():
     return meta_dict
 
 
-def get_file_list(var, obsname, start_date, end_date):
+def get_file_list(var, obsname, obsfreq, start_date, end_date):
     """
     Get a list of data set files that covers the time period defined by
     start_date and end_date provided in the function call.
@@ -262,6 +366,8 @@ def get_file_list(var, obsname, start_date, end_date):
         Input variable, e.g. 'tas'
     obsname: str
         Name of dataset to use, e.g. 'EOBS'
+    obsfreq: str
+        Temporal resolution of dataset to use, e.g. 'day' or '1hr'
     start_date: str
         Start date of time period, format YYYYMM
     end_date: str
@@ -273,7 +379,17 @@ def get_file_list(var, obsname, start_date, end_date):
         List of obs data files
     """
     meta_data = obs_data()
-    data_dict = meta_data[var][obsname]
+
+    data_dict = meta_data.get(var, {}).get(obsfreq, {}).get(obsname)
+
+    # Check if data configuration exists
+    if data_dict is None:
+        errmsg = f"""\n\t\t** Error **
+                 Could not find observation data for:
+                 \tobs: {obsname}, var: {var}, freq: {obsfreq}.
+
+                 Please Check settings in the obs meta data file\n"""
+        raise ValueError(errmsg)
 
     file_pattern = data_dict['file pattern']
     sidx = file_pattern.find('YYYYMM')
@@ -282,7 +398,7 @@ def get_file_list(var, obsname, start_date, end_date):
     obs_path_list = glob.glob(os.path.join(data_dict['path'],
                                            file_pattern[:sidx] + '*.nc'))
     obs_path_list.sort()
-    obs_file_list = [l.split('/')[-1] for l in obs_path_list]
+    obs_file_list = [ln.split('/')[-1] for ln in obs_path_list]
     obs_dates = ['{}-{}'.format(f[sidx:sidx+6], f[eidx:eidx+6])
                  for f in obs_file_list]
     idx_start = [d.split('-')[0] <= start_date <= d.split('-')[1]
