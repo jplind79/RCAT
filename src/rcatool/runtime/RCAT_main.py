@@ -341,7 +341,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     return model_data
 
 
-def get_obs_data(metadata_file, obs, var, factor, offset, time_dict):
+def get_obs_data(metadata_file, obs, var, tres, factor, offset, time_dict):
     """Open observation data"""
 
     from importlib.machinery import SourceFileLoader
@@ -364,7 +364,7 @@ def get_obs_data(metadata_file, obs, var, factor, offset, time_dict):
     print("\t-- Opening {} files\n".format(obs.upper()))
 
     # Open obs files
-    obs_flist = obs_meta.get_file_list(var, obs, start_date, end_date)
+    obs_flist = obs_meta.get_file_list(var, obs, tres, start_date, end_date)
 
     emsg = ("Could not find any {} files at specified location"
             "\n\nexiting ...".format(obs.upper()))
@@ -1333,6 +1333,9 @@ for var in cdict['variables']:
     obs_metadata_file = cdict['obs metadata file']
     obs_names = cdict['variables'][var]['obs']
     obs_list = [obs_names] if not isinstance(obs_names, list) else obs_names
+    obs_tres = cdict['variables'][var]['obs freq']
+    obs_tres = ([obs_tres]*len(obs_list)
+                         if not isinstance(obs_tres, list) else obs_tres)
     obs_scale_factors = var_conf['obs scale factor']
     obs_scale_factors = ([obs_scale_factors]*len(obs_list)
                          if not isinstance(obs_scale_factors, list) else
@@ -1342,10 +1345,10 @@ for var in cdict['variables']:
                           if not isinstance(obs_offset_factors, list) else
                           obs_offset_factors)
     if obs_names is not None:
-        for obsname, scf, ofs\
-                in zip(obs_list, obs_scale_factors, obs_offset_factors):
+        for obsname, tr, scf, ofs\
+                in zip(obs_list, obs_tres, obs_scale_factors, obs_offset_factors):
             obs_data = get_obs_data(
-                obs_metadata_file, obsname, var, scf, ofs,
+                obs_metadata_file, obsname, var, tr, scf, ofs,
                 cdict['obs time dict'])
             data_dict[var][obsname] = obs_data
 
