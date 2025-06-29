@@ -577,7 +577,8 @@ if __name__ == "__main__":
         assert area is not None, errmsg
 
         mproj = args.proj
-        plot_polygon(area, args.resolution, mproj, args.save, args.figpath)
+        # plot_polygon(area, args.resolution, mproj, args.save, args.figpath)
+        plot_polygon(area, args.save, args.figpath)
     elif args.purpose == 'printareas':
         polygons(poly_print=True)
     else:

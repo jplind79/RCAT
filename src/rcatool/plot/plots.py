@@ -1234,20 +1234,23 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
     for i, ax, ft in zip(range(nplots), cbaxs, fmt):
         try:
             lvls = cs[i].levels
-            # lvls = [round(i, 2) for i in lvls]
         except AttributeError:
             lvls = cs[i].norm.boundaries
-            # lvls = [round(i, 2) for i in lvls]
+
+        if 'ticks' not in cbar_kwargs:
+            # ticks = np.linspace(lvls[0], lvls[-1], len(lvls))
+            ticks = lvls
+        else:
+            ticks = cbar_kwargs['ticks']
 
         # Set format of tick labels
         tlbls = [ft.format(i) for i in lvls]
 
-        if 'ticks' not in cbar_kwargs:
-            ticks = np.linspace(lvls[0], lvls[-1], len(lvls))
-        else:
-            ticks = cbar_kwargs['ticks']
+        # Add colorbar
         cb = ax.cax.colorbar(cs[i],
                              spacing='uniform', **cbar_kwargs)
+
+        # Colorbar ticks and tick labels
         if ax.cax.orientation in ['right', 'left']:
             ax.cax.set_yticks(ticks[::labelspacing])
             ax.cax.set_yticklabels(tlbls[::labelspacing])
@@ -1257,6 +1260,7 @@ def image_colorbar(cs, cbaxs, title=None, labelspacing=1,
 
         ax.cax.tick_params(labelsize=labelsize, length=0)
 
+        # Colorbar title
         if title is not None:
             axis = ax.cax.axis[ax.cax.orientation]
             axis.label.set_text(cb_title[i])
