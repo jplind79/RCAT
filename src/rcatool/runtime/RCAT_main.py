@@ -128,7 +128,7 @@ def get_variable_config(var_config):
     return vardict
 
 
-def variabel_modification(dd, nv_dd, funargs, new_variable, mlist, olist):
+def variable_modification(dd, nv_dd, funargs, new_variable, mlist, olist):
     """
     Create new or modify existing variables.
     """
@@ -1394,7 +1394,7 @@ if cdict['var modification'] is not None:
     for new_var, nv_dict in cdict['var modification'].items():
         arglist = list(nv_dict['input'].keys())
         inargs = ",".join(arglist)
-        data_dict[new_var] = variabel_modification(
+        data_dict[new_var] = variable_modification(
             data_dict, nv_dict, inargs, new_var, mod_names, obs_list)
 
         # Change parameters and dictionaries accordingly
