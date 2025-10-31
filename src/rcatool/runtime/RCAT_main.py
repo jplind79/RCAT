@@ -245,7 +245,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     # -- Opening files (possibly with de-accumulation preprocessing)
     if deacc:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='h5netcdf',  # engine='netcdf4',
+            flist, parallel=True, engine='netcdf4',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time'))).drop_duplicates(
@@ -259,7 +259,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
             np.timedelta64(dt.timedelta(seconds=np.round(nsec/2)))
     else:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='h5netcdf',  # engine='netcdf4',
+            flist, parallel=True, engine='netcdf4',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y}).drop_duplicates(
                 dim='time', keep='last')
@@ -384,8 +384,7 @@ def get_obs_data(metadata_file, obs, var, tres, factor, offset, time_dict):
 
     f_obs = xa.open_mfdataset(
         flist, parallel=True, data_vars='minimal', coords='minimal',
-        combine='by_coords', engine='h5netcdf').unify_chunks()
-    # f_obs = f_obs.chunk({'time': 300}).unify_chunks()
+        combine='by_coords', engine='netcdf4').unify_chunks()
 
     # EDIT 2025-02-05:
     # Recent occurrences of issues with netcdf writing seem to be related
@@ -952,6 +951,61 @@ def _coords_in_ascending_order(ds, xd, xc, yd, yc):
     return ds
 
 
+def clean_attrs_for_netcdf(ds, mode="replace", verbose=False):
+    """
+    Detect and fix attribute encoding issues in an xarray.Dataset
+    before writing to NetCDF.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset
+        Dataset to clean.
+    mode : {"replace", "remove"}
+        - "replace": replace invalid characters with "�" (default)
+        - "remove": remove invalid characters entirely
+    verbose : bool
+        If True, print info about attributes that were modified.
+
+    Returns
+    -------
+    cleaned_ds : xarray.Dataset
+        A copy of the dataset with cleaned attributes.
+    """
+    import copy
+    cleaned = ds.copy(deep=True)
+    n_fixes = 0
+
+    def clean_string(s):
+        nonlocal n_fixes
+        if not isinstance(s, str):
+            return s
+        try:
+            s.encode("utf-8")
+            return s
+        except UnicodeEncodeError:
+            n_fixes += 1
+            if verbose:
+                print(f"Non-UTF8 characters fixed in: '{s[:60]}'...")
+            if mode == "replace":
+                return s.encode("utf-8", errors="replace").decode("utf-8")
+            elif mode == "remove":
+                return s.encode("ascii", errors="ignore").decode("ascii")
+            else:
+                raise ValueError("mode must be 'replace' or 'remove'")
+
+    # Clean global attributes
+    cleaned.attrs = {k: clean_string(v) for k, v in cleaned.attrs.items()}
+
+    # Clean variable attributes
+    for var in cleaned.variables:
+        cleaned[var].attrs = {k: clean_string(v) for k, v in cleaned[var].attrs.items()}
+
+    if verbose:
+        print(f"Done! {n_fixes} attribute(s) cleaned.")
+
+    return cleaned
+
+
 def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
                  tres, thr='', regs=None, fulldomain=True):
     """Saving data to netcdf files"""
@@ -978,6 +1032,7 @@ def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
                 f"{time_suffix.replace('_', ' ')}"
             fname = '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
                 label, stat_fn, var, thr, tres, tstat, rn, grid, time_suffix)
+            data['regions'][r] = clean_attrs_for_netcdf(data['regions'][r])
             data['regions'][r].to_netcdf(os.path.join(odir, stat_name, fname),
                                          engine='netcdf4')
         if fulldomain:
@@ -985,6 +1040,7 @@ def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
                 label, stat_fn, var, thr, tres, tstat, grid, time_suffix)
             data['domain'].attrs['Analysed time'] =\
                 f"{time_suffix.replace('_', ' ')}"
+            data['domain'] = clean_attrs_for_netcdf(data['domain'])
             data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
                                      engine='netcdf4')
     else:
@@ -992,6 +1048,7 @@ def save_to_disk(data, label, stat, odir, var, grid, time_suffix, stat_dict,
             label, stat_fn, var, thr, tres, tstat, grid, time_suffix)
         data['domain'].attrs['Analysed time'] =\
             f"{time_suffix.replace('_', ' ')}"
+        data['domain'] = clean_attrs_for_netcdf(data['domain'])
         data['domain'].to_netcdf(os.path.join(odir, stat_name, fname),
                                  engine='netcdf4')
 
