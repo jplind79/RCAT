@@ -94,7 +94,7 @@ def asop(data, keepdims=False, axis=0, bins=None, thr=None, return_bins=False):
                                   else 0 for k, arr in binned_dict.items()])
             frequency = ocurrence/np.nansum(ocurrence)
 
-            # Relative contribution per bin to the total mean
+            # Actual contribution per bin to the total mean
             C = frequency*means
 
             # Contribution per bin independent of the total mean
