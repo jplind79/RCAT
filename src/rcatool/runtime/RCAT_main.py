@@ -245,7 +245,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     # -- Opening files (possibly with de-accumulation preprocessing)
     if deacc:
         _mdata = xa.open_mfdataset(
-            flist, parallel=True, engine='h5netcdf',  # engine='netcdf4',
+            flist, parallel=True, engine='h5netcdf',
             data_vars='minimal', coords='minimal', combine='by_coords',
             chunks={**ch_t, **ch_x, **ch_y},
             preprocess=(lambda arr: arr.diff('time'))).drop_duplicates(
@@ -341,7 +341,7 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     return model_data
 
 
-def get_obs_data(metadata_file, obs, var, tres, factor, offset, time_dict):
+def get_obs_data(metadata_file, obs, var, varnames, tres, factor, offset, time_dict):
     """Open observation data"""
 
     from importlib.machinery import SourceFileLoader
@@ -385,7 +385,6 @@ def get_obs_data(metadata_file, obs, var, tres, factor, offset, time_dict):
     f_obs = xa.open_mfdataset(
         flist, parallel=True, data_vars='minimal', coords='minimal',
         combine='by_coords', engine='h5netcdf').unify_chunks()
-    # f_obs = f_obs.chunk({'time': 300}).unify_chunks()
 
     # EDIT 2025-02-05:
     # Recent occurrences of issues with netcdf writing seem to be related
@@ -401,6 +400,14 @@ def get_obs_data(metadata_file, obs, var, tres, factor, offset, time_dict):
                                 (f_obs.time.dt.year <= end_year) &
                                 (np.isin(f_obs.time.dt.month, months))),
                                drop=True)
+
+    # Rename variable if not consistent with name in configuration file
+    if varnames is not None:
+        if 'all' in varnames:
+            obs_data = obs_data.rename({varnames['all']['vname']: var})
+        elif obs in varnames:
+            obs_data = obs_data.rename({varnames[obs]['vname']: var})
+
     # Scale data
     if factor is not None:
         obs_data[var] *= factor
@@ -1348,7 +1355,7 @@ for var in cdict['variables']:
         for obsname, tr, scf, ofs\
                 in zip(obs_list, obs_tres, obs_scale_factors, obs_offset_factors):
             obs_data = get_obs_data(
-                obs_metadata_file, obsname, var, tr, scf, ofs,
+                obs_metadata_file, obsname, var, var_conf['var names'], tr, scf, ofs,
                 cdict['obs time dict'])
             data_dict[var][obsname] = obs_data
 

@@ -55,7 +55,11 @@ def obs_data():
             },
             'NGCD': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
-                'file pattern': 'tas_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
+                'file pattern': 'tas_NGCD_type2_day_YYYYMMDD-YYYYMMDD.nc', # noqa
+            },
+            'GRIDCLIM': {
+                'path': '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/day/tas',
+                'file pattern': 'tas_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_day_YYYYMMDD-YYYYMMDD.nc', # noqa
             },
         },
         '1hr': {
@@ -86,7 +90,12 @@ def obs_data():
             },
             'NGCD': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
-                'file pattern': 'tasmax_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
+                'file pattern': 'tasmax_NGCD_type2_day_YYYYMMDD-YYYYMMDD.nc', # noqa
+            },
+            'GRIDCLIM': {
+                'path':
+                '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/day/tasmax',
+                'file pattern': 'tasmax_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_day_YYYYMMDD-YYYYMMDD.nc', # noqa
             },
         },
     },
@@ -107,7 +116,12 @@ def obs_data():
             },
             'NGCD': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
-                'file pattern': 'tasmin_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
+                'file pattern': 'tasmin_NGCD_type2_day_YYYYMMDD-YYYYMMDD.nc', # noqa
+            },
+            'GRIDCLIM': {
+                'path':
+                '/nobackup/smhid17/proj/sik/SMHIGridClim/v1.0/netcdf/day/tasmin',
+                'file pattern': 'tasmin_NORDIC-3_SMHI-UERRA-Harmonie_RegRean_v1_Gridpp_v1.0_day_YYYYMMDD-YYYYMMDD.nc', # noqa
             },
         },
     },
@@ -132,7 +146,7 @@ def obs_data():
             },
             'NGCD': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/NGCD',
-                'file pattern': 'pr_NGCD_type2_YYYYMMDD-YYYYMMDD.nc', # noqa
+                'file pattern': 'pr_NGCD_type2_day_YYYYMMDD-YYYYMMDD.nc', # noqa
             },
             'Spain02': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/Spain02/day',
@@ -354,6 +368,16 @@ def obs_data():
     # ------------------------------------------------------------------------
     # Surface upward latent heat fluxes
     'hfls': {
+        'mon': {
+            'FlxCmRS': {
+                'path': '/nobackup/rossby26/users/sm_petli/data/FluxCom/europe/RS/ensemble/4320_2160/monthly',
+                'file pattern': 'hfls_RS.EBC-ALL.MLM-ALL.METEO-NONE.4320_2160.EUR.monthly_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'FlxCmRSMET': {
+                'path': '/nobackup/rossby26/users/sm_petli/data/FluxCom/europe/RS/ensemble/4320_2160/monthly',
+                'file pattern': 'hfls_RS.EBC-ALL.MLM-ALL.METEO-ALL.4320_2160.EUR.monthly_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
         'day': {
             'ERA5': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
@@ -362,6 +386,10 @@ def obs_data():
             'ERA5-Land': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/day/hfls',
                 'file pattern': 'hfls_day_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'GLEAM': {
+                'path': '/nobackup/rossby27/users/sm_fuxwa/GLEAM/data/v3.6a/daily_cmorized',
+                'file pattern': 'hfls_GLEAM_v3.6a_YYYYMM01-YYYYMM31.nc', # noqa
             },
         },
         '1hr': {
@@ -379,6 +407,16 @@ def obs_data():
     # ------------------------------------------------------------------------
     # Surface upward sensible heat fluxes
     'hfss': {
+        'mon': {
+            'FlxCmRS': {
+                'path': '/nobackup/rossby26/users/sm_petli/data/FluxCom/europe/RS/ensemble/4320_2160/monthly',
+                'file pattern': 'hfss_RS.EBC-ALL.MLM-ALL.METEO-NONE.4320_2160.EUR.monthly_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+            'FlxCmRSMET': {
+                'path': '/nobackup/rossby26/users/sm_petli/data/FluxCom/europe/RS/ensemble/4320_2160/monthly',
+                'file pattern': 'hfss_RS.EBC-ALL.MLM-ALL.METEO-ALL.4320_2160.EUR.monthly_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
         'day': {
             'ERA5': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/VALIDATION/EUR/day',
@@ -397,6 +435,21 @@ def obs_data():
             'ERA5-Land': {
                 'path': '/nobackup/rossby26/users/sm_petli/data/ERA5/ERA5-Land/nc/1hr/hfss',
                 'file pattern': 'hfss_1hr_ECMWF-ERA5-Land_rean_r1i1p1_YYYYMM01-YYYYMM31.nc', # noqa
+            },
+        },
+    },
+
+    # ------------------------------------------------------------------------
+    # Soil moisture top layers (~4cm)
+    'mrsol': {
+        'day': {
+            'ESACCI': {
+                'path': '/nobackup/rossby26/users/sm_petli/data/ESACCI/mrsol/europe',
+                'file pattern': 'mrsol_ESACCI-SOILMOISTURE-L3S-SSMV-COMBINED-EUROPE-YYYYMMDD-YYYYMMDD.nc', # noqa
+            },
+            'GLEAM': {
+                'path': '/nobackup/rossby27/users/sm_fuxwa/GLEAM/data/v3.6a/daily_cmorized',
+                'file pattern': 'mrsol_GLEAM_v3.6a_YYYYMM01-YYYYMM31.nc', # noqa
             },
         },
     },
