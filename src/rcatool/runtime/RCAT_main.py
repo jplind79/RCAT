@@ -217,8 +217,12 @@ def get_mod_data(model, mconf, tres, var, varnames, factor, offset, deacc):
     else:
         readvar = var
 
+    # Add model version if necessary
+    mod_vers = mconf['version']
+    mod_vers = f'{mod_vers}/' if mod_vers is not None else ''
+
     file_path = os.path.join(mconf['fpath'],
-                             f'{tres}/{readvar}/{readvar}_*.nc')
+                             f'{tres}/{mod_vers}{readvar}/{readvar}_*.nc')
     _flist = glob.glob(file_path)
 
     errmsg = (f"Could not find any files at specified location:\n{file_path}")
@@ -1236,7 +1240,7 @@ img_outdir = os.path.join(cdict['outdir'], 'imgs')
 if os.path.exists(cdict['outdir']):
     msg = ("\nOutput folder\n\n{}\n\nalready exists!\nDo you want "
            "to overwrite? y/n: ".format(cdict['outdir']))
-    overwrite = input(msg)
+    overwrite = "y"
     if overwrite == 'y':
         [os.makedirs(os.path.join(stat_outdir, t), exist_ok=True)
          for t in stat_names]
