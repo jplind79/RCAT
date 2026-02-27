@@ -128,7 +128,7 @@ def get_variable_config(var_config):
     return vardict
 
 
-def variabel_modification(dd, nv_dd, funargs, new_variable, mlist, olist):
+def variable_modification(dd, nv_dd, funargs, new_variable, mlist, olist):
     """
     Create new or modify existing variables.
     """
@@ -1205,11 +1205,11 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
     # Settings and meta data
     vconf = get_variable_config(cdict['variables'][var])
     grdnme = grid_coords['target grid'][var]['gridname']
-    st = stat.replace(' ', '_')
+    st_name = stat.replace(' ', '_')
     if stat == 'diurnal cycle':
-        stnm = "{}_{}".format(st, cdict['stats_conf'][stat]['dcycle stat'])
+        stnm = "{}_{}".format(st_name, cdict['stats_conf'][stat]['dcycle stat'])
     else:
-        stnm = st
+        stnm = st_name
     if stat in ('annual cycle', 'seasonal cycle', 'diurnal cycle'):
         tstat = '_' + cdict['stats_conf'][stat]['stat method'].replace(
             ' ', '')
@@ -1225,7 +1225,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
 
     # Create dictionaries with list of files for models and obs
     _fm_list = {stat: [glob.glob(os.path.join(
-        stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
+        stat_outdir, f'{st_name}', '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
             m, stnm, var, thrstr, tres[m], tstat, grdnme, tsuffix_dict[m])))
         for m in models]}
     fm_list = {s: [y for x in ll for y in x] for s, ll in _fm_list.items()}
@@ -1233,7 +1233,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
     obs_list = [obs] if not isinstance(obs, list) else obs
     if obs is not None:
         _fo_list = {stat: [glob.glob(os.path.join(
-            stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
+            stat_outdir, f'{st_name}', '{}_{}_{}_{}{}{}_{}_{}.nc'.format(
                 o, stnm, var, thrstr, tres[o], tstat, grdnme,
                 tsuffix_dict[o]))) for o in obs_list]}
         fo_list = {s: [y for x in ll for y in x] for s, ll in _fo_list.items()}
@@ -1263,14 +1263,14 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
         'line kwargs': cdict['line kwargs'],
         'regions': cdict['regions'],
         'time suffix dict': tsuffix_dict,
-        'img dir': os.path.join(img_outdir, st)
+        'img dir': os.path.join(img_outdir, st_name)
     }
 
     # If there are regions, create list of files for these as well
     # Then also update plot dictionary
     if cdict['regions'] is not None:
         _fm_listr = {stat: {r:  [glob.glob(os.path.join(
-            stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
+            stat_outdir, f'{st_name}', '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
                 m, stnm, var, thrstr, tres[m], tstat, r.replace(' ', '_'),
                 grdnme, tsuffix_dict[m])))
             for m in models] for r in cdict['regions']}}
@@ -1278,7 +1278,7 @@ def get_plot_dict(cdict, var, grid_coords, models, obs, tsuffix_dict, tres,
                         for r in _fm_listr[s]} for s in _fm_listr}
         if obs is not None:
             _fo_listr = {stat: {r: [glob.glob(os.path.join(
-                stat_outdir, f'{st}', '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
+                stat_outdir, f'{st_name}', '{}_{}_{}_{}{}{}_{}_{}_{}.nc'.format(
                     o, stnm, var, thrstr, tres[o], tstat, r.replace(' ', '_'),
                     grdnme, tsuffix_dict[o]))) for o in obs_list]
                 for r in cdict['regions']}}
@@ -1459,7 +1459,7 @@ if cdict['var modification'] is not None:
     for new_var, nv_dict in cdict['var modification'].items():
         arglist = list(nv_dict['input'].keys())
         inargs = ",".join(arglist)
-        data_dict[new_var] = variabel_modification(
+        data_dict[new_var] = variable_modification(
             data_dict, nv_dict, inargs, new_var, mod_names, obs_list)
 
         # Change parameters and dictionaries accordingly

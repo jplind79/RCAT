@@ -35,7 +35,7 @@ class PlotConfiguration(object):
         # Reference model and the rest
         self.models = pdict['models']
         self.nmod = len(self.models)
-        self.ref_model = self. models[0]
+        self.ref_model = self.models[0]
         self.othr_mod = self.models.copy()
         self.othr_mod.remove(self.ref_model)
 
